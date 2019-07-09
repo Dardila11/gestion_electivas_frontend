@@ -1,3 +1,19 @@
 .App {
     height: 100vh;
+    
+}
+
+.topbar
+{
+    width: 100wh;
+    
+}
+
+.cajon{
+    width: 120vh;
+}
+
+.calendar{
+    width: 600px;
+    color: black;
 }

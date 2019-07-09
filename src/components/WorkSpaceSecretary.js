@@ -1,48 +1,98 @@
-import React, { Component } from 'react';
-import { ListGroup, Nav } from 'react-bootstrap';
-import { Redirect } from "react-router-dom";
-import "react-bootstrap/dist/react-bootstrap.min.js";
-import '../css/WorkSpaceSecretary.css';
-import axios from 'axios';
+import React from 'react';
+import { TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
+import classnames from 'classnames';
+import FormStarElectivesProcess from './FormStartElectivesProcess';
+import NavBar from './NavBar';
 
-class WorkSpaceSecretary extends Component {
-    constructor(props, context) {
-        super(props, context);
-        const user = JSON.parse(localStorage.getItem('user'));
-        this.state = {
-          user: user
-        };
+export default class Example extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.toggle = this.toggle.bind(this);
+    this.state = {
+      activeTab: '1'
+    };
+  }
+
+  toggle(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab
+      });
     }
-    componentWillMount() {
-        const token = JSON.parse(localStorage.getItem('token'));
-        axios.post('http://localhost:8000/api/verificate/', { "token": token })
-        .catch(error => {
-            this.setState({ user: "" });
-        });
-    }
-    
-    render() {
-        if (this.state.user) {
-            return (
-                <div className="Root__top-container">
-                    <div className="Root__nav-bar">
-                        <ListGroup activeKey="/home">
-                            <ListGroup.Item><Nav.Link href="/workspace/">Inicio</Nav.Link></ListGroup.Item>
-                            <ListGroup.Item>Salones</ListGroup.Item>
-                            <ListGroup.Item>Electivas</ListGroup.Item>
-                            <ListGroup.Item>Estudiantes</ListGroup.Item>
-                            <ListGroup.Item>Configuracion</ListGroup.Item>
-                            <ListGroup.Item><Nav.Link href="/">Salir</Nav.Link></ListGroup.Item>
-                        </ListGroup>
-                    </div>
-                    <div className="Root__main-view">
-                        {/* <Classroom /> */}
-                    </div>
-                </div>
-            )
-        }
-        return <Redirect to='/'/>;
-    }
+  }
+      render() {
+        return (
+
+          <div className="cajon">
+              <div className="topbar">
+              <NavBar/>
+              </div>
+          <Row>
+            <Col xs="6" sm="4" md="4">
+              <Nav tabs vertical pills>
+                <NavItem>
+                  <NavLink
+                    className={classnames({active: this.state.activeTab === '1'})}
+                    onClick={() => {
+                      this.toggle('1');
+                    }}
+                  >
+                    GESTIONAR SALONES
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({active: this.state.activeTab === '2'})}
+                    onClick={() => {
+                      this.toggle('2');
+                    }}
+                  >
+                   GESTIONAR ELECTIVAS
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({active: this.state.activeTab === '3'})}
+                    onClick={() => {
+                      this.toggle('3');
+                    }}
+                  >
+                   REGISTRAR ESTUDIANTES
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({active: this.state.activeTab === '4'})}
+                    onClick={() => {
+                      this.toggle('4');
+                    }}
+                  >
+                   CONFIGURACIÓN
+                  </NavLink>
+                </NavItem>
+                
+              </Nav>
+            </Col>
+            <Col xs="6" sm="6" md="6">
+              <TabContent activeTab={this.state.activeTab}>
+                <TabPane tabId="1">
+                    <div className="calendar"><FormStarElectivesProcess/></div>
+                  
+                </TabPane>
+                <TabPane tabId="2">
+                  <h4>ELECTIVAS</h4>
+                </TabPane>
+                <TabPane tabId="3">
+                  <h4>ESTUDIANTES</h4>
+                </TabPane>
+                <TabPane tabId="4">
+                  <h4>CONFIGURACIÓN</h4>
+                </TabPane>             
+              </TabContent>
+            </Col>
+          </Row>
+          </div>
+        )
+      }
 }
-
-export default WorkSpaceSecretary;  
