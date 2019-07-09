@@ -3,6 +3,9 @@ import { TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap
 import classnames from 'classnames';
 import FormStarElectivesProcess from './FormStartElectivesProcess';
 import NavBar from './NavBar';
+import { Redirect } from "react-router-dom";
+import axios from 'axios';
+
 
 export default class Example extends React.Component {
   constructor(props) {
@@ -10,8 +13,17 @@ export default class Example extends React.Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      activeTab: '1'
+      activeTab: '1',
+      isLogin: true,
     };
+  }
+
+  componentWillMount() {
+    const token = JSON.parse(localStorage.getItem('token'));
+        axios.post('http://localhost:8000/api/verificate/', { "token": token })
+        .catch(error => {
+            this.setState({ isLogin: false });
+        });
   }
 
   toggle(tab) {
@@ -22,6 +34,9 @@ export default class Example extends React.Component {
     }
   }
       render() {
+        if(!this.state.isLogin){
+          return <Redirect to='/'/>;
+        }
         return (
 
           <div className="cajon">
