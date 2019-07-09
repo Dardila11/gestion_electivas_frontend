@@ -14,14 +14,14 @@ class FormStartElectivesProcess extends Component {
         super(props,context);
         this.state = {
             semesterYear: "2019",
-            semesterTerm: "1",
+            semesterTerm: 1,
             startDate: new Date(),
             startSemesterDate: new Date(),
             endDate: new Date(),
             endSemesterDate: new Date(),
             focusedSemesterInput: "",
-            startTime: new Date().getTime(),
-            endTime: new Date().getTime(),
+            startTime: new Date(),
+            endTime: new Date(),
             focusedInput: "",
             redirect: false, 
             error: false, 
@@ -36,7 +36,6 @@ class FormStartElectivesProcess extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeStartTime = this.handleChangeStartTime.bind(this);
         this.handleChangeEndTime = this.handleChangeEndTime.bind(this);
-
     }
 
     handleChangeEndTime(time){
@@ -93,9 +92,19 @@ class FormStartElectivesProcess extends Component {
 
     newSemester(event){
 
-        const { semesterYear, semesterTerm, startDate, startSemesterDate, endDate, endSemesterDate } = this.state;
+        const { semesterYear, semesterTerm, startDate, startSemesterDate, endDate, endSemesterDate, startTime, endTime } = this.state;
         event.preventDefault();
-        axios.post('http://localhost:8000/api/semester/' , { semesterYear, semesterTerm, startDate, startSemesterDate, endDate, endSemesterDate })
+        var fechaInicio = startDate.getFullYear()+"-"+startDate.getMonth()+"-"+startDate.getDate();
+        var fechaFinal = endDate.getFullYear()+"-"+endDate.getMonth()+"-"+endDate.getDate();
+        var fechaSemestreInicio = startSemesterDate.getFullYear()+"-"+startSemesterDate.getMonth()+"-"+startSemesterDate.getDate()+"T"+startTime.getHours()+":"+ startTime.getMinutes()+":"+startTime.getSeconds();
+        var fechaSemestreFinal = endSemesterDate.getFullYear()+"-"+endSemesterDate.getMonth()+"-"+endSemesterDate.getDate()+"T"+endTime.getHours()+":"+ endTime.getMinutes()+":"+endTime.getSeconds();
+        var json = { "year": semesterYear,
+        "period": semesterTerm,
+        "from_date": fechaInicio,
+        "until_date": fechaFinal,
+        "from_date_vote": fechaSemestreInicio,
+        "until_date_vote": fechaSemestreFinal }
+        axios.post('http://localhost:8000/api/semester/' , json )
             .then(response => this.redirect(response))
             .catch(error => {
                 this.setState({ error: true})
@@ -103,11 +112,10 @@ class FormStartElectivesProcess extends Component {
 
         console.log("año semestre " + semesterYear);
         console.log("año periodo " + semesterTerm);
-        console.log("fecha inicio " + startDate.getDate()+"/"+(startDate.getMonth() + 1)+"/"+startDate.getFullYear());
-        console.log("fecha final " + endDate.getDate()+"/"+(endDate.getMonth() + 1)+"/"+endDate.getFullYear());
-        console.log("fecha inicio semestre " + startSemesterDate.getDate()+"/"+(startSemesterDate.getMonth() + 1)+"/"+startSemesterDate.getFullYear());
-        console.log("fecha final semester " + endSemesterDate.getDate()+"/"+(endSemesterDate.getMonth() + 1)+"/"+endSemesterDate.getFullYear());
-        
+        console.log("fecha inicio " + fechaInicio);        
+        console.log("fecha final " + fechaFinal);        
+        console.log("fecha Semestre inicio " + fechaSemestreInicio);        
+        console.log("fecha Semestre final " + fechaSemestreFinal);            
         
     }
 
