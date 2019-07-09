@@ -6,8 +6,8 @@ class CMaddClassroom extends Component {
     constructor(props,context){
         super(props,context);
         this.state = {
-            classRoom_id: "",
-            capacity: "",
+            classRoom_id: "101",
+            capacity: "20",
             description: "nuevo salon",
             faculty: 1
         };
@@ -30,6 +30,8 @@ class CMaddClassroom extends Component {
             .then(function(respone){
                 console.log(respone);
         });
+
+        
     }
     render(){
         return(

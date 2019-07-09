@@ -9,8 +9,8 @@ class LoginSecretary extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            username: 'anita', 
-            password: 'oracle', 
+            username: 'admin', 
+            password: 'admin', 
             redirect: false, 
             error: false, 
             show: true

@@ -13,8 +13,8 @@ class FormStartElectivesProcess extends Component {
     constructor(props,context){
         super(props,context);
         this.state = {
-            semesterYear: "2019",
-            semesterTerm: 1,
+            semesterYear: "2020",
+            semesterTerm: "2",
             startDate: new Date(),
             startSemesterDate: new Date(),
             endDate: new Date(),
@@ -36,6 +36,13 @@ class FormStartElectivesProcess extends Component {
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeStartTime = this.handleChangeStartTime.bind(this);
         this.handleChangeEndTime = this.handleChangeEndTime.bind(this);
+        this.handleChangeYear = this.handleChangeYear.bind(this);
+    }
+
+    handleChangeYear(year){
+        this.setState({
+            semesterYear: year
+        });
     }
 
     handleChangeEndTime(time){
@@ -148,9 +155,9 @@ class FormStartElectivesProcess extends Component {
                                     <option >2021</option>
                             </Form.Control>
                             <Form.Label><span className="h4">Periodo</span></Form.Label>
-                            <Form.Control as="select" value={this.state.semesterTerm} onChange={this.handleChange}>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
+                            <Form.Control as="select">
+                                <option >1</option>
+                                <option >2</option>
                             </Form.Control>
                         </div>
 
