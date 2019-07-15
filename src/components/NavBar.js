@@ -1,8 +1,9 @@
-import { Navbar, Nav,Button,Form,FormControl } from 'react-bootstrap';
-import React from 'react';
-import buscar from '../img/buscar.svg';
+import React, { Component } from 'react';
 import { Redirect } from "react-router-dom";
-class NavBar extends React.Component {
+
+import {Image, InputGroup, Button, Nav, Navbar, Form, FormControl, Container} from 'react-bootstrap';
+
+export default class NavBar extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
@@ -14,6 +15,7 @@ class NavBar extends React.Component {
   logout(event){
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    console.log('saliendo');
     this.setState({ redirect: true });
   }
 
@@ -27,32 +29,23 @@ class NavBar extends React.Component {
     console.log(this.state.redirect)
   }
 
-    render() {
-      if (this.state.redirect) {
-        return <Redirect to='/'/>;
-      }
-      return (
-        <>
-        <Navbar className="navbar" bg="dark" variant="dark">
-          <Navbar.Brand href="#home">Gestión Electivas</Navbar.Brand>
-          <Nav className="mr-auto">
-            
-          </Nav>
-          <Form inline>
-            <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-            <Button variant="outline-info"><img src={buscar} alt="buscar" /></Button>
-            
-            
-          </Form>
-          <Button className = "ml-2" variant="danger" onClick={this.logout}>Cerrar Sesión</Button>
-        </Navbar>
-        <br />    
-      </>
-      );
+  render() {
+    if (this.state.redirect) {
+      return <Redirect to='/'/>;
     }
+    return (
+      <Navbar>
+        <Navbar.Brand>
+            <InputGroup.Checkbox name="boton-show" id="boton-show"/>
+            <Form.Label className="mouse d-inline mr-2" htmlFor="boton-show"><Image src="../img/menu.png" alt=""/></Form.Label>
+            <p className="d-inline m-0">SGE</p>
+        </Navbar.Brand>
+        <Form inline>
+          <FormControl className="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search"/>
+          <Button className="btn btn-success my-2 my-sm-0" type="submit">Buscar</Button>
+          <Button className="btn btn-danger my-2 my-sm-0 ml-1" type="button" onClick={ this.logout }>Cerrar</Button>
+        </Form>
+      </Navbar>
+    );
   }
-
-
-
-
-export default NavBar;
+}
