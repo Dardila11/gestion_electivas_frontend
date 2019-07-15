@@ -22,6 +22,7 @@ class LoginSecretary extends Component {
     }
 
     handleChange(event) {
+        console.log('event');
         this.setState({ [event.target.name]: event.target.value });
     }
 

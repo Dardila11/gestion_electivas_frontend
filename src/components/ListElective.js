@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Redirect } from "react-router-dom";
-import {Image, InputGroup, Button, Form, FormControl, Container, Table} from 'react-bootstrap';
-import axios from 'axios';
+import {Image, Button, Table} from 'react-bootstrap';
+// import axios from 'axios';
 
 export default class ListElective extends Component {
     render() {

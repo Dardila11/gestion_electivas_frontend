@@ -1,32 +1,38 @@
 import React, { Component } from 'react';
 import { Redirect } from "react-router-dom";
 
-import {Image, InputGroup, Button, Nav, Navbar, Form, FormControl, Container} from 'react-bootstrap';
+import {Image, Button, Navbar, Form, FormControl} from 'react-bootstrap';
+
+import { show } from '../js/index';
 
 export default class NavBar extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-        redirect: false
+        redirect: false,
+        show: true,
     };
+    this.handleChange = this.handleChange.bind(this);
     this.logout = this.logout.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({show: event.target.value});
+    show();
   }
 
   logout(event){
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    console.log('saliendo');
     this.setState({ redirect: true });
   }
 
   componentWillMount() {
-    console.log('call create')
-    console.log(this.state.redirect)
+
   }
 
   componentWillUnmount() {
-    console.log('call destroy')
-    console.log(this.state.redirect)
+
   }
 
   render() {
@@ -36,7 +42,7 @@ export default class NavBar extends Component {
     return (
       <Navbar>
         <Navbar.Brand>
-            <InputGroup.Checkbox name="boton-show" id="boton-show"/>
+            <Form.Check className="ocultar" name="boton-show" id="boton-show" checked={ this.state.show } onChange={ this.handleChange }/>
             <Form.Label className="mouse d-inline mr-2" htmlFor="boton-show"><Image src="../img/menu.png" alt=""/></Form.Label>
             <p className="d-inline m-0">SGE</p>
         </Navbar.Brand>

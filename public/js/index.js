@@ -1,10 +1,11 @@
 $(document).ready(function(){
-    $("#menu").hide();
+    $("#menu").addClass("ocultar");
     $("#boton-show").change(function() {
-        $("#menu").show();  
-        console.log('check')    
+        $("#menu").removeClass("ocultar"); 
+        console.log('check');
     });
     $("#boton-hide").change(function() {
-        $("#menu").hide();
+        $("#menu").addClass("ocultar");
+        console.log('check');
     });
 });

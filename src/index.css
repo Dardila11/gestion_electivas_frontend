@@ -31,3 +31,7 @@ body {
 .beige {
   background-color: beige;
 }
+
+.ocultar {
+  display: none;
+}
