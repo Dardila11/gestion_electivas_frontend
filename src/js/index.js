@@ -5,5 +5,6 @@ export function show() {
 }
 
 export function hide() {
+    console.log('oculto');
     $("#menu").addClass("ocultar"); 
 }

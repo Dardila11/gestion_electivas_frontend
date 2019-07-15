@@ -6,7 +6,6 @@ import '../css/DashboardSecretary.css';
 import NavBar from './NavBar';
 import Nav from './Nav';
 
-
 export default class DashboardSecretary extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +14,7 @@ export default class DashboardSecretary extends Component {
     };
   }
 
-  componentWillMount() {
+  componentWillMount() {    
     const token = JSON.parse(localStorage.getItem('token'));
     axios.post('http://localhost:8000/api/verificate/', { "token": token })
     .catch(error => {

@@ -23,7 +23,7 @@ export default class NavBar extends Component {
     render() {
         return (
             <Tab.Container defaultActiveKey="2">
-                <Nav className="flex-column" id="menu">
+                <Nav className="flex-column ocultar" id="menu">
                     <div className="p-3 bb-1">
                         <Form.Check className="ocultar" name="boton-hide" id="boton-hide" checked={ this.state.show } onChange={ this.handleChange }/>
                         <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt=""/></Form.Label>
