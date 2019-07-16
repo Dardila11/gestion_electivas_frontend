@@ -17,8 +17,10 @@ export default class NavBar extends Component {
   }
 
   handleChange(event) {
-    this.setState({show: event.target.value});
-    show();
+    this.setState({ [event.target.name]: [event.target.value]})
+    if (event.target.name === "show") {
+      show();
+    }
   }
 
   logout(event){
@@ -42,14 +44,14 @@ export default class NavBar extends Component {
     return (
       <Navbar>
         <Navbar.Brand>
-            <Form.Check className="ocultar" name="boton-show" id="boton-show" checked={ this.state.show } onChange={ this.handleChange }/>
+            <Form.Check className="ocultar" name="show" id="boton-show" checked={ this.state.show } onChange={ this.handleChange }/>
             <Form.Label className="mouse d-inline mr-2" htmlFor="boton-show"><Image src="../img/menu.png" alt=""/></Form.Label>
             <p className="d-inline m-0">SGE</p>
         </Navbar.Brand>
         <Form inline>
           <FormControl className="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search"/>
           <Button className="btn btn-success my-2 my-sm-0" type="submit">Buscar</Button>
-          <Button className="btn btn-danger my-2 my-sm-0 ml-1" type="button" onClick={ this.logout }>Cerrar</Button>
+          <Button className="btn btn-danger my-2 my-sm-0 ml-1" type="button" onClick={ this.logout }>Salir</Button>
         </Form>
       </Navbar>
     );

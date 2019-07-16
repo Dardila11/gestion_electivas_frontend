@@ -16,16 +16,19 @@ export default class NavBar extends Component {
     }
 
     handleChange(event) {
-        this.setState({show: event.target.value});
-        hide();
+        this.setState({ [event.target.name]: [event.target.value]})
+        if (event.target.name === "show") {
+            hide();
+        }
+        console.log('evento')
     }
 
     render() {
         return (
             <Tab.Container defaultActiveKey="2">
-                <Nav className="flex-column ocultar" id="menu">
+                <Nav className="flex-column ocultar transicion" id="menu">
                     <div className="p-3 bb-1">
-                        <Form.Check className="ocultar" name="boton-hide" id="boton-hide" checked={ this.state.show } onChange={ this.handleChange }/>
+                        <Form.Check className="ocultar" name="show" id="boton-hide" checked={ this.state.show } onChange={ this.handleChange }/>
                         <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt=""/></Form.Label>
                         <p className="d-inline m-0">SGE</p>
                     </div>
