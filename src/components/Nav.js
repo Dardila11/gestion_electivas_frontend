@@ -20,13 +20,16 @@ export default class NavBar extends Component {
         if (event.target.name === "show") {
             hide();
         }
-        console.log('evento')
+    }
+
+    ocultar() {
+        hide();
     }
 
     render() {
         return (
             <Tab.Container defaultActiveKey="2">
-                <Nav className="flex-column ocultar transicion" id="menu">
+                <Nav className="flex-column ocultar-l transicion" id="menu">
                     <div className="p-3 bb-1">
                         <Form.Check className="ocultar" name="show" id="boton-hide" checked={ this.state.show } onChange={ this.handleChange }/>
                         <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt=""/></Form.Label>
@@ -38,10 +41,10 @@ export default class NavBar extends Component {
                             <p className="mb-0">{ localStorage.getItem('user').replace(/['"]+/g, '') }</p>
                         </div>
                     </div>
-                    <Nav.Link eventKey="1">Inicio</Nav.Link>
-                    <Nav.Link eventKey="2">Salones</Nav.Link>
-                    <Nav.Link eventKey="3">Electivas</Nav.Link>
-                    <Nav.Link eventKey="4">Estudiantes</Nav.Link>
+                    <Nav.Link eventKey="1" onClick={ this.ocultar }>Inicio</Nav.Link>
+                    <Nav.Link eventKey="2" onClick={ this.ocultar }>Salones</Nav.Link>
+                    <Nav.Link eventKey="3" onClick={ this.ocultar }>Electivas</Nav.Link>
+                    <Nav.Link eventKey="4" onClick={ this.ocultar }>Estudiantes</Nav.Link>
                 </Nav>
                 <Tab.Content>
                     <Container className="pl-5 pr-5">

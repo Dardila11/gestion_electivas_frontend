@@ -41,25 +41,25 @@ export default class AddElective extends Component {
             <div className="container-fluid">
                 <Form onSubmit={this.newClassroom}>
                     <Row className="bb-1-g mb-3">
-                        <Col className="col-sm-3 col-xl-2">
+                        <Col className="col-sm-3 col-xl-2 col-lg-2">
                         <Form.Group>
                             <Form.Label><span className="ml-0">Código</span></Form.Label>
                             <Form.Control className="ml-0" type="text" name="classRoom_id" value={this.state.classRoom_id} onChange={this.handleChange}/>
                         </Form.Group>
                         </Col>
-                        <Col className="col-sm-3 col-xl-2">
+                        <Col className="col-sm-3 col-xl-2 col-lg-2">
                         <Form.Group>
                             <Form.Label><span className="ml-0">Nombre</span></Form.Label>
                             <Form.Control className="ml-0" type="text" name="capacity" value={this.state.capacity} onChange={this.handleChange} />
                         </Form.Group>
                         </Col>
-                        <Col className="col-sm-6 col-xl-2">
+                        <Col className="col-sm-6 col-xl-2 col-lg-2">
                         <Form.Group>
                             <Form.Label><span className="ml-0">Cupos</span></Form.Label>
                             <Form.Control className="ml-0" type="number"></Form.Control>
                         </Form.Group>
                         </Col>
-                        <Col className="col-sm-6 col-xl-2">
+                        <Col className="col-sm-6 col-xl-2 col-lg-2">
                         <Form.Group>
                             <Form.Label><span className="ml-0">Prioridad</span></Form.Label>
                             <Form.Control className="ml-0" type="number"></Form.Control>

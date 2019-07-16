@@ -1,10 +1,11 @@
 import $ from "jquery";
 
 export function show() {
-    $("#menu").removeClass("ocultar"); 
+    $("#menu").addClass("mostrar-l"); 
+    $("#menu").removeClass("ocultar-l"); 
 }
 
 export function hide() {
-    console.log('oculto');
-    $("#menu").addClass("ocultar"); 
+    $("#menu").addClass("ocultar-l"); 
+    $("#menu").removeClass("mostrar-l");  
 }

@@ -27,7 +27,7 @@ export default class ListStudent extends Component {
         <>
         <div className="title pt-4 mb-2">
         <h5 className="d-inline white">Gestionar estudiantes</h5>
-        <Button className="d-inline float-right btn btn-light mb-2 ml-2"><Image src="./img/mas.png" alt=""/></Button>
+        <Button className="d-inline float-right btn btn-light mb-2 ml-2"><Image src="./img/upload.png" alt=""/></Button>
         <Button className="d-inline float-right btn btn-light mb-2" onClick={ this.handleShow }><Image src="./img/mas.png" alt=""/></Button>
         </div>
         <Table striped bordered hover responsive="xl" size="xl">
