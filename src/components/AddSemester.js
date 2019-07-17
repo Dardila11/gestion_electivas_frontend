@@ -1,17 +1,16 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
 import DatePicker from 'react-datepicker';
-import { registerLocale} from 'react-datepicker';
-//import { Redirect } from "react-router-dom";
+import { registerLocale } from 'react-datepicker';
 import axios from 'axios';
 import "react-datepicker/dist/react-datepicker.css";
 import es from 'date-fns/locale/es';
 registerLocale('es', es);
 
 class FormStartElectivesProcess extends Component {
-    constructor(props,context){
-        super(props,context);
+    constructor(props, context) {
+        super(props, context);
         this.state = {
             semesterYear: "2020",
             semesterTerm: "2",
@@ -23,8 +22,8 @@ class FormStartElectivesProcess extends Component {
             startTime: new Date(),
             endTime: new Date(),
             focusedInput: "",
-            redirect: false, 
-            error: false, 
+            redirect: false,
+            error: false,
             show: true
         };
         this.newSemester = this.newSemester.bind(this);
@@ -39,91 +38,93 @@ class FormStartElectivesProcess extends Component {
         this.handleChangeYear = this.handleChangeYear.bind(this);
     }
 
-    handleChangeYear(year){
+    handleChangeYear(year) {
         this.setState({
             semesterYear: year
         });
     }
 
-    handleChangeEndTime(time){
+    handleChangeEndTime(time) {
         this.setState({
             endTime: time
         });
     }
 
-    handleChangeStartTime(time){
+    handleChangeStartTime(time) {
         this.setState({
             startTime: time
         });
     }
 
-    handleChange(event){
-        this.setState({ [event.target.name]: [event.target.value]})
+    handleChange(event) {
+        this.setState({ [event.target.name]: [event.target.value] })
     }
-    handleChangeSemesterStart(sDate){
+    handleChangeSemesterStart(sDate) {
         this.setState({
             startSemesterDate: sDate
-        });        
+        });
     }
-    handleChangeSemesterEnd(eDate){
+    handleChangeSemesterEnd(eDate) {
         this.setState({
             endSemesterDate: eDate
         });
         console.log(this.state.endSemesterDate);
     }
 
-    handleChangeStart(sDate){
+    handleChangeStart(sDate) {
         //this.setState({ [event.target.name]: event.target.value });
         this.setState({
             startDate: sDate
-            
+
         });
 
         console.log(this.state.startDate);
     }
 
-    handleChangeEnd(eDate){
+    handleChangeEnd(eDate) {
         //this.setState({ [event.target.name]: event.target.value });
         this.setState({
             endDate: eDate
         });
         console.log(this.state.endDate);
 
-        
+
     }
-    redirect(){
-        this.setState({redirect: true});
-        this.setState({error: false});
+    redirect() {
+        this.setState({ redirect: true });
+        this.setState({ error: false });
         console.log(this.state.error);
     }
 
-    newSemester(event){
+    newSemester(event) {
 
         const { semesterYear, semesterTerm, startDate, startSemesterDate, endDate, endSemesterDate, startTime, endTime } = this.state;
         event.preventDefault();
-        var fechaInicio = startDate.getFullYear()+"-"+startDate.getMonth()+"-"+startDate.getDate();
-        var fechaFinal = endDate.getFullYear()+"-"+endDate.getMonth()+"-"+endDate.getDate();
-        var fechaSemestreInicio = startSemesterDate.getFullYear()+"-"+startSemesterDate.getMonth()+"-"+startSemesterDate.getDate()+"T"+startTime.getHours()+":"+ startTime.getMinutes()+":"+startTime.getSeconds();
-        var fechaSemestreFinal = endSemesterDate.getFullYear()+"-"+endSemesterDate.getMonth()+"-"+endSemesterDate.getDate()+"T"+endTime.getHours()+":"+ endTime.getMinutes()+":"+endTime.getSeconds();
-        var json = { "year": semesterYear,
-        "period": semesterTerm,
-        "from_date": fechaInicio,
-        "until_date": fechaFinal,
-        "from_date_vote": fechaSemestreInicio,
-        "until_date_vote": fechaSemestreFinal }
-        axios.post('http://localhost:8000/api/semester/' , json )
+        var fechaInicio = startDate.getFullYear() + "-" + startDate.getMonth() + "-" + startDate.getDate();
+        var fechaFinal = endDate.getFullYear() + "-" + endDate.getMonth() + "-" + endDate.getDate();
+        var fechaSemestreInicio = startSemesterDate.getFullYear() + "-" + startSemesterDate.getMonth() + "-" + startSemesterDate.getDate() + "T" + startTime.getHours() + ":" + startTime.getMinutes() + ":" + startTime.getSeconds();
+        var fechaSemestreFinal = endSemesterDate.getFullYear() + "-" + endSemesterDate.getMonth() + "-" + endSemesterDate.getDate() + "T" + endTime.getHours() + ":" + endTime.getMinutes() + ":" + endTime.getSeconds();
+        var json = {
+            "year": semesterYear,
+            "period": semesterTerm,
+            "from_date": fechaInicio,
+            "until_date": fechaFinal,
+            "from_date_vote": fechaSemestreInicio,
+            "until_date_vote": fechaSemestreFinal
+        }
+        axios.post('http://localhost:8000/api/semester/', json)
             .then(response => this.redirect(response))
             .catch(error => {
-                this.setState({ error: true})
+                this.setState({ error: true })
             });
 
         console.log("año semestre " + semesterYear);
         console.log("año periodo " + semesterTerm);
-        console.log("fecha inicio " + fechaInicio);        
-        console.log("fecha final " + fechaFinal);        
-        console.log("fecha Semestre inicio " + fechaSemestreInicio);        
-        console.log("fecha Semestre final " + fechaSemestreFinal);            
-        
+        console.log("fecha inicio " + fechaInicio);
+        console.log("fecha final " + fechaFinal);
+        console.log("fecha Semestre inicio " + fechaSemestreInicio);
+        console.log("fecha Semestre final " + fechaSemestreFinal);
+
     }
 
     componentWillMount() {
@@ -134,25 +135,25 @@ class FormStartElectivesProcess extends Component {
         console.log('call destroy')
     }
 
-    render(){
-        if(this.state.redirect){
+    render() {
+        if (this.state.redirect) {
             // redireccionamos a la gestion de salones
         }
-        const handleShow = () => this.setState({ show: true });     
-        const handleDismiss = () => this.setState({ show: false });     
-        return(
+        const handleShow = () => this.setState({ show: true });
+        const handleDismiss = () => this.setState({ show: false });
+        return (
             <div className="card">
                 <div className="card-header">
                     <span className="h3 center font-weight-bold">INICIAR PROCESO DE ELECTIVAS</span>
                 </div>
-                <Form onSubmit = {this.newSemester}>
+                <Form onSubmit={this.newSemester}>
                     <div className="btn-group-vertical">
                         <Form.Label><span className="h4">Semestre</span></Form.Label>
                         <div className="align-baseline">
                             <Form.Control as="select">
-                                    <option >2019</option>
-                                    <option >2020</option>
-                                    <option >2021</option>
+                                <option >2019</option>
+                                <option >2020</option>
+                                <option >2021</option>
                             </Form.Control>
                             <Form.Label><span className="h4">Periodo</span></Form.Label>
                             <Form.Control as="select">
@@ -169,7 +170,7 @@ class FormStartElectivesProcess extends Component {
                             endDate={this.state.endDate}
                             onChange={this.handleChangeStart}
                             placeholderText="Fecha Inicio"
-                            dateFormat="dd/MM/yyyy"         
+                            dateFormat="dd/MM/yyyy"
                         />
                         <DatePicker
                             selected={this.state.endDate}
@@ -179,7 +180,7 @@ class FormStartElectivesProcess extends Component {
                             onChange={this.handleChangeEnd}
                             minDate={this.state.startDate}
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Fecha Final"             
+                            placeholderText="Fecha Final"
                         />
                         <DatePicker
                             selected={this.state.startTime}
@@ -196,8 +197,8 @@ class FormStartElectivesProcess extends Component {
                             selectsStart
                             startDate={this.state.startSemesterDate}
                             endDate={this.state.endSemesterDate}
-                            onChange={this.handleChangeSemesterStart} 
-                            placeholderText="Fecha Inicio"   
+                            onChange={this.handleChangeSemesterStart}
+                            placeholderText="Fecha Inicio"
                             dateFormat="dd/MM/yyyy"
                         />
                         <DatePicker
@@ -205,9 +206,9 @@ class FormStartElectivesProcess extends Component {
                             selectsStart
                             startDate={this.state.startSemesterDate}
                             endDate={this.state.endSemesterDate}
-                            onChange={this.handleChangeSemesterEnd} 
+                            onChange={this.handleChangeSemesterEnd}
                             dateFormat="dd/MM/yyyy"
-                            placeholderText="Fecha Final"    
+                            placeholderText="Fecha Final"
                         />
                         <DatePicker
                             selected={this.state.endTime}
@@ -218,14 +219,14 @@ class FormStartElectivesProcess extends Component {
                             dateFormat="h:mm aa"
                             timeCaption="Time"
                         />
-                        <Button className="mt-3 rounded-10"  onClick={ handleShow } variant="primary" type="submit">Iniciar Nuevo Semestre</Button>
+                        <Button className="mt-3 rounded-10" onClick={handleShow} variant="primary" type="submit">Iniciar Nuevo Semestre</Button>
 
                     </div>
                     <div className="no-login">
-                        <Alert variant="danger" show={ this.state.show && this.state.error } onClose={ handleDismiss } dismissible>
+                        <Alert variant="danger" show={this.state.show && this.state.error} onClose={handleDismiss} dismissible>
                             <p>Hubo un error al iniciar el proceso de electivas</p>
                         </Alert>
-                    </div> 
+                    </div>
                 </Form>
             </div>
         )
