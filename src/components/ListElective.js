@@ -51,7 +51,7 @@ export default class ListElective extends Component {
 						</tr>
 					</tbody>
 				</Table>
-				<Modal show={this.state.show} onHide={this.handleClose}>
+				<Modal className="modal-custom" show={this.state.show} onHide={this.handleClose}>
 					<Modal.Header closeButton>
 						<Modal.Title>Registrar electiva</Modal.Title>
 					</Modal.Header>

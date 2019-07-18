@@ -75,10 +75,11 @@ export default class ListClassroom extends Component {
 		this.loadClassrooms();
 	}
 
-	loadClassrooms() {
-		axios.post('http://localhost:8000/api/classroom/')
+	async loadClassrooms() {
+		await axios.post('http://localhost:8000/api/classroom/')
 			.then(response =>
 				this.setState({ listClassroom: response.data }))
+		console.log('load salon')
 	}
 
 	render() {

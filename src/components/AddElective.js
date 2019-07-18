@@ -23,6 +23,8 @@ export default class AddElective extends Component {
 
     newClassroom(event) {
         const { classRoom_id, capacity, description, faculty } = this.state;
+        console.log("Holaaaaaa");
+        console.log("capacidad" + capacity);
         var json = {
             "classroom_id": classRoom_id,
             "capacity": capacity,

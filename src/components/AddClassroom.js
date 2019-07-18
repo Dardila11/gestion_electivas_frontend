@@ -33,7 +33,7 @@ export default class AddClassroom extends Component {
         this.props.handleClose();
     }
 
-    addClassroom(event) {
+    async addClassroom(event) {
         event.preventDefault();
         const { codigo, capacity, description, faculty } = this.state;
         var json = {
@@ -42,10 +42,11 @@ export default class AddClassroom extends Component {
             "description": description,
             "faculty": faculty
         }
-        axios.put('http://localhost:8000/api/classroom/', json)
+        await axios.put('http://localhost:8000/api/classroom/', json)
             .then(function (response) {
                 console.log(response);
             });
+        console.log('create salon')
         this.handleClose();
     }
 
