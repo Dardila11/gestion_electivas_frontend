@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Form, Button, Table, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-import '../css/Table.css';
+import '../../css/Table.css';
 
 export default class AddElective extends Component {
     constructor(props, context) {

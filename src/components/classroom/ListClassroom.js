@@ -3,6 +3,7 @@ import { Image, Button, Table, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
 import AddClassroom from './AddClassroom';
+import EditClassroom from './EditClassroom';
 
 export default class ListClassroom extends Component {
 	constructor(props, context) {
@@ -11,6 +12,7 @@ export default class ListClassroom extends Component {
 			id: -1,
 			listClassroom: [],
 			show: false,
+			showEdit: false,
 			showAlert: false
 		};
 		this.handleClose = this.handleClose.bind(this);
@@ -24,7 +26,7 @@ export default class ListClassroom extends Component {
 	}
 
 	handleClose() {
-		this.setState({ show: false, showAlert: false });
+		this.setState({ show: false, showEdit: false, showAlert: false });
 		this.loadClassrooms();
 	}
 
@@ -33,12 +35,12 @@ export default class ListClassroom extends Component {
 	}
 
 	ver(event) {
-		console.log(event.currentTarget.value);
-		//this.props.clickHandler()
+
 	}
 
 	editar(event) {
-		console.log(event.currentTarget.value);
+		this.setState({ showEdit: true });
+		this.setState({ id: event.target.value })
 	}
 
 	eliminar(event) {
@@ -57,14 +59,14 @@ export default class ListClassroom extends Component {
 	}
 
 	createTableClassrooms() {
-		const listItems = this.state.listClassroom.map((classroom) =>
+		const listItems = this.state.listClassroom.map((classroom) =>						
 			<tr key={classroom.pk}>
 				<td>{classroom.fields.classroom_id}</td>
 				<td>{classroom.fields.capacity}</td>
 				<td>
-					<Button className="btn mr-2 beige" onClick={this.ver} value={classroom.pk}><Image src="./img/ver.png" alt="" /></Button>
-					<Button className="btn mr-2 beige" onClick={this.editar} value={classroom.pk}><Image src="./img/editar.png" alt="" /></Button>
-					<Button className="btn beige" name="eliminar" onClick={this.preguntar} value={classroom.pk}><Image src="./img/borrar.png" alt="" /></Button>
+					<Button className="btn mr-2 beige ver" onClick={this.ver} value={classroom.pk}></Button>
+					<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.pk}></Button>
+					<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.pk}></Button>
 				</td>
 			</tr>
 		);
@@ -76,10 +78,10 @@ export default class ListClassroom extends Component {
 	}
 
 	async loadClassrooms() {
-		await axios.post('http://localhost:8000/api/classroom/')
+		await axios.get('http://localhost:8000/api/classroom/')
 			.then(response =>
-				this.setState({ listClassroom: response.data }))
-		console.log('load salon')
+				this.setState({ listClassroom: response.data })
+			)
 	}
 
 	render() {
@@ -104,6 +106,10 @@ export default class ListClassroom extends Component {
 				{/* Registrar salón */}
 				<Modal className="modal-custom" show={this.state.show} onHide={this.handleClose}>
 					<AddClassroom handleClose={this.handleClose} />
+				</Modal>
+				{/* Editar salón */}
+				<Modal className="modal-custom" show={this.state.showEdit} onHide={this.handleClose}>
+					<EditClassroom handleClose={this.handleClose} salon={this.state.id} />
 				</Modal>
 				{/* Eliminar salón */}
 				<Modal show={this.state.showAlert} onHide={this.handleClose}>

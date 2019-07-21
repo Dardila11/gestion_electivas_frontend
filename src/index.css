@@ -24,6 +24,28 @@ body {
   z-index: -1;
 }
 
+.over-y {
+  overflow-y: auto;
+}
+
+.w-l {
+  height: 145px;
+}
+
+.list-group-item:last-child {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.list-group-item:first-child {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.text-s1 {
+  font-size: 15px;
+}
+
 .transicion {
   transition: all 0.3s ease-in-out;
 }
@@ -54,6 +76,41 @@ body {
  
 .bb-1-g {
   border-bottom: 1px solid gray; 
+}
+
+.no-login {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 35%;
+  right: 35%;
+}
+
+.alert {
+  z-index: 4;
+  margin-top: 10px;
+}
+
+.ver {
+  padding: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./img/ver.png');
+}
+
+.editar {
+  padding: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./img/editar.png');
+}
+
+.borrar {
+  padding: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./img/borrar.png');
 }
 
 @media only screen and (max-width: 700px) {

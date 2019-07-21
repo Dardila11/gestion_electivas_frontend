@@ -5,3 +5,8 @@
 .ocupado {
     background-color: red;
 }
+
+.th-s > th, td {
+    width: 150px;
+    word-wrap: break-word;
+}

@@ -5,6 +5,7 @@ import axios from 'axios';
 
 import logo from '../img/logoU.png';
 import '../css/LoginSecretary.css';
+import { time } from '../js/index';
 
 export default class LoginSecretary extends Component {
     constructor(props, context) {
@@ -39,6 +40,7 @@ export default class LoginSecretary extends Component {
             .then(response => this.redirect(response))
             .catch(error => {
                 this.setState({ show: true });
+                time();
             });
     }
 
@@ -70,7 +72,7 @@ export default class LoginSecretary extends Component {
                             <Button variant="primary" type="submit">Ingresar</Button>
                         </Form>
                     </div>
-                    <div className="no-login">
+                    <div className="no-login time">
                         <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
                             <p>Autenticacion fallida</p>
                         </Alert>

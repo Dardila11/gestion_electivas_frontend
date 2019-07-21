@@ -1,19 +1,28 @@
 import React, { Component } from 'react';
-import { Form, Modal, Button, Table, Row, Col } from 'react-bootstrap';
+import { Form, Modal, Button, Table, Alert, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
-import '../css/Table.css';
+import '../../css/Table.css';
+import { time, agregarHorario } from '../../js/index';
 
-export default class AddClassroom extends Component {
+export default class EditClassroom extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
+            classroom: props.salon,
             codigo: '101',
             capacity: "20",
             description: "nuevo salon",
-            faculty: 1
+            faculty: 1,
+            faculties: [],
+            schedules: [],
+            show: false
         };
-        this.addClassroom = this.addClassroom.bind(this);
+        this.loadClassroom = this.loadClassroom.bind(this);
+        this.editClassroom = this.editClassroom.bind(this);
+        this.createListFaculties = this.createListFaculties.bind(this);
+        this.loadFaculties = this.loadFaculties.bind(this);
+        this.loadSchedules = this.loadSchedules.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleClose = this.handleClose.bind(this);
     }
@@ -22,43 +31,134 @@ export default class AddClassroom extends Component {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
-
         this.setState({
             [name]: value
         });
-        console.log(this.state);
     }
 
     handleClose() {
         this.props.handleClose();
     }
 
-    async addClassroom(event) {
+    async editClassroom(event) {
         event.preventDefault();
-        const { codigo, capacity, description, faculty } = this.state;
+        const { classroom, codigo, capacity, description, faculty } = this.state;
         var json = {
+            "id": classroom,
             "classroom_id": codigo,
             "capacity": capacity,
             "description": description,
             "faculty": faculty
         }
-        await axios.put('http://localhost:8000/api/classroom/', json)
-            .then(function (response) {
+        await axios.post('http://localhost:8000/api/classroom/', json)
+            .then(response => {
                 console.log(response);
+                this.handleClose();
+            })
+            .catch(error => {
+                if (error.response.status) {
+                    time();
+                    this.setState({ show: true });
+                }
             });
-        console.log('create salon')
-        this.handleClose();
+    }
+
+    async loadFaculties() {
+        await axios.post('http://localhost:8000/api/faculty/')
+            .then(response =>
+                this.setState({ faculties: response.data }))
+    }
+
+    createListFaculties() {
+        const listItems = this.state.faculties.map((faculty) =>
+            <option key={faculty.pk} value={faculty.pk}>{faculty.fields.name}</option>
+        );
+        return listItems;
     }
 
     componentWillMount() {
-        console.log(this.state);
+        console.log('salon: ' + this.state.classroom);
+        this.loadFaculties();
+        this.setState({ showAlert: false });
+        axios.get('http://localhost:8000/api/getclassroom/' + this.state.classroom)
+            .then((response) => {
+                this.loadClassroom(response.data[0])
+            })
+        axios.get('http://localhost:8000/api/schedule/' + this.state.classroom)
+            .then((response) => {
+                this.loadSchedules(response.data)
+            })
+    }
+
+    loadSchedules(data) {
+        // this.setState({codigo: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description})
+        var i;
+        console.log(data);
+        for (i = 0; i < data.length; i++) {
+            var inicio = this.getHora(data[i].schedule__time_from);
+            var fin = this.getHora(data[i].schedule__time_to);
+            var dia = this.getDia(data[i].schedule__day);
+            if (agregarHorario(inicio, fin, dia)) {
+                this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
+            }
+        }
+        console.log(this.state.schedules);
+    }
+
+    loadClassroom(data) {
+        this.setState({ codigo: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description })
+    }
+
+    getHora(hora) {
+        switch (hora) {
+            case '07:00:00':
+                return 1;
+            case '09:00:00':
+                return 2;
+            case '11:00:00':
+                return 3;
+            case '13:00:00':
+                return 4;
+            case '14:00:00':
+                return 5;
+            case '16:00:00':
+                return 6;
+            case '18:00:00':
+                return 7;
+            case '20:00:00':
+                return 8;
+            case '21:00:00':
+                return 9;
+            default:
+                break;
+        }
+    }
+
+    getDia(dia) {
+        switch (dia) {
+            case 'lunes':
+                return 1;
+            case 'martes':
+                return 2;
+            case 'miercoles':
+                return 3;
+            case 'jueves':
+                return 4;
+            case 'viernes':
+                return 5;
+            case 'sabado':
+                return 6;
+            default:
+                break;
+        }
     }
 
     render() {
+        const handleDismiss = () => this.setState({ show: false });
         return (
             <>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registrar salón</Modal.Title>
+                    <Modal.Title>Editar salón</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="container-fluid">
@@ -73,16 +173,14 @@ export default class AddClassroom extends Component {
                                 <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Capacidad</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="capacity" value={this.state.capacity} onChange={this.handleChange} />
+                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-4">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Facultad</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select">
-                                            <option>FIET</option>
-                                            <option>PIET</option>
-                                            <option>Contables</option>
+                                        <Form.Control className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
+                                            <this.createListFaculties />
                                         </Form.Control>
                                     </Form.Group>
                                 </Col>
@@ -153,7 +251,7 @@ export default class AddClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="table-sm">
+                                        <tbody className="table-sm body-horario">
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>
@@ -165,7 +263,7 @@ export default class AddClassroom extends Component {
                                             </tr>
                                             <tr>
                                                 <td>09:00</td>
-                                                <td className="ocupado"></td>
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -205,7 +303,7 @@ export default class AddClassroom extends Component {
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td className="ocupado"></td>
+                                                <td></td>
                                                 <td></td>
                                             </tr>
                                             <tr>
@@ -240,11 +338,17 @@ export default class AddClassroom extends Component {
                             </Row>
                         </Form>
                     </div>
+                    <div className="no-login time">
+                        <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
+                            <p>El salón ya existe</p>
+                        </Alert>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={this.addClassroom}>Registrar</Button>
+                    <Button variant="primary" onClick={this.editClassroom}>Guardar cambios</Button>
                     <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
                 </Modal.Footer>
+
             </>
         );
     }
