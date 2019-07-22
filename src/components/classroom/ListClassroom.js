@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Button, Table, Modal, Alert } from 'react-bootstrap';
+import { Image, Button, Table, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
 import AddClassroom from './AddClassroom';
@@ -31,7 +31,7 @@ export default class ListClassroom extends Component {
 	}
 
 	create() {
-		this.setState({ show: true });
+		this.setState({ showCreate: true });
 	}
 
 	update(event) {
@@ -65,7 +65,7 @@ export default class ListClassroom extends Component {
 				<td>{classroom.fields.classroom_id}</td>
 				<td>{classroom.fields.capacity}</td>
 				<td>
-					<Button className="btn mr-2 beige update" onClick={this.update} value={classroom.pk}></Button>
+					<Button className="btn mr-2 beige ver" onClick={this.update} value={classroom.pk}></Button>
 					<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.pk}></Button>
 					<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.pk}></Button>
 				</td>
@@ -91,14 +91,13 @@ export default class ListClassroom extends Component {
 	//- - - - - - - - - - - - - - - -
 
 	render() {
-		const handleDismiss = () => this.setState({ show: false });
 		return (
 			<>
 				<div className="title pt-4 mb-0">
 					<h4 className="d-inline white h-100">Gestionar Salones</h4>
 					<Button className="d-inline float-right btn btn-light mb-2" onClick={this.create}><Image src="./img/mas.png" alt="" /></Button>
 				</div>
-				<Table striped bordered houpdate responsive="xl" size="xl">
+				<Table striped bordered responsive="xl" size="xl">
 					<thead>
 						<tr>
 							<th>No. Salón</th>

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { Form, Modal, Button, Table, Alert, Row, Col, ListGroup } from 'react-bootstrap';
 import axios from 'axios';
-import moment from 'moment';
 
 import '../../css/Table.css';
 import { time, addSchedule, removeSchedule } from '../../js/HandleDOM';
-import { hashHour, hashDay, unhashHour, unhashDay } from '../../js/HandleSchedule';
+import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from '../../js/HandleSchedule';
 
 export default class updateClassroom extends Component {
     constructor(props, context) {
@@ -13,16 +12,17 @@ export default class updateClassroom extends Component {
         this.state = {
             classroom: props.salon,
             classroom_id: '',
-            capacity: "",
-            description: "",
+            capacity: '',
+            description: '',
             faculty: 1,
-            inicio: 1,
-            fin: 1,
-            dia: 1,
+            time_from: 1,
+            time_to: 1,
+            day: 1,
             faculties: [],
             schedules: [],
             schedules_add: [],
             schedules_delete: [],
+            message: '',
             show: false
         };
         this.addSchedule = this.addSchedule.bind(this);
@@ -50,129 +50,23 @@ export default class updateClassroom extends Component {
         this.props.handleClose();
     }
 
-    async updateClassroom(event) {
-        event.preventDefault();
-        const { classroom, classroom_id, capacity, description, faculty } = this.state;
-        var json = {
-            "id": classroom,
-            "classroom_id": classroom_id,
-            "capacity": capacity,
-            "description": description,
-            "faculty": faculty
-        }
-        await axios.post('http://localhost:8000/api/classroom/', json)
-            .then(response => {
-                this.handleClose();
-            })
-            .catch(error => {
-                if (error.response.status) {
-                    time();
-                    this.setState({ show: true });
-                }
-            });
-        const { schedules_add, schedules_delete } = this.state;
-        json = {
-            "id": classroom,
-            "schedules_add": schedules_add,
-            "schedules_delete": schedules_delete
-        }
-        await axios.post('http://localhost:8000/api/schedule/', json)
-            .then(response => {
-                console.log(response);
-                this.handleClose();
-            })
-            .catch(error => {
-                if (error.response.status) {
-                    time();
-                    this.setState({ show: true });
-                }
-            });
-    }
-
-    loadFaculties() {
-        axios.post('http://localhost:8000/api/faculty/')
-            .then(response =>
-                this.setState({ faculties: response.data }))
-    }
-
-    createListFaculties() {
-        const listItems = this.state.faculties.map((faculty) =>
-            <option key={faculty.pk} value={faculty.pk}>{faculty.fields.name}</option>
-        );
-        return listItems;
-    }
-
-    componentWillMount() {
-        this.loadFaculties();
-        this.setState({ showAlert: false });
-        axios.get('http://localhost:8000/api/getclassroom/' + this.state.classroom)
-            .then((response) => {
-                this.loadClassroom(response.data[0])
-            })
-        axios.get('http://localhost:8000/api/schedule/' + this.state.classroom)
-            .then((response) => {
-                //this.setState({schedules: response.data})
-                this.loadSchedules(response.data)
-            })
-    }
-
-    loadSchedules(data) {
-        // this.setState({classroom_id: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description})
-        var i;
-        for (i = 0; i < data.length; i++) {
-            var inicio = data[i].schedule__time_from;
-            var fin = data[i].schedule__time_to;
-            var dia = data[i].schedule__day;
-            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia))) {
-                this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
-            }
-        }
-        this.setState({ schedules: this.state.schedules })
-    }
-
-    loadClassroom(data) {
-        this.setState({ classroom_id: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description })
-    }
-
-    createListSchedule() {
-        const listItems = this.state.schedules.map((schedule) =>
-            <ListGroup.Item
-                className="text-s1"
-                key={schedule.time_from + '' + schedule.time_to + '' + schedule.day}>
-                {schedule.day + ': ' + schedule.time_from + ' - ' + schedule.time_to}
-                <Button name="schedule" value={schedule.time_from + '|' + schedule.time_to + '|' + schedule.day} onClick={this.removeSchedule} className="mouse float-right text-sm p-0">x</Button>
-            </ListGroup.Item>
-        );
-        return listItems;
-    }
-    
     addSchedule() {
-        var agregar = true;
-        var schedule;
-        for (schedule of this.state.schedules) {
-            var hora_from = moment(unhashHour(schedule.time_from), 'HH:mm:ss').hour();
-            var hora_to = moment(unhashHour(schedule.time_to), 'HH:mm:ss').hour();
-            var hora_inicio = moment(this.state.inicio, 'HH:mm:ss').hour();
-            var hora_fin = moment(this.state.fin, 'HH:mm:ss').hour();
-            var start = hora_inicio >= hora_from && hora_inicio < hora_to;
-            var end = hora_fin > hora_from && hora_fin <= hora_to;
-            if ((start || end) && schedule.day === hashDay(this.state.dia)) {
-                agregar = false;
-                break;
-            }
-        }
-        if (agregar) {
-            if (addSchedule(this.state.inicio, this.state.fin, this.state.dia) && agregar) {
-                var inicio = hashHour(this.state.inicio);
-                var fin = hashHour(this.state.fin);
-                var dia = hashDay(this.state.dia);
-                this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia });
-                this.state.schedules_add.push({ "time_from": inicio, "time_to": fin, "day": dia });
+        var isExists = findSchedule(this.state.schedules, this.state.time_from, this.state.time_to, this.state.day);
+        if (isExists) {
+            if (addSchedule(this.state.time_from, this.state.time_to, this.state.day)) {
+                var time_from = hashHour(this.state.time_from);
+                var time_to = hashHour(this.state.time_to);
+                var day = hashDay(this.state.day);
+                this.state.schedules.push({ 'time_from': time_from, 'time_to': time_to, 'day': day });
+                this.state.schedules_add.push({ 'time_from': time_from, 'time_to': time_to, 'day': day });
                 this.setState({ schedules: this.state.schedules })
+            } else {
+                time();
+                this.setState({ message: 'La hora de fin debe ser mayor a la hora de inicio', show: true });
             }
         } else {
             time();
-            this.setState({ message: "horario incluido en otro", show: true });
+            this.setState({ message: 'El horario esta incluido en otra franja', show: true });
         }
     }
 
@@ -183,12 +77,10 @@ export default class updateClassroom extends Component {
             var inicio = event.target.value.split('|')[0];
             var fin = event.target.value.split('|')[1];
             var dia = event.target.value.split('|')[2];
-            console.log(inicio + '|' + schedule.time_from);
             var is_history = false;
             if (inicio === schedule.time_from && fin === schedule.time_to && dia === schedule.day) {
                 var j = 0, schedule_add;
                 for (schedule_add of this.state.schedules_add) {
-                    console.log(schedule.time_from + '|' + schedule_add.time_from)
                     if (schedule.time_from === schedule_add.time_from && schedule.time_to === schedule_add.time_to && schedule.day === schedule_add.day) {
                         this.state.schedules_add.splice(j, 1);
                         is_history = true;
@@ -204,10 +96,111 @@ export default class updateClassroom extends Component {
             }
             i++;
         }
-        console.log(this.state.schedules_add)
-        console.log(this.state.schedules_delete)
         this.setState({ schedules: this.state.schedules });
     }
+
+    //REQUESTS SERVER
+    async updateClassroom(event) {
+        event.preventDefault();
+        //UPDATE CLASSROOM
+        const { classroom, classroom_id, capacity, description, faculty } = this.state;
+        var json = {
+            'id': classroom,
+            'classroom_id': classroom_id,
+            'capacity': capacity,
+            'description': description,
+            'faculty': faculty
+        }
+        await axios.post('http://localhost:8000/api/classroom/', json)
+            .then(response => {
+                this.handleClose();
+            })
+            .catch(error => {
+                if (error.response.status) {
+                    time();
+                    this.setState({ show: true });
+                }
+            });
+        //UPDATE SCHEDULES TO CLASSROOM
+        const { schedules_add, schedules_delete } = this.state;
+        json = {
+            'id': classroom,
+            'schedules_add': schedules_add,
+            'schedules_delete': schedules_delete
+        }
+        await axios.post('http://localhost:8000/api/schedule/', json)
+            .then(response => {
+                this.handleClose();
+            })
+            .catch(error => {
+                if (error.response.status) {
+                    time();
+                    this.setState({ show: true });
+                }
+            });
+    }
+
+    //LOAD DATA
+    loadFaculties() {
+        axios.post('http://localhost:8000/api/faculty/')
+            .then(response =>
+                this.setState({ faculties: response.data }))
+    }
+
+    loadSchedules(data) {
+        var i;
+        for (i = 0; i < data.length; i++) {
+            var inicio = data[i].schedule__time_from;
+            var fin = data[i].schedule__time_to;
+            var dia = data[i].schedule__day;
+            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia))) {
+                this.state.schedules.push({ 'time_from': inicio, 'time_to': fin, 'day': dia, 'schedule': data[i].schedule });
+            }
+        }
+        this.setState({ schedules: this.state.schedules })
+    }
+
+    loadClassroom(data) {
+        this.setState({ classroom_id: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description })
+    }
+    //- - - - - - - - - - - - - - - -
+
+    //CREATE HTML
+    createListFaculties() {
+        const listItems = this.state.faculties.map((faculty) =>
+            <option key={faculty.pk} value={faculty.pk}>{faculty.fields.name}</option>
+        );
+        return listItems;
+    }
+
+    createListSchedule() {
+        const listItems = this.state.schedules.map((schedule) =>
+            <ListGroup.Item
+                className='text-s1'
+                key={schedule.time_from + '' + schedule.time_to + '' + schedule.day}>
+                {schedule.day + ': ' + schedule.time_from + ' - ' + schedule.time_to}
+                <Button name='schedule' value={schedule.time_from + '|' + schedule.time_to + '|' + schedule.day} onClick={this.removeSchedule} className='mouse float-right text-sm p-0'>x</Button>
+            </ListGroup.Item>
+        );
+        return listItems;
+    }
+    //- - - - - - - - - - - - - - - -
+
+    //METHODS LIFESPAN COMPONENT
+    componentWillMount() {
+        this.loadFaculties();
+        this.setState({ showAlert: false });
+        axios.get('http://localhost:8000/api/getclassroom/' + this.state.classroom)
+            .then((response) => {
+                this.loadClassroom(response.data[0])
+            })
+        axios.get('http://localhost:8000/api/schedule/' + this.state.classroom)
+            .then((response) => {
+                //this.setState({schedules: response.data})
+                this.loadSchedules(response.data)
+            })
+    }
+    //- - - - - - - - - - - - - - - -
 
     render() {
         const handleDismiss = () => this.setState({ show: false });
@@ -217,37 +210,37 @@ export default class updateClassroom extends Component {
                     <Modal.Title>Editar salón</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className="container-fluid">
+                    <div className='container-fluid'>
                         <Form>
-                            <Row className="bb-1-g mb-3">
-                                <Col className="col-sm-3 col-xl-2">
+                            <Row className='bb-1-g mb-3'>
+                                <Col className='col-sm-3 col-xl-2'>
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">No. Salón</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} />
+                                        <Form.Label><span className='ml-0'>No. Salón</span></Form.Label>
+                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} />
                                     </Form.Group>
                                 </Col>
-                                <Col className="col-sm-3 col-xl-2">
+                                <Col className='col-sm-3 col-xl-2'>
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Capacidad</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} />
+                                        <Form.Label><span className='ml-0'>Capacidad</span></Form.Label>
+                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} />
                                     </Form.Group>
                                 </Col>
-                                <Col className="col-sm-6 col-xl-4">
+                                <Col className='col-sm-6 col-xl-4'>
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Facultad</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
+                                        <Form.Label><span className='ml-0'>Facultad</span></Form.Label>
+                                        <Form.Control className='ml-0' as='select' name='faculty' value={this.state.faculty} onChange={this.handleChange}>
                                             <this.createListFaculties />
                                         </Form.Control>
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <Row className="bb-1-g mb-3">
-                                <Col className="col-sm-4">
+                            <Row className='bb-1-g mb-3'>
+                                <Col className='col-sm-4'>
                                     <Row>
-                                        <Col className="col-sm-12">
+                                        <Col className='col-sm-12'>
                                             <Form.Group>
-                                                <Form.Label><span className="ml-0">Día</span></Form.Label>
-                                                <Form.Control className="ml-0" as="select" name="dia" value={this.state.dia} onChange={this.handleChange}>
+                                                <Form.Label><span className='ml-0'>Día</span></Form.Label>
+                                                <Form.Control className='ml-0' as='select' name='day' value={this.state.day} onChange={this.handleChange}>
                                                     <option value='1'>Lunes</option>
                                                     <option value='2'>Martes</option>
                                                     <option value='3'>Miércoles</option>
@@ -257,54 +250,54 @@ export default class updateClassroom extends Component {
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
-                                        <Col className="col-sm-6">
+                                        <Col className='col-sm-6'>
                                             <Form.Group>
-                                                <Form.Label><span className="ml-0">Inicio</span></Form.Label>
-                                                <Form.Control className="ml-0" as="select" name="inicio" value={this.state.inicio} onChange={this.handleChange}>
-                                                    <option value="1">07:00</option>
-                                                    <option value="2">09:00</option>
-                                                    <option value="3">11:00</option>
-                                                    <option value="4">13:00</option>
-                                                    <option value="5">14:00</option>
-                                                    <option value="6">16:00</option>
-                                                    <option value="7">18:00</option>
-                                                    <option value="8">20:00</option>
+                                                <Form.Label><span className='ml-0'>Inicio</span></Form.Label>
+                                                <Form.Control className='ml-0' as='select' name='time_from' value={this.state.time_from} onChange={this.handleChange}>
+                                                    <option value='1'>07:00</option>
+                                                    <option value='2'>09:00</option>
+                                                    <option value='3'>11:00</option>
+                                                    <option value='4'>13:00</option>
+                                                    <option value='5'>14:00</option>
+                                                    <option value='6'>16:00</option>
+                                                    <option value='7'>18:00</option>
+                                                    <option value='8'>20:00</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
-                                        <Col className="col-sm-6">
+                                        <Col className='col-sm-6'>
                                             <Form.Group>
-                                                <Form.Label><span className="ml-0">Fin</span></Form.Label>
-                                                <Form.Control className="ml-0" name="fin" value={this.state.fin} onChange={this.handleChange} as="select">
-                                                    <option value="1">07:00</option>
-                                                    <option value="2">09:00</option>
-                                                    <option value="3">11:00</option>
-                                                    <option value="4">13:00</option>
-                                                    <option value="5">14:00</option>
-                                                    <option value="6">16:00</option>
-                                                    <option value="7">18:00</option>
-                                                    <option value="8">20:00</option>
-                                                    <option value="9">21:00</option>
+                                                <Form.Label><span className='ml-0'>Fin</span></Form.Label>
+                                                <Form.Control className='ml-0' name='time_to' value={this.state.time_to} onChange={this.handleChange} as='select'>
+                                                    <option value='1'>07:00</option>
+                                                    <option value='2'>09:00</option>
+                                                    <option value='3'>11:00</option>
+                                                    <option value='4'>13:00</option>
+                                                    <option value='5'>14:00</option>
+                                                    <option value='6'>16:00</option>
+                                                    <option value='7'>18:00</option>
+                                                    <option value='8'>20:00</option>
+                                                    <option value='9'>21:00</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col className="col-sm-12">
-                                            <Button className="rounded-10  w-100" variant="primary" onClick={this.addSchedule}>Agregar Horario</Button>
+                                        <Col className='col-sm-12'>
+                                            <Button className='rounded-10  w-100' variant='primary' onClick={this.addSchedule}>Agregar Horario</Button>
                                         </Col>
                                     </Row>
-                                    <Row className="pt-2 pb-2">
+                                    <Row className='pt-2 pb-2'>
                                         <Col>
-                                            <ListGroup className="w-l over-y">
+                                            <ListGroup className='w-l over-y'>
                                                 <this.createListSchedule />
                                             </ListGroup>
                                         </Col>
                                     </Row>
                                 </Col>
-                                <Col className="col-sm-8">
-                                    <Table responsive size="s">
-                                        <thead className="table-sm">
+                                <Col className='col-sm-8'>
+                                    <Table responsive size='s'>
+                                        <thead className='table-sm'>
                                             <tr>
                                                 <th>Hora</th>
                                                 <th>Lunes</th>
@@ -315,7 +308,7 @@ export default class updateClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="table-sm body-horario">
+                                        <tbody className='table-sm body-horario'>
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>
@@ -395,22 +388,22 @@ export default class updateClassroom extends Component {
                             <Row>
                                 <Col>
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Description</span></Form.Label>
-                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange}></textarea>
+                                        <Form.Label><span className='ml-0'>Description</span></Form.Label>
+                                        <textarea className='form-control' name='description' id='' value={this.state.description} onChange={this.handleChange}></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>
                         </Form>
                     </div>
-                    <div className="no-login time">
-                        <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
-                            <p>El salón ya existe</p>
+                    <div className='no-login time'>
+                        <Alert variant='danger' show={this.state.show} onClose={handleDismiss} dismissible>
+                            <p>{this.state.message}</p>
                         </Alert>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={this.updateClassroom}>Guardar cambios</Button>
-                    <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
+                    <Button variant='primary' onClick={this.updateClassroom}>Guardar cambios</Button>
+                    <Button variant='secondary' onClick={this.handleClose}>Cerrar</Button>
                 </Modal.Footer>
 
             </>

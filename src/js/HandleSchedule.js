@@ -89,8 +89,8 @@ export function unhashDay(day) {
 export function findSchedule(schedules, time_from, time_to, day) {
     var schedule;
     for (schedule of schedules) {
-        var old_time_from = unhashHour(schedule.time_from)
-        var old_time_to = unhashHour(schedule.time_to)
+        var old_time_from = unhashHour(schedule.time_from);
+        var old_time_to = unhashHour(schedule.time_to);
         var new_time_from = time_from >= old_time_from && time_from < old_time_to;
         var new_time_to = time_to > old_time_from && time_to <= old_time_to;
         if ((new_time_from || new_time_to) && schedule.day === hashDay(day)) {
