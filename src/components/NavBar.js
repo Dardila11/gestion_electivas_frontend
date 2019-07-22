@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Redirect } from "react-router-dom";
-
 import { Image, Button, Navbar, Form, FormControl } from 'react-bootstrap';
 
 import { show } from '../js/index';
@@ -13,33 +12,25 @@ export default class NavBar extends Component {
 			show: true,
 		};
 		this.handleChange = this.handleChange.bind(this);
-		this.logout = this.logout.bind(this);
+		this.onLogout = this.onLogout.bind(this);
 	}
 
 	handleChange(event) {
-		this.setState({ [event.target.name]: [event.target.value] })
+		this.setState({ [event.target.name]: event.target.value });
 		if (event.target.name === "show") {
 			show();
 		}
 	}
 
-	logout(event) {
-		localStorage.removeItem('token');
-		localStorage.removeItem('user');
+	onLogout() {
+		localStorage.removeItem("token");
+		localStorage.removeItem("user");
 		this.setState({ redirect: true });
-	}
-
-	componentWillMount() {
-
-	}
-
-	componentWillUnmount() {
-
 	}
 
 	render() {
 		if (this.state.redirect) {
-			return <Redirect to='/' />;
+			return <Redirect to="/" />;
 		}
 		return (
 			<Navbar>
@@ -51,7 +42,7 @@ export default class NavBar extends Component {
 				<Form inline>
 					<FormControl className="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" />
 					<Button className="btn btn-success my-2 my-sm-0" type="submit">Buscar</Button>
-					<Button className="btn btn-danger my-2 my-sm-0 ml-1" type="button" onClick={this.logout}>Salir</Button>
+					<Button className="btn btn-danger my-2 my-sm-0 ml-1" type="button" onClick={this.onLogout}>Salir</Button>
 				</Form>
 			</Navbar>
 		);

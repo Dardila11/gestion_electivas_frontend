@@ -15,28 +15,27 @@ export default class NavBar extends Component {
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
-        this.padre = this.padre.bind(this);
+        this.changeTab = this.changeTab.bind(this);
         this.ocultar = this.ocultar.bind(this);
     }
 
     handleChange(event) {
-        this.setState({ [event.target.name]: [event.target.value] })
+        this.setState({ [event.target.name]: event.target.value });
         if (event.target.name === "show") {
             hide();
         }
     }
 
-    padre() {
-        this.setState( {tab: 5} )
+    changeTab() {
+        this.setState({ tab: 5 });
     }
 
-    ocultar(event) {
-        console.log(event.target.name)
+    ocultar() {
         hide();
     }
 
     handleSelect(key) {
-        this.setState( {tab: key} )
+        this.setState({ tab: key })
     }
 
     render() {
@@ -63,7 +62,7 @@ export default class NavBar extends Component {
                     <Container className="pl-5 pr-5">
                         <Tab.Pane eventKey="1"></Tab.Pane>
                         <Tab.Pane eventKey="2">
-                            <ListClassroom clickHandler={this.padre} />
+                            <ListClassroom />
                         </Tab.Pane>
                         <Tab.Pane eventKey="3">
                             <ListElective />

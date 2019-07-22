@@ -36,9 +36,7 @@ export default class AddClassroom extends Component {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
-        this.setState({
-            [name]: value
-        });
+        this.setState({ [name]: value });
     }
 
     handleClose() {
@@ -128,8 +126,8 @@ export default class AddClassroom extends Component {
         }
     }
 
-    async loadFaculties() {
-        await axios.post('http://localhost:8000/api/faculty/')
+    loadFaculties() {
+        axios.post('http://localhost:8000/api/faculty/')
             .then(response =>
                 this.setState({ faculties: response.data }))
     }
@@ -184,16 +182,20 @@ export default class AddClassroom extends Component {
         }
         console.log(agregar);
         if (agregar) {
-            if (agregarHorario(this.state.inicio, this.state.fin, this.state.dia) && agregar) {
+            if (agregarHorario(this.state.inicio, this.state.fin, this.state.dia)) {
                 var inicio = this.getHora(this.state.inicio);
                 var fin = this.getHora(this.state.fin);
                 var dia = this.getDia(this.state.dia);
                 this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia });
                 this.setState({ schedules: this.state.schedules })
             }
+            else {
+                time();
+                this.setState({ message: "la hora de inicio debe ser mayor a la final", show: true });
+            }
         } else {
             time();
-            this.setState({ message: "horario incluido en otro", show: true });
+            this.setState({ message: "horario ya agregado", show: true });
         }
     }
 
@@ -241,7 +243,7 @@ export default class AddClassroom extends Component {
 
     createLisSchedule() {
         const listItems = this.state.schedules.map((schedule) =>
-            <ListGroup.Item 
+            <ListGroup.Item
                 className="text-s1"
                 key={schedule.time_from + '' + schedule.time_to + '' + schedule.day}>
                 {schedule.day + ': ' + schedule.time_from + ' - ' + schedule.time_to}
@@ -444,16 +446,17 @@ export default class AddClassroom extends Component {
                             </Row>
                         </Form>
                     </div>
-                    <div className="no-login time">
-                        <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
-                            <p>{this.state.message}</p>
-                        </Alert>
-                    </div>
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" type="submit" form="formulario">Registrar</Button>
                     <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
                 </Modal.Footer>
+                <div className="no-login time">
+                    <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
+                        <p className="mb-0">{this.state.message}</p>
+                    </Alert>
+                </div>
             </>
         );
     }

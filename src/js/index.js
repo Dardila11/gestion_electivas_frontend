@@ -13,7 +13,6 @@ export function agregarHorario(inicio, fin, dia) {
 
 export function eliminarHorario(inicio, fin, dia) {
     var i;
-    console.log(inicio);
     for (i = inicio - 1; i < fin - 1; i++) {
         $(".body-horario").children().eq(i).children().eq(dia).removeClass("ocupado");
     }
@@ -32,6 +31,6 @@ export function hide() {
 export function time() {
     setTimeout(function () {
         $(".time").fadeIn(0);
-        $(".time").fadeOut(3500);
-    }, 0);
+        $(".time").fadeOut(2000);
+    }, 100);
 }

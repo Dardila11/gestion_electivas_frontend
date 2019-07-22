@@ -79,12 +79,12 @@ body {
 }
 
 .no-login {
-  position: absolute;
+  position: fixed;
   display: flex;
   justify-content: center;
-  align-items: center;
   left: 35%;
   right: 35%;
+  top: 0;
 }
 
 .alert {

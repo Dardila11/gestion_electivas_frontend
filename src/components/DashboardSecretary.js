@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
 import axios from 'axios';
 
 import '../css/DashboardSecretary.css';
@@ -16,8 +16,8 @@ export default class DashboardSecretary extends Component {
 
 	componentWillMount() {
 		const token = JSON.parse(localStorage.getItem('token'));
-		axios.post('http://localhost:8000/api/verificate/', { "token": token })
-			.catch(error => {
+		axios.post('http://localhost:8000/api/verificate/', { 'token': token })
+			.catch(() => {
 				this.setState({ isLogin: false });
 			});
 	}
@@ -27,7 +27,7 @@ export default class DashboardSecretary extends Component {
 			return <Redirect to='/' />;
 		}
 		return (
-			<div className="hmi-100">
+			<div className='hmi-100 app-main'>
 				<NavBar />
 				<Nav />
 			</div>
