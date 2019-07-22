@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Image, Nav, Tab, Form, Container } from 'react-bootstrap';
 
-import { hide } from '../js/index';
+import { hide } from '../js/HandleDOM';
 import ListClassroom from './classroom/ListClassroom';
 import ListElective from './elective/ListElective';
 import ListStudent from './student/ListStudent';

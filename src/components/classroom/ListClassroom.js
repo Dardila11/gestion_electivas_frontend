@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Button, Table, Modal } from 'react-bootstrap';
+import { Image, Button, Table, Modal, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 import AddClassroom from './AddClassroom';
@@ -11,35 +11,35 @@ export default class ListClassroom extends Component {
 		this.state = {
 			id: -1,
 			listClassroom: [],
-			show: false,
-			showEdit: false,
+			showCreate: false,
+			showUpdate: false,
 			showAlert: false
 		};
 		this.handleClose = this.handleClose.bind(this);
-		this.handleShow = this.handleShow.bind(this);
+		this.create = this.create.bind(this);
 		this.loadClassrooms = this.loadClassrooms.bind(this);
 		this.createTableClassrooms = this.createTableClassrooms.bind(this);
-		this.ver = this.ver.bind(this);
+		this.update = this.update.bind(this);
 		this.editar = this.editar.bind(this);
 		this.eliminar = this.eliminar.bind(this);
 		this.preguntar = this.preguntar.bind(this);
 	}
 
 	handleClose() {
-		this.setState({ show: false, showEdit: false, showAlert: false });
+		this.setState({ showCreate: false, showUpdate: false, showAlert: false });
 		this.loadClassrooms();
 	}
 
-	handleShow() {
+	create() {
 		this.setState({ show: true });
 	}
 
-	ver(event) {
+	update(event) {
 
 	}
 
 	editar(event) {
-		this.setState({ showEdit: true });
+		this.setState({ showUpdate: true });
 		this.setState({ id: event.target.value })
 	}
 
@@ -58,13 +58,14 @@ export default class ListClassroom extends Component {
 		}
 	}
 
+	//CREATE HTML
 	createTableClassrooms() {
 		const listItems = this.state.listClassroom.map((classroom) =>						
 			<tr key={classroom.pk}>
 				<td>{classroom.fields.classroom_id}</td>
 				<td>{classroom.fields.capacity}</td>
 				<td>
-					<Button className="btn mr-2 beige ver" onClick={this.ver} value={classroom.pk}></Button>
+					<Button className="btn mr-2 beige update" onClick={this.update} value={classroom.pk}></Button>
 					<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.pk}></Button>
 					<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.pk}></Button>
 				</td>
@@ -72,26 +73,32 @@ export default class ListClassroom extends Component {
 		);
 		return listItems;
 	}
+	//- - - - - - - - - - - - - - - -
 
-	componentWillMount() {
-		this.loadClassrooms();
-	}
-
+	//LOAD DATA
 	async loadClassrooms() {
 		await axios.get('http://localhost:8000/api/classroom/')
 			.then(response =>
 				this.setState({ listClassroom: response.data })
 			)
 	}
+	//- - - - - - - - - - - - - - - -
+
+	//METHODS LIFESPAN COMPONENT
+	componentWillMount() {
+		this.loadClassrooms();
+	}
+	//- - - - - - - - - - - - - - - -
 
 	render() {
+		const handleDismiss = () => this.setState({ show: false });
 		return (
 			<>
 				<div className="title pt-4 mb-0">
 					<h4 className="d-inline white h-100">Gestionar Salones</h4>
-					<Button className="d-inline float-right btn btn-light mb-2" onClick={this.handleShow}><Image src="./img/mas.png" alt="" /></Button>
+					<Button className="d-inline float-right btn btn-light mb-2" onClick={this.create}><Image src="./img/mas.png" alt="" /></Button>
 				</div>
-				<Table striped bordered hover responsive="xl" size="xl">
+				<Table striped bordered houpdate responsive="xl" size="xl">
 					<thead>
 						<tr>
 							<th>No. Salón</th>
@@ -104,11 +111,11 @@ export default class ListClassroom extends Component {
 					</tbody>
 				</Table>
 				{/* Registrar salón */}
-				<Modal className="modal-custom" show={this.state.show} onHide={this.handleClose}>
+				<Modal className="modal-custom" show={this.state.showCreate} onHide={this.handleClose}>
 					<AddClassroom handleClose={this.handleClose} />
 				</Modal>
 				{/* Editar salón */}
-				<Modal className="modal-custom" show={this.state.showEdit} onHide={this.handleClose}>
+				<Modal className="modal-custom" show={this.state.showUpdate} onHide={this.handleClose}>
 					<EditClassroom handleClose={this.handleClose} salon={this.state.id} />
 				</Modal>
 				{/* Eliminar salón */}

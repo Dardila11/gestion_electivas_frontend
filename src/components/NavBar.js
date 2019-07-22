@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Redirect } from "react-router-dom";
 import { Image, Button, Navbar, Form, FormControl } from 'react-bootstrap';
 
-import { show } from '../js/index';
+import { show } from '../js/HandleDOM';
 
 export default class NavBar extends Component {
 	constructor(props, context) {

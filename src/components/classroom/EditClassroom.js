@@ -4,14 +4,15 @@ import axios from 'axios';
 import moment from 'moment';
 
 import '../../css/Table.css';
-import { time, agregarHorario, eliminarHorario } from '../../js/index';
+import { time, addSchedule, removeSchedule } from '../../js/HandleDOM';
+import { hashHour, hashDay, unhashHour, unhashDay } from '../../js/HandleSchedule';
 
-export default class EditClassroom extends Component {
+export default class updateClassroom extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
             classroom: props.salon,
-            codigo: '',
+            classroom_id: '',
             capacity: "",
             description: "",
             faculty: 1,
@@ -24,48 +25,16 @@ export default class EditClassroom extends Component {
             schedules_delete: [],
             show: false
         };
-        this.agregarHorario = this.agregarHorario.bind(this);
-        this.eliminarHorario = this.eliminarHorario.bind(this);
+        this.addSchedule = this.addSchedule.bind(this);
+        this.removeSchedule = this.removeSchedule.bind(this);
         this.loadClassroom = this.loadClassroom.bind(this);
-        this.createLisSchedule = this.createLisSchedule.bind(this);
-        this.editClassroom = this.editClassroom.bind(this);
+        this.createListSchedule = this.createListSchedule.bind(this);
+        this.updateClassroom = this.updateClassroom.bind(this);
         this.createListFaculties = this.createListFaculties.bind(this);
         this.loadFaculties = this.loadFaculties.bind(this);
         this.loadSchedules = this.loadSchedules.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleClose = this.handleClose.bind(this);
-    }
-
-    agregarHorario() {
-        var agregar = true;
-        var schedule;
-        for (schedule of this.state.schedules) {
-            var hora_from = moment(this.getHora(schedule.time_from), 'HH:mm:ss').hour();
-            var hora_to = moment(this.getHora(schedule.time_to), 'HH:mm:ss').hour();
-            var hora_inicio = moment(this.state.inicio, 'HH:mm:ss').hour();
-            var hora_fin = moment(this.state.fin, 'HH:mm:ss').hour();
-            var start = hora_inicio >= hora_from && hora_inicio < hora_to;
-            var end = hora_fin > hora_from && hora_fin <= hora_to;
-            // console.log(schedule.day + ' ' +  this.getDia1(this.state.dia));
-            // console.log(start + ' ' + hora_inicio + '>=' + hora_from + '&&' + hora_inicio + '<' + hora_to);
-            if ((start || end) && schedule.day === this.getDia1(this.state.dia)) {
-                agregar = false;
-                break;
-            }
-        }
-        if (agregar) {
-            if (agregarHorario(this.state.inicio, this.state.fin, this.state.dia) && agregar) {
-                var inicio = this.getHora1(this.state.inicio);
-                var fin = this.getHora1(this.state.fin);
-                var dia = this.getDia1(this.state.dia);
-                this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia });
-                this.state.schedules_add.push({ "time_from": inicio, "time_to": fin, "day": dia });
-                this.setState({ schedules: this.state.schedules })
-            }
-        } else {
-            time();
-            this.setState({ message: "horario incluido en otro", show: true });
-        }
     }
 
     handleChange(event) {
@@ -81,19 +50,18 @@ export default class EditClassroom extends Component {
         this.props.handleClose();
     }
 
-    async editClassroom(event) {
+    async updateClassroom(event) {
         event.preventDefault();
-        const { classroom, codigo, capacity, description, faculty } = this.state;
+        const { classroom, classroom_id, capacity, description, faculty } = this.state;
         var json = {
             "id": classroom,
-            "classroom_id": codigo,
+            "classroom_id": classroom_id,
             "capacity": capacity,
             "description": description,
             "faculty": faculty
         }
         await axios.post('http://localhost:8000/api/classroom/', json)
             .then(response => {
-                console.log(response);
                 this.handleClose();
             })
             .catch(error => {
@@ -103,8 +71,8 @@ export default class EditClassroom extends Component {
                 }
             });
         const { schedules_add, schedules_delete } = this.state;
-        var json = {
-            "id": classroom, 
+        json = {
+            "id": classroom,
             "schedules_add": schedules_add,
             "schedules_delete": schedules_delete
         }
@@ -121,8 +89,8 @@ export default class EditClassroom extends Component {
             });
     }
 
-    async loadFaculties() {
-        await axios.post('http://localhost:8000/api/faculty/')
+    loadFaculties() {
+        axios.post('http://localhost:8000/api/faculty/')
             .then(response =>
                 this.setState({ faculties: response.data }))
     }
@@ -149,124 +117,66 @@ export default class EditClassroom extends Component {
     }
 
     loadSchedules(data) {
-        // this.setState({codigo: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description})
+        // this.setState({classroom_id: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description})
         var i;
         for (i = 0; i < data.length; i++) {
             var inicio = data[i].schedule__time_from;
             var fin = data[i].schedule__time_to;
             var dia = data[i].schedule__day;
-            if (agregarHorario(this.getHora(inicio), this.getHora(fin), this.getDia(dia))) {
+            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia))) {
                 this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
             }
         }
-        this.setState({schedules: this.state.schedules})
+        this.setState({ schedules: this.state.schedules })
     }
 
     loadClassroom(data) {
-        this.setState({ codigo: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description })
+        this.setState({ classroom_id: data.fields.classroom_id, faculty: data.fields.faculty, capacity: data.fields.capacity, description: data.fields.description })
     }
 
-    getHora(hora) {
-        switch (hora) {
-            case '07:00:00':
-                return 1;
-            case '09:00:00':
-                return 2;
-            case '11:00:00':
-                return 3;
-            case '13:00:00':
-                return 4;
-            case '14:00:00':
-                return 5;
-            case '16:00:00':
-                return 6;
-            case '18:00:00':
-                return 7;
-            case '20:00:00':
-                return 8;
-            case '21:00:00':
-                return 9;
-            default:
-                break;
-        }
-    }
-
-    getDia(dia) {
-        switch (dia) {
-            case 'lunes':
-                return 1;
-            case 'martes':
-                return 2;
-            case 'miercoles':
-                return 3;
-            case 'jueves':
-                return 4;
-            case 'viernes':
-                return 5;
-            case 'sabado':
-                return 6;
-            default:
-                break;
-        }
-    }
-
-    getHora1(hora) {
-        switch (hora) {
-            case 1: case '1':
-                return "07:00:00";
-            case 2: case '2':
-                return "09:00:00";
-            case 3: case '3':
-                return "11:00:00";
-            case 4: case '4':
-                return "13:00:00";
-            case 5: case '5':
-                return "14:00:00";
-            case 6: case '6':
-                return "16:00:00";
-            case 7: case '7':
-                return "18:00:00";
-            case 8: case '8':
-                return "20:00:00";
-            case 9: case '9':
-                return "21:00:00";
-            default:
-                break;
-        }
-    }
-
-    getDia1(dia) {
-        switch (dia) {
-            case 1: case '1':
-                return "lunes";
-            case 2: case '2':
-                return "martes";
-            case 3: case '3':
-                return "miercoles";
-            case 4: case '4':
-                return "jueves";
-            case 5: case '5':
-                return "viernes";
-            case 6: case '6':
-                return "sabado";
-            default:
-                break;
-        }
-    }
-
-    createLisSchedule() {
+    createListSchedule() {
         const listItems = this.state.schedules.map((schedule) =>
             <ListGroup.Item
                 className="text-s1"
                 key={schedule.time_from + '' + schedule.time_to + '' + schedule.day}>
                 {schedule.day + ': ' + schedule.time_from + ' - ' + schedule.time_to}
-                <Button name="schedule" value={schedule.time_from + '|' + schedule.time_to + '|' + schedule.day} onClick={this.eliminarHorario} className="mouse float-right text-sm p-0">x</Button>
+                <Button name="schedule" value={schedule.time_from + '|' + schedule.time_to + '|' + schedule.day} onClick={this.removeSchedule} className="mouse float-right text-sm p-0">x</Button>
             </ListGroup.Item>
         );
         return listItems;
     }
+    
+    addSchedule() {
+        var agregar = true;
+        var schedule;
+        for (schedule of this.state.schedules) {
+            var hora_from = moment(unhashHour(schedule.time_from), 'HH:mm:ss').hour();
+            var hora_to = moment(unhashHour(schedule.time_to), 'HH:mm:ss').hour();
+            var hora_inicio = moment(this.state.inicio, 'HH:mm:ss').hour();
+            var hora_fin = moment(this.state.fin, 'HH:mm:ss').hour();
+            var start = hora_inicio >= hora_from && hora_inicio < hora_to;
+            var end = hora_fin > hora_from && hora_fin <= hora_to;
+            if ((start || end) && schedule.day === hashDay(this.state.dia)) {
+                agregar = false;
+                break;
+            }
+        }
+        if (agregar) {
+            if (addSchedule(this.state.inicio, this.state.fin, this.state.dia) && agregar) {
+                var inicio = hashHour(this.state.inicio);
+                var fin = hashHour(this.state.fin);
+                var dia = hashDay(this.state.dia);
+                this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia });
+                this.state.schedules_add.push({ "time_from": inicio, "time_to": fin, "day": dia });
+                this.setState({ schedules: this.state.schedules })
+            }
+        } else {
+            time();
+            this.setState({ message: "horario incluido en otro", show: true });
+        }
+    }
 
-    eliminarHorario(event) {
+    removeSchedule(event) {
         var schedule;
         var i = 0;
         for (schedule of this.state.schedules) {
@@ -289,7 +199,7 @@ export default class EditClassroom extends Component {
                 if (!is_history)
                     this.state.schedules_delete.push(this.state.schedules[i]);
                 this.state.schedules.splice(i, 1);
-                eliminarHorario(this.getHora(inicio), this.getHora(fin), this.getDia(dia));
+                removeSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia));
                 break;
             }
             i++;
@@ -313,7 +223,7 @@ export default class EditClassroom extends Component {
                                 <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">No. Salón</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="codigo" value={this.state.codigo} onChange={this.handleChange} />
+                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-3 col-xl-2">
@@ -381,13 +291,13 @@ export default class EditClassroom extends Component {
                                     </Row>
                                     <Row>
                                         <Col className="col-sm-12">
-                                            <Button className="rounded-10  w-100" variant="primary" onClick={this.agregarHorario}>Agregar Horario</Button>
+                                            <Button className="rounded-10  w-100" variant="primary" onClick={this.addSchedule}>Agregar Horario</Button>
                                         </Col>
                                     </Row>
                                     <Row className="pt-2 pb-2">
                                         <Col>
                                             <ListGroup className="w-l over-y">
-                                                <this.createLisSchedule />
+                                                <this.createListSchedule />
                                             </ListGroup>
                                         </Col>
                                     </Row>
@@ -499,7 +409,7 @@ export default class EditClassroom extends Component {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={this.editClassroom}>Guardar cambios</Button>
+                    <Button variant="primary" onClick={this.updateClassroom}>Guardar cambios</Button>
                     <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
                 </Modal.Footer>
 

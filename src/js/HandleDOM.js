@@ -1,20 +1,20 @@
 import $ from "jquery";
 
-export function agregarHorario(inicio, fin, dia) {
-    if (fin > inicio) {
+export function addSchedule(time_from, time_to, day) {
+    if (time_to > time_from) {
         var i;
-        for (i = inicio - 1; i < fin - 1; i++) {
-            $(".body-horario").children().eq(i).children().eq(dia).addClass("ocupado");
+        for (i = time_from - 1; i < time_to - 1; i++) {
+            $(".body-horario").children().eq(i).children().eq(day).addClass("ocupado");
         }
         return true;
     }
     return false;
 }
 
-export function eliminarHorario(inicio, fin, dia) {
+export function removeSchedule(time_from, time_to, day) {
     var i;
-    for (i = inicio - 1; i < fin - 1; i++) {
-        $(".body-horario").children().eq(i).children().eq(dia).removeClass("ocupado");
+    for (i = time_from - 1; i < time_to - 1; i++) {
+        $(".body-horario").children().eq(i).children().eq(day).removeClass("ocupado");
     }
 }
 

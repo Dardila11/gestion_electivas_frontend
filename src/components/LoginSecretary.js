@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import logo from '../img/logoU.png';
 import '../css/LoginSecretary.css';
-import { time } from '../js/index';
+import { time } from '../js/HandleDOM';
 
 export default class LoginSecretary extends Component {
     constructor(props, context) {
