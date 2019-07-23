@@ -38,6 +38,7 @@ export default class LoginSecretary extends Component {
         axios.post("http://localhost:8000/api/login/", { username, password }, { cancelToken: this.source.token, })
             .then(response => this.redirect(response))
             .catch(error => {
+                console.log(error.response);
                 this.setState({ message: error.response.data.error, show: true });
                 time();
             });
