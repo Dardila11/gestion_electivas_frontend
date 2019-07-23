@@ -34,7 +34,7 @@ export default class updateClassroom extends Component {
         this.loadFaculties = this.loadFaculties.bind(this);
         this.loadSchedules = this.loadSchedules.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleClose = this.handleClose.bind(this);
+        this.handleCloseUpdate = this.handleCloseUpdate.bind(this);
     }
 
     handleChange(event) {
@@ -46,8 +46,12 @@ export default class updateClassroom extends Component {
         });
     }
 
-    handleClose() {
+    handleClose = () => {
         this.props.handleClose();
+    }
+
+    handleCloseUpdate() {
+        this.props.handleCloseUpdate();
     }
 
     addSchedule() {
@@ -113,7 +117,7 @@ export default class updateClassroom extends Component {
         }
         await axios.post('http://localhost:8000/api/classroom/', json)
             .then(response => {
-                this.handleClose();
+                this.handleCloseUpdate();
             })
             .catch(error => {
                 if (error.response.status) {
@@ -130,7 +134,6 @@ export default class updateClassroom extends Component {
         }
         await axios.post('http://localhost:8000/api/schedule/', json)
             .then(response => {
-                this.handleClose();
             })
             .catch(error => {
                 if (error.response.status) {
@@ -211,18 +214,18 @@ export default class updateClassroom extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     <div className='container-fluid'>
-                        <Form>
+                        <Form id='formulario' onSubmit={this.updateClassroom}>
                             <Row className='bb-1-g mb-3'>
                                 <Col className='col-sm-3 col-xl-2'>
                                     <Form.Group>
                                         <Form.Label><span className='ml-0'>No. Salón</span></Form.Label>
-                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} />
+                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className='col-sm-3 col-xl-2'>
                                     <Form.Group>
                                         <Form.Label><span className='ml-0'>Capacidad</span></Form.Label>
-                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} />
+                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className='col-sm-6 col-xl-4'>
@@ -388,8 +391,8 @@ export default class updateClassroom extends Component {
                             <Row>
                                 <Col>
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Description</span></Form.Label>
-                                        <textarea className='form-control' name='description' id='' value={this.state.description} onChange={this.handleChange}></textarea>
+                                        <Form.Label><span className='ml-0'>Descripción</span></Form.Label>
+                                        <textarea className='form-control' name='description' id='' value={this.state.description} onChange={this.handleChange} required></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -397,12 +400,12 @@ export default class updateClassroom extends Component {
                     </div>
                     <div className='no-login time'>
                         <Alert variant='danger' show={this.state.show} onClose={handleDismiss} dismissible>
-                            <p>{this.state.message}</p>
+                            <p className='mb-0'>{this.state.message}</p>
                         </Alert>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant='primary' onClick={this.updateClassroom}>Guardar cambios</Button>
+                    <Button variant='primary' type='submit' form='formulario'>Guardar cambios</Button>
                     <Button variant='secondary' onClick={this.handleClose}>Cerrar</Button>
                 </Modal.Footer>
 

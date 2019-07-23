@@ -29,7 +29,7 @@ export default class AddClassroom extends Component {
         this.createListSchedule = this.createListSchedule.bind(this);
         this.loadFaculties = this.loadFaculties.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleClose = this.handleClose.bind(this);
+        this.handleCloseCreate = this.handleCloseCreate.bind(this);
     }
 
     handleChange(event) {
@@ -39,8 +39,12 @@ export default class AddClassroom extends Component {
         this.setState({ [name]: value });
     }
 
-    handleClose() {
+    handleClose = () => {
         this.props.handleClose();
+    }
+
+    handleCloseCreate() {
+        this.props.handleCloseCreate();
     }
 
     addSchedule() {
@@ -118,7 +122,7 @@ export default class AddClassroom extends Component {
                 }
             });
         if (successfull) {
-            this.handleClose();
+            this.handleCloseCreate();
         }
     }
     //- - - - - - - - - - - - - - - -
@@ -172,13 +176,13 @@ export default class AddClassroom extends Component {
                                 <Col className='col-sm-3 col-xl-2'>
                                     <Form.Group>
                                         <Form.Label><span className='ml-0'>No. Salón</span></Form.Label>
-                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} required />
+                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className='col-sm-3 col-xl-2'>
                                     <Form.Group>
                                         <Form.Label><span className='ml-0'>Capacidad</span></Form.Label>
-                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} required />
+                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className='col-sm-6 col-xl-4'>
@@ -344,7 +348,7 @@ export default class AddClassroom extends Component {
                             <Row>
                                 <Col>
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Description</span></Form.Label>
+                                        <Form.Label><span className='ml-0'>Descripción</span></Form.Label>
                                         <textarea className='form-control' name='description' id='' value={this.state.description} onChange={this.handleChange} required></textarea>
                                     </Form.Group>
                                 </Col>

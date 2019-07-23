@@ -92,6 +92,13 @@ body {
   margin-top: 10px;
 }
 
+.agregar {
+  padding: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./img/mas.png');
+}
+
 .ver {
   padding: 15px;
   background-position: center;

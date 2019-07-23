@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Image, Button, Table, Modal } from 'react-bootstrap';
+import { Button, Table, Modal, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
+import { time } from '../../js/HandleDOM';
 import AddClassroom from './AddClassroom';
 import EditClassroom from './EditClassroom';
 
@@ -13,9 +14,10 @@ export default class ListClassroom extends Component {
 			listClassroom: [],
 			showCreate: false,
 			showUpdate: false,
-			showAlert: false
+			showAlert: false,
+			showMessage: false
 		};
-		this.handleClose = this.handleClose.bind(this);
+		this.handleClose = this.handleClose.bind(this);		
 		this.create = this.create.bind(this);
 		this.loadClassrooms = this.loadClassrooms.bind(this);
 		this.createTableClassrooms = this.createTableClassrooms.bind(this);
@@ -28,6 +30,18 @@ export default class ListClassroom extends Component {
 	handleClose() {
 		this.setState({ showCreate: false, showUpdate: false, showAlert: false });
 		this.loadClassrooms();
+	}
+
+	handleCloseCreate = () => {
+		this.setState({ showMessage: true, message: 'Salón creado' });
+		this.handleClose();
+		time();
+	}
+
+	handleCloseUpdate = () => {
+		this.setState({ showMessage: true, message: 'Cambios guardados' });
+		this.handleClose();
+		time();
 	}
 
 	create() {
@@ -91,11 +105,12 @@ export default class ListClassroom extends Component {
 	//- - - - - - - - - - - - - - - -
 
 	render() {
+		const handleDismiss = () => this.setState({ showMessage: false });
 		return (
 			<>
 				<div className="title pt-4 mb-0">
 					<h4 className="d-inline white h-100">Gestionar Salones</h4>
-					<Button className="d-inline float-right btn btn-light mb-2" onClick={this.create}><Image src="./img/mas.png" alt="" /></Button>
+					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.create}></Button>
 				</div>
 				<Table striped bordered responsive="xl" size="xl">
 					<thead>
@@ -111,11 +126,11 @@ export default class ListClassroom extends Component {
 				</Table>
 				{/* Registrar salón */}
 				<Modal className="modal-custom" show={this.state.showCreate} onHide={this.handleClose}>
-					<AddClassroom handleClose={this.handleClose} />
+					<AddClassroom handleCloseCreate={this.handleCloseCreate} handleClose={this.handleClose} />
 				</Modal>
 				{/* Editar salón */}
 				<Modal className="modal-custom" show={this.state.showUpdate} onHide={this.handleClose}>
-					<EditClassroom handleClose={this.handleClose} salon={this.state.id} />
+					<EditClassroom handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} salon={this.state.id} />
 				</Modal>
 				{/* Eliminar salón */}
 				<Modal show={this.state.showAlert} onHide={this.handleClose}>
@@ -127,6 +142,11 @@ export default class ListClassroom extends Component {
 						<Button variant="primary" name="eliminar" onClick={this.eliminar}>Aceptar</Button>
 					</Modal.Footer>
 				</Modal>
+				<div className='no-login time'>
+                    <Alert variant='success' show={this.state.showMessage} onClose={handleDismiss} dismissible>
+                        <p className='mb-0'>{this.state.message}</p>
+                    </Alert>
+                </div>
 			</>
 		);
 	}
