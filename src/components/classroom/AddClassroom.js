@@ -86,7 +86,7 @@ export default class AddClassroom extends Component {
     //REQUESTS SERVER
     async addClassroom(event) {
         event.preventDefault();
-        var successfull = false;
+        var okClassroom = false, okSchedules = false;
         //CREATE CLASSROOM
         const { classroom_id, capacity, description, faculty } = this.state;
         var json = {
@@ -97,9 +97,10 @@ export default class AddClassroom extends Component {
         }
         await axios.put('http://localhost:8000/api/classroom/', json)
             .then(response => {
-                successfull = true;
+                okClassroom = true;
             })
             .catch(error => {
+                console.log(error);
                 if (error.response.status) {
                     time();
                     this.setState({ message: 'El salón ya existe', show: true });
@@ -113,7 +114,7 @@ export default class AddClassroom extends Component {
         }
         await axios.put('http://localhost:8000/api/schedule/', json)
             .then(response => {
-                successfull = true;
+                okSchedules = true;
             })
             .catch(error => {
                 if (error.response.status) {
@@ -121,7 +122,7 @@ export default class AddClassroom extends Component {
                     this.setState({ message: 'Alguno de los horarios ya existe', show: true });
                 }
             });
-        if (successfull) {
+        if (okClassroom && okSchedules) {
             this.handleCloseCreate();
         }
     }

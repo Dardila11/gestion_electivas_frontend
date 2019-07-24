@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Table, Modal, Alert } from 'react-bootstrap';
+import { Button, Table, Modal, Alert, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 
-import { time } from '../../js/HandleDOM';
+import { time, changePage } from '../../js/HandleDOM';
 import AddClassroom from './AddClassroom';
 import EditClassroom from './EditClassroom';
 
@@ -11,13 +11,15 @@ export default class ListClassroom extends Component {
 		super(props, context);
 		this.state = {
 			id: -1,
+			size: 0,
+			page: 0,
 			listClassroom: [],
 			showCreate: false,
 			showUpdate: false,
 			showAlert: false,
 			showMessage: false
 		};
-		this.handleClose = this.handleClose.bind(this);		
+		this.handleClose = this.handleClose.bind(this);
 		this.create = this.create.bind(this);
 		this.loadClassrooms = this.loadClassrooms.bind(this);
 		this.createTableClassrooms = this.createTableClassrooms.bind(this);
@@ -74,7 +76,7 @@ export default class ListClassroom extends Component {
 
 	//CREATE HTML
 	createTableClassrooms() {
-		const listItems = this.state.listClassroom.map((classroom) =>						
+		const listItems = this.state.listClassroom.map((classroom) =>
 			<tr key={classroom.pk}>
 				<td>{classroom.fields.classroom_id}</td>
 				<td>{classroom.fields.capacity}</td>
@@ -87,14 +89,44 @@ export default class ListClassroom extends Component {
 		);
 		return listItems;
 	}
+
+	createPagination = () => {
+		let items = [];
+		for (let number = 1; number <= Math.ceil(this.state.size / 4); number++) {
+			items.push(
+				<Pagination.Item key={number} name={number} onClick={this.changeClassrooms}>
+					{number}
+				</Pagination.Item>,
+			);
+		}
+		return items;
+	}
 	//- - - - - - - - - - - - - - - -
 
 	//LOAD DATA
-	async loadClassrooms() {
-		await axios.get('http://localhost:8000/api/classroom/')
+	changeClassrooms = (event) => {
+		const init = (parseInt(event.target.name) - 1) * 4;
+		const end = parseInt(event.target.name) * 4;
+		changePage(parseInt(event.target.name));
+		this.setState({ page: init });
+		axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + end)
 			.then(response =>
 				this.setState({ listClassroom: response.data })
 			)
+	}
+
+	async loadClassrooms() {
+		var init = this.state.page;
+		await axios.get('http://localhost:8000/api/classroom/count/')
+			.then(response =>
+				this.setState({ size: response.data })
+			)
+		await axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + (init + 4))
+			.then(response =>
+				this.setState({ listClassroom: response.data })
+			)
+		// console.log(Math.ceil(init / 4) + '>=' + Math.ceil((this.state.size) / 4));		
+		changePage(Math.ceil(init / 4) >= Math.ceil(this.state.size / 4) ? Math.ceil(init / 4) : Math.ceil((init + 1) / 4));
 	}
 	//- - - - - - - - - - - - - - - -
 
@@ -102,6 +134,8 @@ export default class ListClassroom extends Component {
 	componentWillMount() {
 		this.loadClassrooms();
 	}
+
+	componentWillUnmount() { }
 	//- - - - - - - - - - - - - - - -
 
 	render() {
@@ -124,6 +158,7 @@ export default class ListClassroom extends Component {
 						<this.createTableClassrooms />
 					</tbody>
 				</Table>
+				<Pagination id="page" className="justify-items"><this.createPagination /></Pagination>
 				{/* Registrar salón */}
 				<Modal className="modal-custom" show={this.state.showCreate} onHide={this.handleClose}>
 					<AddClassroom handleCloseCreate={this.handleCloseCreate} handleClose={this.handleClose} />
@@ -143,10 +178,10 @@ export default class ListClassroom extends Component {
 					</Modal.Footer>
 				</Modal>
 				<div className='no-login time'>
-                    <Alert variant='success' show={this.state.showMessage} onClose={handleDismiss} dismissible>
-                        <p className='mb-0'>{this.state.message}</p>
-                    </Alert>
-                </div>
+					<Alert variant='success' show={this.state.showMessage} onClose={handleDismiss} dismissible>
+						<p className='mb-0'>{this.state.message}</p>
+					</Alert>
+				</div>
 			</>
 		);
 	}

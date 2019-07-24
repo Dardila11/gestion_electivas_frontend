@@ -120,6 +120,25 @@ body {
   background-image: url('./img/borrar.png');
 }
 
+.select {
+  background-color: #007bff;
+  color: white;
+}
+
+.unselect {
+  background-color: white;
+  color: #007bff;
+}
+
+.page-link:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination {
+  justify-content: center;
+}
+
 @media only screen and (max-width: 700px) {
   .modal-custom > .modal-dialog {
     max-width: 100%;

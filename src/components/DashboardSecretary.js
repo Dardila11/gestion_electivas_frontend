@@ -7,6 +7,9 @@ import NavBar from './NavBar';
 import Nav from './Nav';
 
 export default class DashboardSecretary extends Component {
+	CancelToken = axios.CancelToken;
+	source = this.CancelToken.source();
+	token = JSON.parse(localStorage.getItem('token'));
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -15,11 +18,14 @@ export default class DashboardSecretary extends Component {
 	}
 
 	componentWillMount() {
-		const token = JSON.parse(localStorage.getItem('token'));
-		axios.post('http://localhost:8000/api/verificate/', { 'token': token })
+		axios.post('http://localhost:8000/api/verificate/', { 'token': this.token }, { cancelToken: this.source.token, })
 			.catch(() => {
 				this.setState({ isLogin: false });
 			});
+	}
+
+	componentWillUnmount() {
+		this.source.cancel("cancel request");
 	}
 
 	render() {

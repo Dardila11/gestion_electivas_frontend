@@ -10,6 +10,7 @@ export default class NavBar extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            user: '',
             show: true,
             tab: 2
         };
@@ -38,6 +39,16 @@ export default class NavBar extends Component {
         this.setState({ tab: key })
     }
 
+    componentWillMount() {
+        if (localStorage.getItem('user') != null) {
+            this.setState({ user: localStorage.getItem('user').replace(/['"]+/g, '') });
+        }
+    }
+
+    componentWillUnmount() {
+        
+    }
+
     render() {
         return (
             <Tab.Container activeKey={this.state.tab} onSelect={this.handleSelect}>
@@ -50,7 +61,7 @@ export default class NavBar extends Component {
                     <div className="p-3 bb-1 d-flex justify-content-center">
                         <div className="text-center">
                             <Image className="b-a p-1" src="../img/chica.png" roundedCircle />
-                            <p className="mb-0">{localStorage.getItem('user').replace(/['"]+/g, '')}</p>
+                            <p className="mb-0">{this.state.user}</p>
                         </div>
                     </div>
                     <Nav.Link eventKey="1" name="1" onClick={this.ocultar}>Inicio</Nav.Link>

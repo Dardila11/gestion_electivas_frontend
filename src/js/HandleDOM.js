@@ -1,5 +1,18 @@
 import $ from "jquery";
 
+export function changePage(pos) {
+    const size = $("#page").children().length;
+    for (var i = 0; i < size; i++) {
+        if (i === pos - 1) {
+            $("#page").children().eq(i).children().eq(0).addClass("select");
+            $("#page").children().eq(i).children().eq(0).removeClass("unselect");
+        } else {
+            $("#page").children().eq(i).children().eq(0).addClass("unselect");
+            $("#page").children().eq(i).children().eq(0).removeClass("select");
+        }
+    }
+}
+
 export function addSchedule(time_from, time_to, day) {
     if (time_to > time_from) {
         var i;
