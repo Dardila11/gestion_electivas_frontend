@@ -10,7 +10,7 @@ import es from "date-fns/locale/es";
 import { time } from "../../js/HandleDOM";
 registerLocale("es", es);
 
-class FormStartElectivesProcess extends Component {
+export default class FormStartElectivesProcess extends Component {
     CancelToken = axios.CancelToken;
     source = this.CancelToken.source();
     constructor(props, context) {
@@ -20,10 +20,7 @@ class FormStartElectivesProcess extends Component {
             period: -1,
             semesterDateFrom: new Date(),
             semesterDateTo: new Date(),
-            focusedSemesterInput: "",
-            focusedInput: "",
             redirect: false,
-            error: false,
             show: false,
             showAlertThis: false,
             showAlertModal: false,
@@ -176,7 +173,6 @@ class FormStartElectivesProcess extends Component {
                                                         placeholderText="Fecha Inicio"
                                                         dateFormat="dd/MM/yyyy"
                                                     />
-
                                                 </Form.Group>
                                             </Col>
                                             <Col className="col-lg-3">
@@ -244,5 +240,3 @@ class FormStartElectivesProcess extends Component {
         )
     }
 }
-
-export default FormStartElectivesProcess;

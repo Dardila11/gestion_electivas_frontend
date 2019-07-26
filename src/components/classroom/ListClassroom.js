@@ -8,6 +8,7 @@ import EditClassroom from './EditClassroom';
 import ViewClassroom from './ViewClassroom';
 
 export default class ListClassroom extends Component {
+	sizeBreak = 2;
 	CancelToken = axios.CancelToken;
 	source = this.CancelToken.source();
 	constructor(props, context) {
@@ -50,8 +51,7 @@ export default class ListClassroom extends Component {
 	}
 
 	ver = (event) => {
-		this.setState({ showView: true });
-		this.setState({ id: event.target.value });
+		this.setState({ showView: true, id: event.target.value });
 	}
 
 	create() {
@@ -59,8 +59,7 @@ export default class ListClassroom extends Component {
 	}
 
 	editar(event) {
-		this.setState({ showUpdate: true });
-		this.setState({ id: event.target.value });
+		this.setState({ showUpdate: true, id: event.target.value });
 	}
 
 	eliminar(event) {
@@ -73,22 +72,21 @@ export default class ListClassroom extends Component {
 
 	preguntar(event) {
 		if (event.currentTarget.name === 'eliminar') {
-			this.setState({ id: event.currentTarget.value });
-			this.setState({ showAlert: true });
+			this.setState({ id: event.currentTarget.value, showAlert: true });
 		}
 	}
 
 	//CREATE HTML
 	createTableClassrooms() {
 		const listItems = this.state.listClassroom.map((classroom) =>
-			<tr key={classroom.pk}>
-				<td>{classroom.fields.classroom_id}</td>
-				<td>{classroom.fields.capacity}</td>
+			<tr key={classroom.id}>
+				<td>{classroom.classroom_id} {classroom.faculty__name}</td>
+				<td>{classroom.capacity}</td>
 				<td>
 					<div className="d-flex">
-						<Button className="btn mr-2 beige ver" onClick={this.ver} value={classroom.pk}></Button>
-						<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.pk}></Button>
-						<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.pk}></Button>
+						<Button className="btn mr-2 beige ver" onClick={this.ver} value={classroom.id}></Button>
+						<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.id}></Button>
+						<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.id}></Button>
 					</div>
 				</td>
 			</tr>
@@ -98,7 +96,7 @@ export default class ListClassroom extends Component {
 
 	createPagination = () => {
 		let items = [];
-		for (let number = 1; number <= Math.ceil(this.state.size / 4); number++) {
+		for (let number = 1; number <= Math.ceil(this.state.size / this.sizeBreak); number++) {
 			items.push(
 				<Pagination.Item key={number} name={number} onClick={this.changeClassrooms}>
 					{number}
@@ -111,8 +109,8 @@ export default class ListClassroom extends Component {
 
 	//LOAD DATA
 	changeClassrooms = (event) => {
-		const init = (parseInt(event.target.name) - 1) * 4;
-		const end = parseInt(event.target.name) * 4;
+		const init = (parseInt(event.target.name) - 1) * this.sizeBreak;
+		const end = parseInt(event.target.name) * this.sizeBreak;
 		changePage(parseInt(event.target.name));
 		this.setState({ page: init });
 		axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + end, { cancelToken: this.source.token, })
@@ -127,12 +125,20 @@ export default class ListClassroom extends Component {
 			.then(response =>
 				this.setState({ size: response.data })
 			)
-		await axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + (init + 4), { cancelToken: this.source.token, })
-			.then(response =>
-				this.setState({ listClassroom: response.data })
-			)
-		// console.log(Math.ceil(init / 4) + '>=' + Math.ceil((this.state.size) / 4));		
-		changePage(Math.ceil(init / 4) >= Math.ceil(this.state.size / 4) ? Math.ceil(init / 4) : Math.ceil((init + 1) / 4));
+		if (this.state.size > 0) {
+			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
+			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
+			await axios.get('http://localhost:8000/api/classroom/limit/' + initAux + '/' + endAux, { cancelToken: this.source.token, })
+				.then((response) => {
+					this.setState({ listClassroom: response.data })
+				})
+			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak));
+		} else {
+			await axios.get('http://localhost:8000/api/classroom/limit/' + 0 + '/' + 0, { cancelToken: this.source.token, })
+				.then(response =>
+					this.setState({ listClassroom: response.data })
+				)
+		}
 	}
 	//- - - - - - - - - - - - - - - -
 

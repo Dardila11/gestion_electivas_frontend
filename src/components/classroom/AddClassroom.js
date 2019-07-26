@@ -81,9 +81,9 @@ export default class AddClassroom extends Component {
 
     //REQUESTS SERVER
     async addClassroom(event) {
-        event.preventDefault();
-        var okClassroom = false, okSchedules = false;
+        event.preventDefault();        
         if (parseInt(this.state.faculty) !== -1) {
+            var okClassroom = false, okSchedules = false;
             //CREATE CLASSROOM
             const { classroom_id, capacity, description, faculty } = this.state;
             var json = {

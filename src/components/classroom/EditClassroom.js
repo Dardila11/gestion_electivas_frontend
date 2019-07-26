@@ -102,8 +102,8 @@ export default class updateClassroom extends Component {
     //REQUESTS SERVER
     async updateClassroom(event) {
         event.preventDefault();
-        var okClassroom = false, okSchedules = false;
         if (parseInt(this.state.faculty) !== -1) {
+            var okClassroom = false, okSchedules = false;
             //CREATE CLASSROOM
             const { classroom, classroom_id, capacity, description, faculty } = this.state;
             var json = {
