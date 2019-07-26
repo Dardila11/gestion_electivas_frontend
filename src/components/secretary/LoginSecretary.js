@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { Component } from "react";
+import { Form, Button, Alert } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
-import logo from '../img/logoU.png';
-import '../css/LoginSecretary.css';
-import { time } from '../js/HandleDOM';
+import logo from "../../img/logoU.png";
+import "../../css/LoginSecretary.css";
+import { time } from "../../js/HandleDOM";
 
 export default class LoginSecretary extends Component {
     constructor(props, context) {
@@ -44,7 +44,7 @@ export default class LoginSecretary extends Component {
     redirect = (response) => {
         localStorage.setItem("user", JSON.stringify(response.data.user.username));
         localStorage.setItem("token", JSON.stringify(response.data.token));
-        axios.get('http://localhost:8000/api/semester/', { 'token': this.token }, { cancelToken: this.source.token, })
+        axios.get("http://localhost:8000/api/semester/", { "token": this.token }, { cancelToken: this.source.token, })
             .then((response) => {
                 this.handleSemester(response.data);
             })

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import DashboardSecretary from './components/DashboardSecretary';
-import LoginSecretary from './components/LoginSecretary';
+import DashboardSecretary from './components/secretary/DashboardSecretary';
+import LoginSecretary from './components/secretary/LoginSecretary';
 import AddSemester from './components/semester/AddSemester';
 
 function App() {

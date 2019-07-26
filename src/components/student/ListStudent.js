@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, Modal, Table } from 'react-bootstrap';
+import { Button, Modal, Table } from 'react-bootstrap';
 // import axios from 'axios';
 import AddStudent from './AddStudent';
 
@@ -26,8 +26,8 @@ export default class ListStudent extends Component {
 			<>
 				<div className="title pt-4 mb-2">
 					<h4 className="d-inline white">Gestionar estudiantes</h4>
-					<Button className="d-inline float-right btn btn-light mb-2 ml-2"><Image src="./img/upload.png" alt="" /></Button>
-					<Button className="d-inline float-right btn btn-light mb-2" onClick={this.handleShow}><Image src="./img/mas.png" alt="" /></Button>
+					<Button className="d-inline float-right btn btn-light mb-2 ml-2 subir"></Button>
+					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.handleShow}></Button>
 				</div>
 				<Table striped bordered hover responsive="xl" size="xl">
 					<thead>
@@ -46,9 +46,9 @@ export default class ListStudent extends Component {
 							<td>Miller Daniel</td>
 							<td>Quilindo Velasco</td>
 							<td>
-								<Button className="btn mr-2 beige"><Image src="./img/ver.png" alt="" /></Button>
-								<Button className="btn mr-2 beige"><Image src="./img/editar.png" alt="" /></Button>
-								<Button className="btn beige"><Image src="./img/borrar.png" alt="" /></Button>
+								<Button className="btn mr-2 beige ver"></Button>
+								<Button className="btn mr-2 beige editar"></Button>
+								<Button className="btn beige borrar"></Button>
 							</td>
 						</tr>
 					</tbody>

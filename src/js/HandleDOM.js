@@ -1,14 +1,14 @@
 import $ from "jquery";
 
-export function changePage(pos) {
-    const size = $("#page").children().length;
+export function changePage(pos, elemento) {
+    const size = $("#"+elemento).children().length;
     for (var i = 0; i < size; i++) {
         if (i === pos - 1) {
-            $("#page").children().eq(i).children().eq(0).addClass("select");
-            $("#page").children().eq(i).children().eq(0).removeClass("unselect");
+            $("#"+elemento).children().eq(i).children().eq(0).addClass("select");
+            $("#"+elemento).children().eq(i).children().eq(0).removeClass("unselect");
         } else {
-            $("#page").children().eq(i).children().eq(0).addClass("unselect");
-            $("#page").children().eq(i).children().eq(0).removeClass("select");
+            $("#"+elemento).children().eq(i).children().eq(0).addClass("unselect");
+            $("#"+elemento).children().eq(i).children().eq(0).removeClass("select");
         }
     }
 }

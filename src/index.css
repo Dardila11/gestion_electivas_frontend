@@ -121,6 +121,13 @@ body {
   background-image: url('./img/borrar.png');
 }
 
+.subir {
+  padding: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./img/upload.png');
+}
+
 .select {
   background-color: #007bff;
   color: white;
@@ -142,6 +149,10 @@ body {
 
 .react-datepicker-wrapper {
   margin-right: 2px;
+}
+
+.table-autosize > th, td {
+  vertical-align: middle; 
 }
 
 @media only screen and (max-width: 700px) {

@@ -11,7 +11,7 @@ export default class addStudentStudent extends Component {
             codigo: 104613020476,
             nombres: "Miller Daniel",
             apellidos: "Quilindo Velasco",
-            email: "mdquilindo@unicauca.edu.co"
+            usuario: "mdquilindo"
         };
         this.addStudent = this.addStudent.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -49,8 +49,8 @@ export default class addStudentStudent extends Component {
                         </Col>
                         <Col className="col-sm-6 col-xl-6 col-lg-6">
                             <Form.Group>
-                                <Form.Label><span className="ml-0">Correo</span></Form.Label>
-                                <Form.Control className="ml-0" type="email" value={this.state.email} onChange={this.handleChange} required></Form.Control>
+                                <Form.Label><span className="ml-0">Usuario</span></Form.Label>
+                                <Form.Control className="ml-0" type="text" value={this.state.usuario} onChange={this.handleChange} required></Form.Control>
                             </Form.Group>
                         </Col>
                         <Col className="col-sm-6 col-xl-6 col-lg-6">

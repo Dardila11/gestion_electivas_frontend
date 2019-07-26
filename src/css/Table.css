@@ -10,3 +10,8 @@
     width: 150px;
     word-wrap: break-word;
 }
+
+.table-autosize > th, td {
+    width: max-content;
+    word-wrap: break-word;
+}

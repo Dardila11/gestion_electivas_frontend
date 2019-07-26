@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
-import { Button, Table, Modal, Alert, Pagination } from 'react-bootstrap';
-import axios from 'axios';
+import React, { Component } from "react";
+import { Button, Table, Modal, Alert, Pagination } from "react-bootstrap";
+import axios from "axios";
 
-import { time, changePage } from '../../js/HandleDOM';
-import AddClassroom from './AddClassroom';
-import EditClassroom from './EditClassroom';
-import ViewClassroom from './ViewClassroom';
+import { time, changePage } from "../../js/HandleDOM";
+import AddClassroom from "./AddClassroom";
+import EditClassroom from "./EditClassroom";
+import ViewClassroom from "./ViewClassroom";
+
+import '../../css/Table.css';
 
 export default class ListClassroom extends Component {
 	sizeBreak = 2;
@@ -24,28 +26,23 @@ export default class ListClassroom extends Component {
 			showAlert: false,
 			showMessage: false
 		};
-		this.handleClose = this.handleClose.bind(this);
-		this.create = this.create.bind(this);
 		this.loadClassrooms = this.loadClassrooms.bind(this);
 		this.createTableClassrooms = this.createTableClassrooms.bind(this);
-		this.editar = this.editar.bind(this);
-		this.eliminar = this.eliminar.bind(this);
-		this.preguntar = this.preguntar.bind(this);
 	}
 
-	handleClose() {
+	handleClose = () => {
 		this.setState({ showView: false, showCreate: false, showUpdate: false, showAlert: false });
 		this.loadClassrooms();
 	}
 
 	handleCloseCreate = () => {
-		this.setState({ showMessage: true, message: 'Salón creado' });
+		this.setState({ showMessage: true, message: "Salón creado" });
 		this.handleClose();
 		time();
 	}
 
 	handleCloseUpdate = () => {
-		this.setState({ showMessage: true, message: 'Cambios guardados' });
+		this.setState({ showMessage: true, message: "Cambios guardados" });
 		this.handleClose();
 		time();
 	}
@@ -54,24 +51,24 @@ export default class ListClassroom extends Component {
 		this.setState({ showView: true, id: event.target.value });
 	}
 
-	create() {
+	create = () => {
 		this.setState({ showCreate: true });
 	}
 
-	editar(event) {
+	editar = (event) => {
 		this.setState({ showUpdate: true, id: event.target.value });
 	}
 
-	eliminar(event) {
+	eliminar = (event) => {
 		this.setState({ showAlert: false });
-		axios.delete('http://localhost:8000/api/deleteclassroom/' + this.state.id)
+		axios.delete("http://localhost:8000/api/deleteclassroom/" + this.state.id)
 			.then(() => {
 				this.loadClassrooms()
 			})
 	}
 
-	preguntar(event) {
-		if (event.currentTarget.name === 'eliminar') {
+	preguntar = (event) => {
+		if (event.currentTarget.name === "eliminar") {
 			this.setState({ id: event.currentTarget.value, showAlert: true });
 		}
 	}
@@ -111,9 +108,9 @@ export default class ListClassroom extends Component {
 	changeClassrooms = (event) => {
 		const init = (parseInt(event.target.name) - 1) * this.sizeBreak;
 		const end = parseInt(event.target.name) * this.sizeBreak;
-		changePage(parseInt(event.target.name));
+		changePage(parseInt(event.target.name), "pageClassroom");
 		this.setState({ page: init });
-		axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + end, { cancelToken: this.source.token, })
+		axios.get("http://localhost:8000/api/classroom/limit/" + init + "/" + end, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listClassroom: response.data })
 			)
@@ -121,20 +118,20 @@ export default class ListClassroom extends Component {
 
 	async loadClassrooms() {
 		var init = this.state.page;
-		await axios.get('http://localhost:8000/api/classroom/count/', { cancelToken: this.source.token, })
+		await axios.get("http://localhost:8000/api/classroom/count/", { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ size: response.data })
 			)
 		if (this.state.size > 0) {
 			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
 			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
-			await axios.get('http://localhost:8000/api/classroom/limit/' + initAux + '/' + endAux, { cancelToken: this.source.token, })
+			await axios.get("http://localhost:8000/api/classroom/limit/" + initAux + "/" + endAux, { cancelToken: this.source.token, })
 				.then((response) => {
 					this.setState({ listClassroom: response.data })
 				})
-			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak));
+			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak), "pageClassroom");
 		} else {
-			await axios.get('http://localhost:8000/api/classroom/limit/' + 0 + '/' + 0, { cancelToken: this.source.token, })
+			await axios.get("http://localhost:8000/api/classroom/limit/" + 0 + "/" + 0, { cancelToken: this.source.token, })
 				.then(response =>
 					this.setState({ listClassroom: response.data })
 				)
@@ -168,11 +165,11 @@ export default class ListClassroom extends Component {
 							<th>Opciones</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody  className="table-autosize">
 						<this.createTableClassrooms />
 					</tbody>
 				</Table>
-				<Pagination id="page" className="justify-items"><this.createPagination /></Pagination>
+				<Pagination id="pageClassroom" className="justify-items"><this.createPagination /></Pagination>
 				{/* Registrar salón */}
 				<Modal className="modal-custom" show={this.state.showCreate} onHide={this.handleClose}>
 					<AddClassroom handleCloseCreate={this.handleCloseCreate} handleClose={this.handleClose} />
@@ -195,9 +192,9 @@ export default class ListClassroom extends Component {
 						<Button variant="primary" name="eliminar" onClick={this.eliminar}>Aceptar</Button>
 					</Modal.Footer>
 				</Modal>
-				<div className='no-login time'>
-					<Alert variant='success' show={this.state.showMessage} onClose={handleDismiss} dismissible>
-						<p className='mb-0'>{this.state.message}</p>
+				<div className="no-login time">
+					<Alert variant="success" show={this.state.showMessage} onClose={handleDismiss} dismissible>
+						<p className="mb-0">{this.state.message}</p>
 					</Alert>
 				</div>
 			</>

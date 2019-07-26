@@ -1,19 +1,19 @@
-import React, { Component } from 'react';
-import { Form, Modal, Button, Table, Alert, Row, Col } from 'react-bootstrap';
-import axios from 'axios';
+import React, { Component } from "react";
+import { Form, Modal, Button, Table, Alert, Row, Col } from "react-bootstrap";
+import axios from "axios";
 
-import '../../css/Table.css';
-import { addSchedule } from '../../js/HandleDOM';
-import { unhashHour, unhashDay } from '../../js/HandleSchedule';
+import "../../css/Table.css";
+import { addSchedule } from "../../js/HandleDOM";
+import { unhashHour, unhashDay } from "../../js/HandleSchedule";
 
 export default class ViewClassroom extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
             classroom: props.classroom,
-            classroom_id: '',
-            capacity: '',
-            description: '',
+            classroom_id: "",
+            capacity: "",
+            description: "",
             faculty: 1,
             time_from: 1,
             time_to: 1,
@@ -22,7 +22,7 @@ export default class ViewClassroom extends Component {
             schedules: [],
             schedules_add: [],
             schedules_delete: [],
-            message: '',
+            message: "",
             show: false
         };
         this.loadClassroom = this.loadClassroom.bind(this);
@@ -34,7 +34,7 @@ export default class ViewClassroom extends Component {
 
     handleChange(event) {
         const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const value = target.type === "checkbox" ? target.checked : target.value;
         const name = target.name;
         this.setState({
             [name]: value
@@ -47,7 +47,7 @@ export default class ViewClassroom extends Component {
 
     //LOAD DATA
     loadFaculties() {
-        axios.post('http://localhost:8000/api/faculty/')
+        axios.post("http://localhost:8000/api/faculty/")
             .then(response =>
                 this.setState({ faculties: response.data }))
     }
@@ -59,7 +59,7 @@ export default class ViewClassroom extends Component {
             var fin = data[i].schedule__time_to;
             var dia = data[i].schedule__day;
             if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia))) {
-                this.state.schedules.push({ 'time_from': inicio, 'time_to': fin, 'day': dia, 'schedule': data[i].schedule });
+                this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
             }
         }
         this.setState({ schedules: this.state.schedules })
@@ -83,11 +83,11 @@ export default class ViewClassroom extends Component {
     componentWillMount() {
         this.loadFaculties();
         this.setState({ showAlert: false });
-        axios.get('http://localhost:8000/api/getclassroom/' + this.state.classroom)
+        axios.get("http://localhost:8000/api/getclassroom/" + this.state.classroom)
             .then((response) => {
                 this.loadClassroom(response.data[0])
             })
-        axios.get('http://localhost:8000/api/schedule/' + this.state.classroom)
+        axios.get("http://localhost:8000/api/schedule/" + this.state.classroom)
             .then((response) => {
                 //this.setState({schedules: response.data})
                 this.loadSchedules(response.data)
@@ -103,34 +103,34 @@ export default class ViewClassroom extends Component {
                     <Modal.Title>Detalles salón</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='container-fluid'>
-                        <Form id='formulario' onSubmit={this.updateClassroom}>
-                            <Row className='bb-1-g mb-3'>
-                                <Col className='col-sm-3 col-xl-2'>
+                    <div className="container-fluid">
+                        <Form id="formulario" onSubmit={this.updateClassroom}>
+                            <Row className="bb-1-g mb-3">
+                                <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>No. Salón</span></Form.Label>
-                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
+                                        <Form.Label><span className="ml-0">No. Salón</span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
                                     </Form.Group>
                                 </Col>
-                                <Col className='col-sm-3 col-xl-2'>
+                                <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Capacidad</span></Form.Label>
-                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
+                                        <Form.Label><span className="ml-0">Capacidad</span></Form.Label>
+                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
                                     </Form.Group>
                                 </Col>
-                                <Col className='col-sm-6 col-xl-4'>
+                                <Col className="col-sm-6 col-xl-4">
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Facultad</span></Form.Label>
-                                        <Form.Control className='ml-0' as='select' name='faculty' value={this.state.faculty} onChange={this.handleChange}>
+                                        <Form.Label><span className="ml-0">Facultad</span></Form.Label>
+                                        <Form.Control className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
                                             <this.createListFaculties />
                                         </Form.Control>
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <Row className='bb-1-g mb-3'>
-                                <Col className='col-sm-12'>
-                                    <Table responsive size='s'>
-                                        <thead className='table-sm'>
+                            <Row className="bb-1-g mb-3">
+                                <Col className="col-sm-12">
+                                    <Table responsive size="s">
+                                        <thead className="table-sm">
                                             <tr>
                                                 <th>Hora</th>
                                                 <th>Lunes</th>
@@ -141,7 +141,7 @@ export default class ViewClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className='table-sm body-horario'>
+                                        <tbody className="table-sm body-horario">
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>
@@ -221,21 +221,21 @@ export default class ViewClassroom extends Component {
                             <Row>
                                 <Col>
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Descripción</span></Form.Label>
-                                        <textarea className='form-control' name='description' id='' value={this.state.description} onChange={this.handleChange} required></textarea>
+                                        <Form.Label><span className="ml-0">Descripción</span></Form.Label>
+                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange} required></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>
                         </Form>
                     </div>
-                    <div className='no-login time'>
-                        <Alert variant='danger' show={this.state.show} onClose={handleDismiss} dismissible>
-                            <p className='mb-0'>{this.state.message}</p>
+                    <div className="no-login time">
+                        <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
+                            <p className="mb-0">{this.state.message}</p>
                         </Alert>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant='secondary' onClick={this.handleClose}>Cerrar</Button>
+                    <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
                 </Modal.Footer>
             </>
         );

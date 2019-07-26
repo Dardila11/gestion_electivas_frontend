@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import { Image, Nav, Tab, Form, Container } from 'react-bootstrap';
+import React, { Component } from "react";
+import { Image, Nav, Tab, Form, Container } from "react-bootstrap";
 
-import { hide } from '../js/HandleDOM';
-import ListClassroom from './classroom/ListClassroom';
-import ListElective from './elective/ListElective';
-import ListStudent from './student/ListStudent';
+import { hide } from "../../js/HandleDOM";
+import ListClassroom from "../classroom/ListClassroom";
+import ListElective from "../elective/ListElective";
+import ListStudent from "../student/ListStudent";
 
-export default class NavBar extends Component {
+export default class NavBarSecretary extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            user: '',
+            user: "",
             show: true,
             tab: 2
         };
@@ -40,8 +40,8 @@ export default class NavBar extends Component {
     }
 
     componentWillMount() {
-        if (localStorage.getItem('user') != null) {
-            this.setState({ user: localStorage.getItem('user').replace(/['"]+/g, '') });
+        if (localStorage.getItem("user") != null) {
+            this.setState({ user: localStorage.getItem("user").replace(/[""]+/g, "") });
         }
     }
 

@@ -1,36 +1,36 @@
-import React, { Component } from 'react';
-import { Form, Modal, Button, Table, Alert, Row, Col, ListGroup } from 'react-bootstrap';
-import axios from 'axios';
+import React, { Component } from "react";
+import { Form, Modal, Button, Table, Alert, Row, Col, ListGroup } from "react-bootstrap";
+import axios from "axios";
 
-import '../../css/Table.css';
-import { time, addSchedule, removeSchedule } from '../../js/HandleDOM';
-import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from '../../js/HandleSchedule';
+import "../../css/Table.css";
+import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
+import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
 
 export default class AddClassroom extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            classroom_id: '',
-            capacity: '',
-            description: '',
+            classroom_id: "",
+            capacity: "",
+            description: "",
             faculty: -1,
             time_from: 1,
             time_to: 1,
             day: 1,
             faculties: [],
             schedules: [],
-            message: '',
+            message: "",
             show: false
         };
         this.addClassroom = this.addClassroom.bind(this);
         this.loadFaculties = this.loadFaculties.bind(this);
         this.createListFaculties = this.createListFaculties.bind(this);
-        this.createListSchedule = this.createListSchedule.bind(this);
+        this.createListSchedules = this.createListSchedules.bind(this);
     }
 
     handleChange = (event) => {
         const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const value = target.type === "checkbox" ? target.checked : target.value;
         const name = target.name;
         this.setState({ [name]: value });
     }
@@ -50,15 +50,15 @@ export default class AddClassroom extends Component {
                 var time_from = hashHour(this.state.time_from);
                 var time_to = hashHour(this.state.time_to);
                 var day = hashDay(this.state.day);
-                this.state.schedules.push({ 'time_from': time_from, 'time_to': time_to, 'day': day });
+                this.state.schedules.push({ "time_from": time_from, "time_to": time_to, "day": day });
                 this.setState({ schedules: this.state.schedules })
             } else {
                 time();
-                this.setState({ message: 'La hora de fin debe ser mayor a la hora de inicio', show: true });
+                this.setState({ message: "La hora de fin debe ser mayor a la hora de inicio", show: true });
             }
         } else {
             time();
-            this.setState({ message: 'El horario esta incluido en otra franja', show: true });
+            this.setState({ message: "El horario esta incluido en otra franja", show: true });
         }
     }
 
@@ -66,9 +66,9 @@ export default class AddClassroom extends Component {
         var schedule;
         var i = 0;
         for (schedule of this.state.schedules) {
-            var time_from = event.target.value.split('|')[0];
-            var time_to = event.target.value.split('|')[1];
-            var day = event.target.value.split('|')[2];
+            var time_from = event.target.value.split("|")[0];
+            var time_to = event.target.value.split("|")[1];
+            var day = event.target.value.split("|")[2];
             if (time_from === schedule.time_from && time_to === schedule.time_to && day === schedule.day) {
                 this.state.schedules.splice(i, 1);
                 removeSchedule(unhashHour(time_from), unhashHour(time_to), unhashDay(day));
@@ -87,12 +87,12 @@ export default class AddClassroom extends Component {
             //CREATE CLASSROOM
             const { classroom_id, capacity, description, faculty } = this.state;
             var json = {
-                'classroom_id': classroom_id,
-                'capacity': capacity,
-                'description': description,
-                'faculty': faculty
+                "classroom_id": classroom_id,
+                "capacity": capacity,
+                "description": description,
+                "faculty": faculty
             }
-            await axios.put('http://localhost:8000/api/classroom/', json)
+            await axios.put("http://localhost:8000/api/classroom/", json)
                 .then(() => {
                     okClassroom = true;
                 })
@@ -100,23 +100,23 @@ export default class AddClassroom extends Component {
                     console.log(error);
                     if (error.response.status) {
                         time();
-                        this.setState({ message: 'El salón ya existe', show: true });
+                        this.setState({ message: "El salón ya existe", show: true });
                     }
                 });
             //CREATE SCHEDULES TO CLASSROOM
             const { schedules } = this.state;
             json = {
-                'classroom': classroom_id,
-                'schedules': schedules
+                "classroom": classroom_id,
+                "schedules": schedules
             }
-            await axios.put('http://localhost:8000/api/schedule/', json)
+            await axios.put("http://localhost:8000/api/schedule/", json)
                 .then(() => {
                     okSchedules = true;
                 })
                 .catch(error => {
                     if (error.response.status) {
                         time();
-                        this.setState({ message: 'Alguno de los horarios ya existe', show: true });
+                        this.setState({ message: "Alguno de los horarios ya existe", show: true });
                     }
                 });
             if (okClassroom && okSchedules) {
@@ -124,15 +124,14 @@ export default class AddClassroom extends Component {
             }
         } else {
             time();
-            this.setState({ message: 'Seleccione una facultad', show: true });
+            this.setState({ message: "Seleccione una facultad", show: true });
         }
     }
     //- - - - - - - - - - - - - - - -
 
     //LOAD DATA
-    //TODO Update faculty for first position in array request server
     loadFaculties() {
-        axios.post('http://localhost:8000/api/faculty/')
+        axios.post("http://localhost:8000/api/faculty/")
             .then(response =>
                 this.setState({ faculties: response.data }))
     }
@@ -146,13 +145,13 @@ export default class AddClassroom extends Component {
         return listItems;
     }
 
-    createListSchedule() {
+    createListSchedules() {
         const listItems = this.state.schedules.map((schedule) =>
             <ListGroup.Item
-                className='text-s1'
-                key={schedule.time_from + '' + schedule.time_to + '' + schedule.day}>
-                {schedule.day + ': ' + schedule.time_from + ' - ' + schedule.time_to}
-                <Button name='schedule' value={schedule.time_from + '|' + schedule.time_to + '|' + schedule.day} onClick={this.removeSchedule} className='mouse float-right text-sm p-0'>x</Button>
+                className="text-s1"
+                key={schedule.time_from + "" + schedule.time_to + "" + schedule.day}>
+                {schedule.day + ": " + schedule.time_from + " - " + schedule.time_to}
+                <Button name="schedule" value={schedule.time_from + "|" + schedule.time_to + "|" + schedule.day} onClick={this.removeSchedule} className="mouse float-right text-sm p-0">x</Button>
             </ListGroup.Item>
         );
         return listItems;
@@ -173,95 +172,95 @@ export default class AddClassroom extends Component {
                     <Modal.Title>Registrar salón</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='container-fluid'>
-                        <Form id='formulario' onSubmit={this.addClassroom}>
-                            <Row className='bb-1-g mb-3'>
-                                <Col className='col-sm-3 col-xl-2'>
+                    <div className="container-fluid">
+                        <Form id="formulario" onSubmit={this.addClassroom}>
+                            <Row className="bb-1-g mb-3">
+                                <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>No. Salón</span></Form.Label>
-                                        <Form.Control className='ml-0' type='text' name='classroom_id' value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
+                                        <Form.Label><span className="ml-0">No. Salón</span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
                                     </Form.Group>
                                 </Col>
-                                <Col className='col-sm-3 col-xl-2'>
+                                <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Capacidad</span></Form.Label>
-                                        <Form.Control className='ml-0' type='number' name='capacity' value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
+                                        <Form.Label><span className="ml-0">Capacidad</span></Form.Label>
+                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
                                     </Form.Group>
                                 </Col>
-                                <Col className='col-sm-6 col-xl-4'>
+                                <Col className="col-sm-6 col-xl-4">
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Facultad</span></Form.Label>
-                                        <Form.Control className='ml-0' as='select' name='faculty' value={this.state.faculty} onChange={this.handleChange}>
+                                        <Form.Label><span className="ml-0">Facultad</span></Form.Label>
+                                        <Form.Control className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <this.createListFaculties />
                                         </Form.Control>
                                     </Form.Group>
                                 </Col>
                             </Row>
-                            <Row className='bb-1-g mb-3'>
-                                <Col className='col-sm-4'>
+                            <Row className="bb-1-g mb-3">
+                                <Col className="col-sm-4">
                                     <Row>
-                                        <Col className='col-sm-12'>
+                                        <Col className="col-sm-12">
                                             <Form.Group>
-                                                <Form.Label><span className='ml-0'>Día</span></Form.Label>
-                                                <Form.Control className='ml-0' as='select' name='day' value={this.state.day} onChange={this.handleChange}>
-                                                    <option value='1'>Lunes</option>
-                                                    <option value='2'>Martes</option>
-                                                    <option value='3'>Miércoles</option>
-                                                    <option value='4'>Jueves</option>
-                                                    <option value='5'>Viernes</option>
-                                                    <option value='6'>Sábado</option>
+                                                <Form.Label><span className="ml-0">Día</span></Form.Label>
+                                                <Form.Control className="ml-0" as="select" name="day" value={this.state.day} onChange={this.handleChange}>
+                                                    <option value="1">Lunes</option>
+                                                    <option value="2">Martes</option>
+                                                    <option value="3">Miércoles</option>
+                                                    <option value="4">Jueves</option>
+                                                    <option value="5">Viernes</option>
+                                                    <option value="6">Sábado</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
-                                        <Col className='col-sm-6'>
+                                        <Col className="col-sm-6">
                                             <Form.Group>
-                                                <Form.Label><span className='ml-0'>Inicio</span></Form.Label>
-                                                <Form.Control className='ml-0' as='select' name='time_from' value={this.state.time_from} onChange={this.handleChange}>
-                                                    <option value='1'>07:00</option>
-                                                    <option value='2'>09:00</option>
-                                                    <option value='3'>11:00</option>
-                                                    <option value='5'>14:00</option>
-                                                    <option value='6'>16:00</option>
-                                                    <option value='7'>18:00</option>
-                                                    <option value='8'>20:00</option>
+                                                <Form.Label><span className="ml-0">Inicio</span></Form.Label>
+                                                <Form.Control className="ml-0" as="select" name="time_from" value={this.state.time_from} onChange={this.handleChange}>
+                                                    <option value="1">07:00</option>
+                                                    <option value="2">09:00</option>
+                                                    <option value="3">11:00</option>
+                                                    <option value="5">14:00</option>
+                                                    <option value="6">16:00</option>
+                                                    <option value="7">18:00</option>
+                                                    <option value="8">20:00</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
-                                        <Col className='col-sm-6'>
+                                        <Col className="col-sm-6">
                                             <Form.Group>
-                                                <Form.Label><span className='ml-0'>Fin</span></Form.Label>
-                                                <Form.Control className='ml-0' as='select' name='time_to' value={this.state.time_to} onChange={this.handleChange}>
-                                                    <option value='1'>07:00</option>
-                                                    <option value='2'>09:00</option>
-                                                    <option value='3'>11:00</option>
-                                                    <option value='4'>13:00</option>
-                                                    <option value='5'>14:00</option>
-                                                    <option value='6'>16:00</option>
-                                                    <option value='7'>18:00</option>
-                                                    <option value='8'>20:00</option>
-                                                    <option value='9'>21:00</option>
+                                                <Form.Label><span className="ml-0">Fin</span></Form.Label>
+                                                <Form.Control className="ml-0" as="select" name="time_to" value={this.state.time_to} onChange={this.handleChange}>
+                                                    <option value="1">07:00</option>
+                                                    <option value="2">09:00</option>
+                                                    <option value="3">11:00</option>
+                                                    <option value="4">13:00</option>
+                                                    <option value="5">14:00</option>
+                                                    <option value="6">16:00</option>
+                                                    <option value="7">18:00</option>
+                                                    <option value="8">20:00</option>
+                                                    <option value="9">21:00</option>
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
                                     </Row>
                                     <Row>
-                                        <Col className='col-sm-12'>
-                                            <Button className='rounded-10  w-100' variant='primary' onClick={this.addSchedule}>Agregar Horario</Button>
+                                        <Col className="col-sm-12">
+                                            <Button className="rounded-10  w-100" variant="primary" onClick={this.addSchedule}>Agregar Horario</Button>
                                         </Col>
                                     </Row>
-                                    <Row className='pt-2 pb-2'>
+                                    <Row className="pt-2 pb-2">
                                         <Col>
-                                            <ListGroup className='w-l over-y'>
-                                                <this.createListSchedule />
+                                            <ListGroup className="w-l over-y">
+                                                <this.createListSchedules />
                                             </ListGroup>
                                         </Col>
                                     </Row>
                                 </Col>
-                                <Col className='col-sm-8'>
-                                    <Table responsive size='s'>
-                                        <thead className='table-sm'>
-                                            <tr className='th-s'>
+                                <Col className="col-sm-8">
+                                    <Table responsive size="s">
+                                        <thead className="table-sm">
+                                            <tr className="th-s">
                                                 <th>Hora</th>
                                                 <th>Lunes</th>
                                                 <th>Martes</th>
@@ -271,7 +270,7 @@ export default class AddClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className='table-sm body-horario'>
+                                        <tbody className="table-sm body-horario">
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>
@@ -351,8 +350,8 @@ export default class AddClassroom extends Component {
                             <Row>
                                 <Col>
                                     <Form.Group>
-                                        <Form.Label><span className='ml-0'>Descripción</span></Form.Label>
-                                        <textarea className='form-control' name='description' id='' value={this.state.description} onChange={this.handleChange} required></textarea>
+                                        <Form.Label><span className="ml-0">Descripción</span></Form.Label>
+                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange} required></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -361,12 +360,12 @@ export default class AddClassroom extends Component {
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant='primary' type='submit' form='formulario'>Registrar</Button>
-                    <Button variant='secondary' onClick={this.handleClose}>Cerrar</Button>
+                    <Button variant="primary" type="submit" form="formulario">Registrar</Button>
+                    <Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
                 </Modal.Footer>
-                <div className='no-login time'>
-                    <Alert variant='danger' show={this.state.show} onClose={handleDismiss} dismissible>
-                        <p className='mb-0'>{this.state.message}</p>
+                <div className="no-login time">
+                    <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
+                        <p className="mb-0">{this.state.message}</p>
                     </Alert>
                 </div>
             </>
