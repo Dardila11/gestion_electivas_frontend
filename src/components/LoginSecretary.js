@@ -13,12 +13,12 @@ export default class LoginSecretary extends Component {
         this.state = {
             username: "anita",
             password: "oracle",
-            redirect: false,
+            dashboard: false,
+            semester: false,
             message: "",
             show: false
         };
         this.handleChange = this.handleChange.bind(this);
-        this.redirect = this.redirect.bind(this);
         this.onLogin = this.onLogin.bind(this);
     }
 
@@ -26,15 +26,33 @@ export default class LoginSecretary extends Component {
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    redirect(response) {
+    handleSemester = (data) => {
+        if (data.length > 0) {
+            const now = new Date();
+            const date = new Date(data[data.length - 1].fields.until_date);
+            if (now > date) {
+                this.setState({ semester: true });
+            } else {
+                localStorage.setItem("semester", data[data.length - 1].pk);
+                this.setState({ dashboard: true });
+            }
+        } else {
+            this.setState({ semester: true });
+        }
+    }
+
+    redirect = (response) => {
         localStorage.setItem("user", JSON.stringify(response.data.user.username));
         localStorage.setItem("token", JSON.stringify(response.data.token));
-        this.setState({ show: false, redirect: true });
+        axios.get('http://localhost:8000/api/semester/', { 'token': this.token }, { cancelToken: this.source.token, })
+            .then((response) => {
+                this.handleSemester(response.data);
+            })
     }
 
     onLogin(event) {
         event.preventDefault();
-        const { username, password } = this.state;        
+        const { username, password } = this.state;
         axios.post("http://localhost:8000/api/login/", { username, password }, { cancelToken: this.source.token, })
             .then(response => this.redirect(response))
             .catch(error => {
@@ -53,8 +71,11 @@ export default class LoginSecretary extends Component {
     }
 
     render() {
-        if (this.state.redirect) {
+        if (this.state.dashboard) {
             return <Redirect to="/dashboard" />;
+        }
+        else if (this.state.semester) {
+            return <Redirect to="/semester" />
         }
         const handleDismiss = () => this.setState({ show: false });
         return (

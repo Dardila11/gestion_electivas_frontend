@@ -1,234 +1,246 @@
-import React, { Component } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { Component } from "react";
+import { Form, Button, Alert, Row, Col, Modal } from "react-bootstrap";
 
-import DatePicker from 'react-datepicker';
-import { registerLocale } from 'react-datepicker';
-import axios from 'axios';
+import { Redirect } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import { registerLocale } from "react-datepicker";
+import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
-import es from 'date-fns/locale/es';
-registerLocale('es', es);
+import es from "date-fns/locale/es";
+import { time } from "../../js/HandleDOM";
+registerLocale("es", es);
 
 class FormStartElectivesProcess extends Component {
+    CancelToken = axios.CancelToken;
+    source = this.CancelToken.source();
     constructor(props, context) {
         super(props, context);
         this.state = {
-            semesterYear: "2020",
-            semesterTerm: "2",
-            startDate: new Date(),
-            startSemesterDate: new Date(),
-            endDate: new Date(),
-            endSemesterDate: new Date(),
+            year: -1,
+            period: -1,
+            semesterDateFrom: new Date(),
+            semesterDateTo: new Date(),
             focusedSemesterInput: "",
-            startTime: new Date(),
-            endTime: new Date(),
             focusedInput: "",
             redirect: false,
             error: false,
-            show: true
+            show: false,
+            showAlertThis: false,
+            showAlertModal: false,
+            semester: -1,
+            semesters: [],
+            message: ""
         };
-        this.newSemester = this.newSemester.bind(this);
+        this.createSemester = this.createSemester.bind(this);
         this.redirect = this.redirect.bind(this);
-        this.handleChangeStart = this.handleChangeStart.bind(this);
-        this.handleChangeEnd = this.handleChangeEnd.bind(this);
-        this.handleChangeSemesterStart = this.handleChangeSemesterStart.bind(this);
-        this.handleChangeSemesterEnd = this.handleChangeSemesterEnd.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleChangeStartTime = this.handleChangeStartTime.bind(this);
-        this.handleChangeEndTime = this.handleChangeEndTime.bind(this);
-        this.handleChangeYear = this.handleChangeYear.bind(this);
     }
 
-    handleChangeYear(year) {
-        this.setState({
-            semesterYear: year
-        });
+    handleChange = (event) => {
+        const target = event.target;
+        const value = target.type === "checkbox" ? target.checked : target.value;
+        const name = target.name;
+        this.setState({ [name]: value });
     }
 
-    handleChangeEndTime(time) {
-        this.setState({
-            endTime: time
-        });
+    handleClose = () => {
+        this.setState({ show: false });
     }
 
-    handleChangeStartTime(time) {
-        this.setState({
-            startTime: time
-        });
+    //HANDLE DATE AND TIME
+    handleChangeSemesterDateFrom = (date) => {
+        this.setState({ semesterDateFrom: date });
     }
 
-    handleChange(event) {
-        this.setState({ [event.target.name]: [event.target.value] })
+    handleChangeSemesterDateTo = (date) => {
+        this.setState({ semesterDateTo: date });
     }
-    handleChangeSemesterStart(sDate) {
-        this.setState({
-            startSemesterDate: sDate
-        });
-    }
-    handleChangeSemesterEnd(eDate) {
-        this.setState({
-            endSemesterDate: eDate
-        });
-        console.log(this.state.endSemesterDate);
-    }
+    //- - - - - - - - - - - - - - - -
 
-    handleChangeStart(sDate) {
-        //this.setState({ [event.target.name]: event.target.value });
-        this.setState({
-            startDate: sDate
-
-        });
-
-        console.log(this.state.startDate);
-    }
-
-    handleChangeEnd(eDate) {
-        //this.setState({ [event.target.name]: event.target.value });
-        this.setState({
-            endDate: eDate
-        });
-        console.log(this.state.endDate);
-
-
-    }
     redirect() {
+        localStorage.setItem("semester", this.state.semester);
         this.setState({ redirect: true });
-        this.setState({ error: false });
-        console.log(this.state.error);
     }
 
-    newSemester(event) {
-
-        const { semesterYear, semesterTerm, startDate, startSemesterDate, endDate, endSemesterDate, startTime, endTime } = this.state;
-        event.preventDefault();
-        var fechaInicio = startDate.getFullYear() + "-" + startDate.getMonth() + "-" + startDate.getDate();
-        var fechaFinal = endDate.getFullYear() + "-" + endDate.getMonth() + "-" + endDate.getDate();
-        var fechaSemestreInicio = startSemesterDate.getFullYear() + "-" + startSemesterDate.getMonth() + "-" + startSemesterDate.getDate() + "T" + startTime.getHours() + ":" + startTime.getMinutes() + ":" + startTime.getSeconds();
-        var fechaSemestreFinal = endSemesterDate.getFullYear() + "-" + endSemesterDate.getMonth() + "-" + endSemesterDate.getDate() + "T" + endTime.getHours() + ":" + endTime.getMinutes() + ":" + endTime.getSeconds();
-        var json = {
-            "year": semesterYear,
-            "period": semesterTerm,
-            "from_date": fechaInicio,
-            "until_date": fechaFinal,
-            "from_date_vote": fechaSemestreInicio,
-            "until_date_vote": fechaSemestreFinal
+    selectSemester = () => {
+        if (parseInt(this.state.semester) !== -1) {
+            this.redirect();
+        } else {
+            this.setState({ message: "Eliga un semester", showAlertModal: true });
+            time();
         }
-        axios.post('http://localhost:8000/api/semester/', json)
-            .then(response => this.redirect(response))
-            .catch(error => {
-                this.setState({ error: true })
-            });
-
-        console.log("año semestre " + semesterYear);
-        console.log("año periodo " + semesterTerm);
-        console.log("fecha inicio " + fechaInicio);
-        console.log("fecha final " + fechaFinal);
-        console.log("fecha Semestre inicio " + fechaSemestreInicio);
-        console.log("fecha Semestre final " + fechaSemestreFinal);
-
     }
 
+    //REQUESTS SERVER
+    createSemester(event) {
+        event.preventDefault();
+        if (parseInt(this.state.year) !== -1 || parseInt(this.state.period) !== -1) {
+            const { year, period, semesterDateFrom, semesterDateTo } = this.state;
+            const from_date = semesterDateFrom.getFullYear() + "-" + semesterDateFrom.getMonth() + "-" + semesterDateFrom.getDate();
+            const until_date = semesterDateTo.getFullYear() + "-" + semesterDateTo.getMonth() + "-" + semesterDateTo.getDate();
+            var json = {
+                "year": year,
+                "period": period,
+                "from_date": from_date,
+                "until_date": until_date
+            }
+            axios.post("http://localhost:8000/api/semester/", json)
+                .then((response) => { this.setState({ semester: response.data[0].pk }); this.redirect(response) })
+                .catch(error => {
+                    this.setState({ error: true })
+                });
+        } else {
+            this.setState({ message: "Eliga un año y periodo", showAlertThis: true });
+            time();
+        }
+    }
+    //- - - - - - - - - - - - - - - -
+
+    //LOAD DATA
+    loadSemesters = () => {
+        axios.get("http://localhost:8000/api/semester/")
+            .then(response =>
+                this.setState({ semesters: response.data })
+            )
+    }
+    //- - - - - - - - - - - - - - - -
+
+    //CREATE HTML
+    createListSemesters = () => {
+        const listItems = this.state.semesters.map((semester) =>
+            <option key={semester.pk} value={semester.pk}>{semester.fields.year} - {semester.fields.period}</option>
+        );
+        return listItems;
+    }
+    //- - - - - - - - - - - - - - - -
+
+    //METHODS LIFESPAN COMPONENT
     componentWillMount() {
-        console.log('call create')
+        this.loadSemesters();
     }
-
-    componentWillUnmount() {
-        console.log('call destroy')
-    }
+    //- - - - - - - - - - - - - - - -
 
     render() {
         if (this.state.redirect) {
-            // redireccionamos a la gestion de salones
+            return <Redirect to="/dashboard" />;
         }
-        const handleShow = () => this.setState({ show: true });
-        const handleDismiss = () => this.setState({ show: false });
+        const handleShow = () => this.setState({ show: true, showAlertModal: false });
+        const handleDismiss = () => this.setState({ show: false, showAlertModal: false });
         return (
-            <div className="card">
-                <div className="card-header">
-                    <span className="h3 center font-weight-bold">INICIAR PROCESO DE ELECTIVAS</span>
-                </div>
-                <Form onSubmit={this.newSemester}>
-                    <div className="btn-group-vertical">
-                        <Form.Label><span className="h4">Semestre</span></Form.Label>
-                        <div className="align-baseline">
-                            <Form.Control as="select">
-                                <option >2019</option>
-                                <option >2020</option>
-                                <option >2021</option>
-                            </Form.Control>
-                            <Form.Label><span className="h4">Periodo</span></Form.Label>
-                            <Form.Control as="select">
-                                <option >1</option>
-                                <option >2</option>
-                            </Form.Control>
-                        </div>
-
-                        <Form.Label><span className="h4 mt-3">Fechas Semestre</span></Form.Label>
-                        <DatePicker
-                            selected={this.state.startDate}
-                            selectsStart
-                            startDate={this.state.startDate}
-                            endDate={this.state.endDate}
-                            onChange={this.handleChangeStart}
-                            placeholderText="Fecha Inicio"
-                            dateFormat="dd/MM/yyyy"
-                        />
-                        <DatePicker
-                            selected={this.state.endDate}
-                            selectsEnd
-                            startDate={this.state.startDate}
-                            endDate={this.state.endDate}
-                            onChange={this.handleChangeEnd}
-                            minDate={this.state.startDate}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText="Fecha Final"
-                        />
-                        <DatePicker
-                            selected={this.state.startTime}
-                            onChange={this.handleChangeStartTime}
-                            showTimeSelect
-                            showTimeSelectOnly
-                            timeIntervals={15}
-                            dateFormat="h:mm aa"
-                            timeCaption="Time"
-                        />
-                        <Form.Label><span className="h4 mt-3">Fechas Proceso de Electivas</span></Form.Label>
-                        <DatePicker
-                            selected={this.state.startSemesterDate}
-                            selectsStart
-                            startDate={this.state.startSemesterDate}
-                            endDate={this.state.endSemesterDate}
-                            onChange={this.handleChangeSemesterStart}
-                            placeholderText="Fecha Inicio"
-                            dateFormat="dd/MM/yyyy"
-                        />
-                        <DatePicker
-                            selected={this.state.endSemesterDate}
-                            selectsStart
-                            startDate={this.state.startSemesterDate}
-                            endDate={this.state.endSemesterDate}
-                            onChange={this.handleChangeSemesterEnd}
-                            dateFormat="dd/MM/yyyy"
-                            placeholderText="Fecha Final"
-                        />
-                        <DatePicker
-                            selected={this.state.endTime}
-                            onChange={this.handleChangeEndTime}
-                            showTimeSelect
-                            showTimeSelectOnly
-                            timeIntervals={15}
-                            dateFormat="h:mm aa"
-                            timeCaption="Time"
-                        />
-                        <Button className="mt-3 rounded-10" onClick={handleShow} variant="primary" type="submit">Iniciar Nuevo Semestre</Button>
-
+            <>
+                <div className="card m-3">
+                    <div className="card-header">
+                        <span className="center font-weight-bold">INICIAR PROCESO DE ELECTIVAS</span>
                     </div>
-                    <div className="no-login">
-                        <Alert variant="danger" show={this.state.show && this.state.error} onClose={handleDismiss} dismissible>
-                            <p>Hubo un error al iniciar el proceso de electivas</p>
+                    <div className="card-body">
+                        <Form id="formulario" onSubmit={this.createSemester}>
+                            <Row>
+                                <Col>
+                                    <Form.Label><span className="h5">Semestre</span></Form.Label>
+                                    <Form.Group>
+                                        <Row>
+                                            <Col className="col-lg-2">
+                                                <Form.Label><span >Año</span></Form.Label>
+                                                <Form.Control name="year" as="select" onChange={this.handleChange}>
+                                                    <option value={-1}>-----</option>
+                                                    <option value="2019">2019</option>
+                                                    <option value="2020">2020</option>
+                                                    <option value="2021">2021</option>
+                                                </Form.Control>
+                                            </Col>
+                                            <Col className="col-lg-2">
+                                                <Form.Label><span >Periodo</span></Form.Label>
+                                                <Form.Control name="period" as="select" onChange={this.handleChange}>
+                                                    <option value={-1}>-----</option>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                </Form.Control>
+                                            </Col>
+                                        </Row>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                            <Row className="mt-2">
+                                <Col>
+                                    <Form.Label><span className="h5">Fechas de Semestre</span></Form.Label>
+                                    <Form.Group>
+                                        <Row>
+                                            <Col className="col-lg-3">
+                                                <Form.Label><span >Inicio</span></Form.Label>
+                                                <Form.Group className="mb-0">
+                                                    <DatePicker className="form-control"
+                                                        selected={this.state.semesterDateFrom}
+                                                        selectsStart
+                                                        voteDateFrom={this.state.semesterDateFrom}
+                                                        voteDateTo={this.state.semesterDateTo}
+                                                        onChange={this.handleChangeSemesterDateFrom}
+                                                        placeholderText="Fecha Inicio"
+                                                        dateFormat="dd/MM/yyyy"
+                                                    />
+
+                                                </Form.Group>
+                                            </Col>
+                                            <Col className="col-lg-3">
+                                                <Form.Label><span >Final</span></Form.Label>
+                                                <Form.Group className="mb-0">
+                                                    <DatePicker className="form-control"
+                                                        selected={this.state.semesterDateTo}
+                                                        selectsStart
+                                                        voteDateFrom={this.state.semesterDateFrom}
+                                                        voteDateTo={this.state.semesterDateTo}
+                                                        onChange={this.handleChangeSemesterDateTo}
+                                                        dateFormat="dd/MM/yyyy"
+                                                        placeholderText="Fecha Final"
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </div>
+                    <div className="card-footer">
+                        <div className="d-flex">
+                            <Button className="rounded-10 mr-1" form="formulario" variant="primary" type="submit">Iniciar nuevo semestre</Button>
+                            <Button className="rounded-10" variant="secondary" onClick={handleShow}>Seleccionar uno anterior</Button>
+                        </div>
+                    </div>
+                </div>
+                <Modal className="modal-custom" show={this.state.show} onHide={this.handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Seleccionar semestre</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="container-fluid">
+                            <Row>
+                                <Col className="col-sm-3 col-xl-2">
+                                    <Form.Label><span className="ml-0">Semestre</span></Form.Label>
+                                    <Form.Control className="ml-0" as="select" name="semester" value={this.state.semester} onChange={this.handleChange}>
+                                        <option value={-1}>-----</option>
+                                        <this.createListSemesters />
+                                    </Form.Control>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <div className="d-flex">
+                            <Button variant="primary mr-1" onClick={this.selectSemester}>Seleccionar semestre</Button>
+                            <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
+                        </div>
+                    </Modal.Footer>
+                    <div className="no-login time">
+                        <Alert variant="danger" show={this.state.showAlertModal} onClose={handleDismiss} dismissible>
+                            <p className="mb-0">{this.state.message}</p>
                         </Alert>
                     </div>
-                </Form>
-            </div>
+                </Modal>
+                <div className="no-login time">
+                    <Alert variant="danger" show={this.state.showAlertThis} onClose={handleDismiss} dismissible>
+                        <p className="mb-0">{this.state.message}</p>
+                    </Alert>
+                </div>
+            </>
         )
     }
 }

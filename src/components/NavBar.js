@@ -25,6 +25,7 @@ export default class NavBar extends Component {
 	onLogout() {
 		localStorage.removeItem("token");
 		localStorage.removeItem("user");
+		localStorage.removeItem("semester");
 		this.setState({ redirect: true });
 	}
 

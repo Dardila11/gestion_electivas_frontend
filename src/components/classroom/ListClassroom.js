@@ -5,8 +5,11 @@ import axios from 'axios';
 import { time, changePage } from '../../js/HandleDOM';
 import AddClassroom from './AddClassroom';
 import EditClassroom from './EditClassroom';
+import ViewClassroom from './ViewClassroom';
 
 export default class ListClassroom extends Component {
+	CancelToken = axios.CancelToken;
+	source = this.CancelToken.source();
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
@@ -14,6 +17,7 @@ export default class ListClassroom extends Component {
 			size: 0,
 			page: 0,
 			listClassroom: [],
+			showView: false,
 			showCreate: false,
 			showUpdate: false,
 			showAlert: false,
@@ -23,14 +27,13 @@ export default class ListClassroom extends Component {
 		this.create = this.create.bind(this);
 		this.loadClassrooms = this.loadClassrooms.bind(this);
 		this.createTableClassrooms = this.createTableClassrooms.bind(this);
-		this.update = this.update.bind(this);
 		this.editar = this.editar.bind(this);
 		this.eliminar = this.eliminar.bind(this);
 		this.preguntar = this.preguntar.bind(this);
 	}
 
 	handleClose() {
-		this.setState({ showCreate: false, showUpdate: false, showAlert: false });
+		this.setState({ showView: false, showCreate: false, showUpdate: false, showAlert: false });
 		this.loadClassrooms();
 	}
 
@@ -46,17 +49,18 @@ export default class ListClassroom extends Component {
 		time();
 	}
 
+	ver = (event) => {
+		this.setState({ showView: true });
+		this.setState({ id: event.target.value });
+	}
+
 	create() {
 		this.setState({ showCreate: true });
 	}
 
-	update(event) {
-
-	}
-
 	editar(event) {
 		this.setState({ showUpdate: true });
-		this.setState({ id: event.target.value })
+		this.setState({ id: event.target.value });
 	}
 
 	eliminar(event) {
@@ -81,9 +85,11 @@ export default class ListClassroom extends Component {
 				<td>{classroom.fields.classroom_id}</td>
 				<td>{classroom.fields.capacity}</td>
 				<td>
-					<Button className="btn mr-2 beige ver" onClick={this.update} value={classroom.pk}></Button>
-					<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.pk}></Button>
-					<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.pk}></Button>
+					<div className="d-flex">
+						<Button className="btn mr-2 beige ver" onClick={this.ver} value={classroom.pk}></Button>
+						<Button className="btn mr-2 beige editar" onClick={this.editar} value={classroom.pk}></Button>
+						<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={classroom.pk}></Button>
+					</div>
 				</td>
 			</tr>
 		);
@@ -109,7 +115,7 @@ export default class ListClassroom extends Component {
 		const end = parseInt(event.target.name) * 4;
 		changePage(parseInt(event.target.name));
 		this.setState({ page: init });
-		axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + end)
+		axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + end, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listClassroom: response.data })
 			)
@@ -117,11 +123,11 @@ export default class ListClassroom extends Component {
 
 	async loadClassrooms() {
 		var init = this.state.page;
-		await axios.get('http://localhost:8000/api/classroom/count/')
+		await axios.get('http://localhost:8000/api/classroom/count/', { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ size: response.data })
 			)
-		await axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + (init + 4))
+		await axios.get('http://localhost:8000/api/classroom/limit/' + init + '/' + (init + 4), { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listClassroom: response.data })
 			)
@@ -135,7 +141,9 @@ export default class ListClassroom extends Component {
 		this.loadClassrooms();
 	}
 
-	componentWillUnmount() { }
+	componentWillUnmount() {
+		this.source.cancel("cancel request");
+	}
 	//- - - - - - - - - - - - - - - -
 
 	render() {
@@ -165,7 +173,11 @@ export default class ListClassroom extends Component {
 				</Modal>
 				{/* Editar salón */}
 				<Modal className="modal-custom" show={this.state.showUpdate} onHide={this.handleClose}>
-					<EditClassroom handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} salon={this.state.id} />
+					<EditClassroom handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} classroom={this.state.id} />
+				</Modal>
+				{/* Ver salón */}
+				<Modal className="modal-custom" show={this.state.showView} onHide={this.handleClose}>
+					<ViewClassroom handleClose={this.handleClose} classroom={this.state.id} />
 				</Modal>
 				{/* Eliminar salón */}
 				<Modal show={this.state.showAlert} onHide={this.handleClose}>

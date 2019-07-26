@@ -10,11 +10,11 @@ export default class updateClassroom extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            classroom: props.salon,
+            classroom: props.classroom,
             classroom_id: '',
             capacity: '',
             description: '',
-            faculty: 1,
+            faculty: -1,
             time_from: 1,
             time_to: 1,
             day: 1,
@@ -25,19 +25,15 @@ export default class updateClassroom extends Component {
             message: '',
             show: false
         };
-        this.addSchedule = this.addSchedule.bind(this);
-        this.removeSchedule = this.removeSchedule.bind(this);
-        this.loadClassroom = this.loadClassroom.bind(this);
-        this.createListSchedule = this.createListSchedule.bind(this);
         this.updateClassroom = this.updateClassroom.bind(this);
-        this.createListFaculties = this.createListFaculties.bind(this);
+        this.loadClassroom = this.loadClassroom.bind(this);
         this.loadFaculties = this.loadFaculties.bind(this);
         this.loadSchedules = this.loadSchedules.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleCloseUpdate = this.handleCloseUpdate.bind(this);
+        this.createListFaculties = this.createListFaculties.bind(this);
+        this.createListSchedule = this.createListSchedule.bind(this);
     }
 
-    handleChange(event) {
+    handleChange = (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
@@ -50,11 +46,11 @@ export default class updateClassroom extends Component {
         this.props.handleClose();
     }
 
-    handleCloseUpdate() {
+    handleCloseUpdate = () => {
         this.props.handleCloseUpdate();
     }
 
-    addSchedule() {
+    addSchedule = () => {
         var isExists = findSchedule(this.state.schedules, this.state.time_from, this.state.time_to, this.state.day);
         if (isExists) {
             if (addSchedule(this.state.time_from, this.state.time_to, this.state.day)) {
@@ -74,7 +70,7 @@ export default class updateClassroom extends Component {
         }
     }
 
-    removeSchedule(event) {
+    removeSchedule = (event) => {
         var schedule;
         var i = 0;
         for (schedule of this.state.schedules) {
@@ -106,42 +102,54 @@ export default class updateClassroom extends Component {
     //REQUESTS SERVER
     async updateClassroom(event) {
         event.preventDefault();
-        //UPDATE CLASSROOM
-        const { classroom, classroom_id, capacity, description, faculty } = this.state;
-        var json = {
-            'id': classroom,
-            'classroom_id': classroom_id,
-            'capacity': capacity,
-            'description': description,
-            'faculty': faculty
-        }
-        await axios.post('http://localhost:8000/api/classroom/', json)
-            .then(response => {
+        var okClassroom = false, okSchedules = false;
+        if (parseInt(this.state.faculty) !== -1) {
+            //CREATE CLASSROOM
+            const { classroom, classroom_id, capacity, description, faculty } = this.state;
+            var json = {
+                'id': classroom,
+                'classroom_id': classroom_id,
+                'capacity': capacity,
+                'description': description,
+                'faculty': faculty
+            }
+            await axios.post('http://localhost:8000/api/classroom/', json)
+                .then(() => {
+                    okClassroom = true;
+                })
+                .catch(error => {
+                    console.log(error);
+                    if (error.response.status) {
+                        time();
+                        this.setState({ message: 'El salón ya existe', show: true });
+                    }
+                });
+            //UPDATE SCHEDULES TO CLASSROOM
+            const { schedules_add, schedules_delete } = this.state;
+            json = {
+                'id': classroom,
+                'schedules_add': schedules_add,
+                'schedules_delete': schedules_delete
+            }
+            await axios.post('http://localhost:8000/api/schedule/', json)
+                .then(() => {
+                    okSchedules = true;
+                })
+                .catch(error => {
+                    if (error.response.status) {
+                        time();
+                        this.setState({ message: 'Alguno de los horarios ya existe', show: true });
+                    }
+                });
+            if (okClassroom && okSchedules) {
                 this.handleCloseUpdate();
-            })
-            .catch(error => {
-                if (error.response.status) {
-                    time();
-                    this.setState({ show: true });
-                }
-            });
-        //UPDATE SCHEDULES TO CLASSROOM
-        const { schedules_add, schedules_delete } = this.state;
-        json = {
-            'id': classroom,
-            'schedules_add': schedules_add,
-            'schedules_delete': schedules_delete
+            }
+        } else {
+            time();
+            this.setState({ message: 'Seleccione una facultad', show: true });
         }
-        await axios.post('http://localhost:8000/api/schedule/', json)
-            .then(response => {
-            })
-            .catch(error => {
-                if (error.response.status) {
-                    time();
-                    this.setState({ show: true });
-                }
-            });
     }
+    //- - - - - - - - - - - - - - - -
 
     //LOAD DATA
     loadFaculties() {
@@ -232,6 +240,7 @@ export default class updateClassroom extends Component {
                                     <Form.Group>
                                         <Form.Label><span className='ml-0'>Facultad</span></Form.Label>
                                         <Form.Control className='ml-0' as='select' name='faculty' value={this.state.faculty} onChange={this.handleChange}>
+                                            <option key={-1} value={-1}>-----</option>
                                             <this.createListFaculties />
                                         </Form.Control>
                                     </Form.Group>
@@ -260,7 +269,6 @@ export default class updateClassroom extends Component {
                                                     <option value='1'>07:00</option>
                                                     <option value='2'>09:00</option>
                                                     <option value='3'>11:00</option>
-                                                    <option value='4'>13:00</option>
                                                     <option value='5'>14:00</option>
                                                     <option value='6'>16:00</option>
                                                     <option value='7'>18:00</option>
