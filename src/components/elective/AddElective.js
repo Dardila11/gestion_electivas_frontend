@@ -89,7 +89,7 @@ export default class AddElective extends Component {
 
     addSchedule = () => {        
         var isExists = findSchedule(this.state.avaliable_hours, unhashHour(this.state.time_from), unhashDay(this.state.time_to), unhashDay(this.state.day));
-        if (parseInt(this.state.schedule !== -1)) {
+        if (parseInt(this.state.avaliable_hour) !== -1) {
             if (isExists) {
                 if (addSchedule(unhashHour(this.state.time_from), unhashHour(this.state.time_to), unhashDay(this.state.day), "schedule-elective")) {
                     var time_from = this.state.time_from;
