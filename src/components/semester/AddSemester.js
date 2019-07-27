@@ -72,19 +72,25 @@ export default class FormStartElectivesProcess extends Component {
         event.preventDefault();
         if (parseInt(this.state.year) !== -1 || parseInt(this.state.period) !== -1) {
             const { year, period, semesterDateFrom, semesterDateTo } = this.state;
-            const from_date = semesterDateFrom.getFullYear() + "-" + semesterDateFrom.getMonth() + "-" + semesterDateFrom.getDate();
-            const until_date = semesterDateTo.getFullYear() + "-" + semesterDateTo.getMonth() + "-" + semesterDateTo.getDate();
-            var json = {
-                "year": year,
-                "period": period,
-                "from_date": from_date,
-                "until_date": until_date
+            if (Date.parse(semesterDateFrom) < Date.parse(semesterDateTo)) {
+                const from_date = semesterDateFrom.getFullYear() + "-" + semesterDateFrom.getMonth() + "-" + semesterDateFrom.getDate();
+                const until_date = semesterDateTo.getFullYear() + "-" + semesterDateTo.getMonth() + "-" + semesterDateTo.getDate();
+                var json = {
+                    "year": year,
+                    "period": period,
+                    "from_date": from_date,
+                    "until_date": until_date
+                }
+                axios.post("http://localhost:8000/api/semester/", json)
+                    .then((response) => { this.setState({ semester: response.data[0].pk }); this.redirect(response) })
+                    .catch(error => {
+                        this.setState({ error: true })
+                    });
+            } else {
+                this.setState({ message: "La Fecha Final debe ser mayor a la Fecha de Inicio", showAlertThis: true });
+                time();
+                console.log("La fecha final debe ser mayor a la fecha de inicio");
             }
-            axios.post("http://localhost:8000/api/semester/", json)
-                .then((response) => { this.setState({ semester: response.data[0].pk }); this.redirect(response) })
-                .catch(error => {
-                    this.setState({ error: true })
-                });
         } else {
             this.setState({ message: "Eliga un año y periodo", showAlertThis: true });
             time();
@@ -186,6 +192,7 @@ export default class FormStartElectivesProcess extends Component {
                                                         onChange={this.handleChangeSemesterDateTo}
                                                         dateFormat="dd/MM/yyyy"
                                                         placeholderText="Fecha Final"
+                                                        minDate={this.state.semesterDateFrom}
                                                     />
                                                 </Form.Group>
                                             </Col>
