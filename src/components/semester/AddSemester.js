@@ -76,8 +76,8 @@ export default class FormStartElectivesProcess extends Component {
                 const from_date = semesterDateFrom.getFullYear() + "-" + semesterDateFrom.getMonth() + "-" + semesterDateFrom.getDay();
                 const until_date = semesterDateTo.getFullYear() + "-" + semesterDateTo.getMonth() + "-" + semesterDateTo.getDay();
                 var json = {
-                    "year": year,
-                    "period": period,
+                    "year": parseInt(year),
+                    "period": parseInt(period),
                     "from_date": from_date,
                     "until_date": until_date
                 }
