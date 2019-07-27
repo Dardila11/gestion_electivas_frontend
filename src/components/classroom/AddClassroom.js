@@ -46,7 +46,7 @@ export default class AddClassroom extends Component {
     addSchedule = () => {
         var isExists = findSchedule(this.state.schedules, this.state.time_from, this.state.time_to, this.state.day);
         if (isExists) {
-            if (addSchedule(this.state.time_from, this.state.time_to, this.state.day)) {
+            if (addSchedule(this.state.time_from, this.state.time_to, this.state.day, "schedule-classroom")) {
                 var time_from = hashHour(this.state.time_from);
                 var time_to = hashHour(this.state.time_to);
                 var day = hashDay(this.state.day);
@@ -71,7 +71,7 @@ export default class AddClassroom extends Component {
             var day = event.target.value.split("|")[2];
             if (time_from === schedule.time_from && time_to === schedule.time_to && day === schedule.day) {
                 this.state.schedules.splice(i, 1);
-                removeSchedule(unhashHour(time_from), unhashHour(time_to), unhashDay(day));
+                removeSchedule(unhashHour(time_from), unhashHour(time_to), unhashDay(day), "schedule-classroom");
                 break;
             }
             i++;
@@ -270,7 +270,7 @@ export default class AddClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="table-sm body-horario">
+                                        <tbody className="table-sm schedule-classroom">
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>

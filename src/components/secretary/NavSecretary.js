@@ -12,7 +12,7 @@ export default class NavBarSecretary extends Component {
         this.state = {
             user: "",
             show: true,
-            tab: 2
+            tab: 3
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSelect = this.handleSelect.bind(this);

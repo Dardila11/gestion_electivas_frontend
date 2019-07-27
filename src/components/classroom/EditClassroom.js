@@ -53,7 +53,7 @@ export default class updateClassroom extends Component {
     addSchedule = () => {
         var isExists = findSchedule(this.state.schedules, this.state.time_from, this.state.time_to, this.state.day);
         if (isExists) {
-            if (addSchedule(this.state.time_from, this.state.time_to, this.state.day)) {
+            if (addSchedule(this.state.time_from, this.state.time_to, this.state.day, "schedule-classroom")) {
                 var time_from = hashHour(this.state.time_from);
                 var time_to = hashHour(this.state.time_to);
                 var day = hashDay(this.state.day);
@@ -91,7 +91,7 @@ export default class updateClassroom extends Component {
                 if (!is_history)
                     this.state.schedules_delete.push(this.state.schedules[i]);
                 this.state.schedules.splice(i, 1);
-                removeSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia));
+                removeSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia), "schedule-classroom");
                 break;
             }
             i++;
@@ -164,7 +164,7 @@ export default class updateClassroom extends Component {
             var inicio = data[i].schedule__time_from;
             var fin = data[i].schedule__time_to;
             var dia = data[i].schedule__day;
-            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia))) {
+            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia), "schedule-classroom")) {
                 this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
             }
         }
@@ -319,7 +319,7 @@ export default class updateClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="table-sm body-horario">
+                                        <tbody className="table-sm schedule-classroom">
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>

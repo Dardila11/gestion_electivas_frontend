@@ -13,21 +13,21 @@ export function changePage(pos, elemento) {
     }
 }
 
-export function addSchedule(time_from, time_to, day) {
+export function addSchedule(time_from, time_to, day, elemento) {
     if (time_to > time_from) {
         var i;
         for (i = time_from - 1; i < time_to - 1; i++) {
-            $(".body-horario").children().eq(i).children().eq(day).addClass("ocupado");
+            $("."+elemento).children().eq(i).children().eq(day).addClass("ocupado");
         }
         return true;
     }
     return false;
 }
 
-export function removeSchedule(time_from, time_to, day) {
+export function removeSchedule(time_from, time_to, day, elemento) {
     var i;
     for (i = time_from - 1; i < time_to - 1; i++) {
-        $(".body-horario").children().eq(i).children().eq(day).removeClass("ocupado");
+        $("."+elemento).children().eq(i).children().eq(day).removeClass("ocupado");
     }
 }
 

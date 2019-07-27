@@ -58,7 +58,7 @@ export default class ViewClassroom extends Component {
             var inicio = data[i].schedule__time_from;
             var fin = data[i].schedule__time_to;
             var dia = data[i].schedule__day;
-            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia))) {
+            if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia), "schedule-classroom")) {
                 this.state.schedules.push({ "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
             }
         }
@@ -141,7 +141,7 @@ export default class ViewClassroom extends Component {
                                                 <th>Sábado</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="table-sm body-horario">
+                                        <tbody className="table-sm schedule-classroom">
                                             <tr>
                                                 <td>07:00</td>
                                                 <td></td>
