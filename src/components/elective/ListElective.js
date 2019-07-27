@@ -26,6 +26,7 @@ export default class ListElective extends Component {
 
 	handleClose = () => {
 		this.setState({ show: false });
+		this.loadElectives();
 	}
 
 	handleShow = () => {

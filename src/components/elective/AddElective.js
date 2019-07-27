@@ -8,10 +8,10 @@ import es from "date-fns/locale/es";
 
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
-import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
+import { unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
 registerLocale("es", es);
 
-export default class AddElective extends Component {
+export default class createElective extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -37,7 +37,7 @@ export default class AddElective extends Component {
             show: false,
             message: ""
         };
-        this.addElective = this.addElective.bind(this);
+        this.createElective = this.createElective.bind(this);
         this.loadClassrooms = this.loadClassrooms.bind(this);
         this.loadSchedules = this.loadSchedules.bind(this);
         this.loadProfessors = this.loadProfessors.bind(this);
@@ -129,10 +129,11 @@ export default class AddElective extends Component {
     }
 
     //REQUESTS SERVER
-    addElective(event) {
+    async createElective(event) {
         //TODO Registrar horarios
         event.preventDefault();
         var okCourse = false;
+        var okSchedules = false;
         const semester = parseInt(localStorage.getItem("semester"));
         if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
             const { elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
@@ -147,7 +148,7 @@ export default class AddElective extends Component {
                 "professor": professor,
                 "semester": semester,
             }
-            axios.put("http://localhost:8000/api/course/", json)
+            await axios.put("http://localhost:8000/api/course/", json)
                 .then(function (respone) {
                     okCourse = true
                 })
@@ -155,11 +156,27 @@ export default class AddElective extends Component {
                     time();
                     this.setState({ message: "El curso ya esta incluido ", show: true });
                 })
+            //CREATE SCHEDULES TO CLASSROOM
+            const { avaliable_hours } = this.state;
+            json = {
+                "course": elective_id,
+                "schedules": avaliable_hours
+            }
+            await axios.put("http://localhost:8000/api/course/schedule/", json)
+                .then(() => {
+                    okSchedules = true;
+                })
+                .catch(error => {
+                    if (error.response.status) {
+                        time();
+                        this.setState({ message: "Alguno de los horarios ya existe", show: true });
+                    }
+                });
         } else {
             time();
             this.setState({ message: "Elija una prioridad y profesor", show: true });
         }
-        if (okCourse) {
+        if (okCourse && okSchedules) {
             this.handleCloseCreate();
         }
     }
@@ -236,7 +253,7 @@ export default class AddElective extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="container-fluid">
-                        <Form id="formulario" onSubmit={this.addElective}>
+                        <Form id="formulario" onSubmit={this.createElective}>
                             <Row className="bb-1-g mb-3">
                                 <Col className="col-sm-3 col-xl-2 col-lg-2">
                                     <Form.Group>
