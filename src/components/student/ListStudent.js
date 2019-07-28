@@ -1,16 +1,25 @@
 import React, { Component } from 'react';
-import { Button, Modal, Table, Form, FormControl } from 'react-bootstrap';
+import { Button, Modal, Table, Form, FormControl, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import AddStudent from './AddStudent';
+import { time, changePage } from "../../js/HandleDOM";
 
 export default class ListStudent extends Component {
+	sizeBreak = 2;
+	CancelToken = axios.CancelToken;
+	source = this.CancelToken.source();
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
+			size: 0,
+			page: 0,
 			cvs_file: '',
+			listStudents: [],
 			show: false,
 			showUpload: false
 		};
+		this.loadStudents = this.loadStudents.bind(this);
+		this.createTableStudents = this.createTableStudents.bind(this);
 	}
 
 	handleChange = (event) => {
@@ -23,6 +32,11 @@ export default class ListStudent extends Component {
 		});
 	}
 
+	handleClose = () => {
+		this.setState({ show: false, showUpload: false });
+		this.loadStudents();
+	}
+
 	handleShow = () => {
 		this.setState({ show: true });
 	}
@@ -31,12 +45,9 @@ export default class ListStudent extends Component {
 		this.setState({ showUpload: true });
 	}
 
-	subir = () => {
+	upload = () => {
 		console.log(this.state.cvs_file)
 		this.setState({ showAlert: false });
-		var json = {
-			"cvs_file": this.state.cvs_file
-		}
 		let form_data = new FormData();
 		form_data.append('csv_file', this.state.cvs_file[0], this.state.cvs_file[0].name);
 		form_data.append('title', 'file');
@@ -46,10 +57,90 @@ export default class ListStudent extends Component {
 				'Content-Type': 'multipart/form-data'
 			}
 		})
-			.then(() => {
-				// this.loadStudents()
+			.then((response) => {
+				console.log(response);
+				this.handleClose();
 			})
 	}
+
+	//CREATE HTML
+	createTableStudents() {
+		const listItems = this.state.listStudents.map((student) =>
+			<tr key={student.student__id}>
+				<td>{student.student__user_id}</td>
+				<td>{student.student__first_name}</td>
+				<td>{student.student__last_name}</td>
+				<td>
+					<div className="d-flex">
+						<Button className="btn mr-2 beige ver" onClick={this.ver} value={student.student__id}></Button>
+						<Button className="btn mr-2 beige editar" onClick={this.editar} value={student.student__id}></Button>
+						<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={student.studenet__id}></Button>
+					</div>
+				</td>
+			</tr>
+		);
+		return listItems;
+	}
+
+	createPagination = () => {
+		let items = [];
+		for (let number = 1; number <= Math.ceil(this.state.size / this.sizeBreak); number++) {
+			items.push(
+				<Pagination.Item key={number} name={number} onClick={this.changeStudents}>
+					{number}
+				</Pagination.Item>,
+			);
+		}
+		return items;
+	}
+	//- - - - - - - - - - - - - - - -
+
+	//LOAD DATA
+	changeStudents = (event) => {
+		const semester = parseInt(localStorage.getItem("semester"));
+		const init = (parseInt(event.target.name) - 1) * this.sizeBreak;
+		const end = parseInt(event.target.name) * this.sizeBreak;
+		changePage(parseInt(event.target.name), "pageStudent");
+		this.setState({ page: init });
+		axios.get("http://localhost:8000/api/student/limit/" + init + "/" + end + "/" + semester, { cancelToken: this.source.token, })
+			.then(response =>
+				this.setState({ listStudents: response.data })
+			)
+	}
+
+	async loadStudents() {
+		const semester = parseInt(localStorage.getItem("semester"));
+		var init = this.state.page;
+		await axios.get("http://localhost:8000/api/student/count/" + semester, { cancelToken: this.source.token, })
+			.then(response =>
+				this.setState({ size: response.data })
+			)
+		if (this.state.size > 0) {
+			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
+			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
+			await axios.get("http://localhost:8000/api/student/limit/" + initAux + "/" + endAux + "/" + semester, { cancelToken: this.source.token, })
+				.then((response) => {
+					this.setState({ listStudents: response.data })
+				})
+			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak), "pageStudent");
+		} else {
+			await axios.get("http://localhost:8000/api/student/limit/" + 0 + "/" + 0 + "/" + semester, { cancelToken: this.source.token, })
+				.then(response =>
+					this.setState({ listStudents: response.data })
+				)
+		}
+	}
+	//- - - - - - - - - - - - - - - -
+
+	//METHODS LIFESPAN COMPONENT
+	componentWillMount() {
+		this.loadStudents();
+	}
+
+	componentWillUnmount() {
+		this.source.cancel("cancel request");
+	}
+	//- - - - - - - - - - - - - - - -
 
 	render() {
 		return (
@@ -62,27 +153,17 @@ export default class ListStudent extends Component {
 				<Table striped bordered hover responsive="xl" size="xl">
 					<thead>
 						<tr>
-							<th>#</th>
 							<th>Código</th>
 							<th>Nombres</th>
 							<th>Apellidos</th>
 							<th>Opciones</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td>1</td>
-							<td>104613020476</td>
-							<td>Miller Daniel</td>
-							<td>Quilindo Velasco</td>
-							<td>
-								<Button className="btn mr-2 beige ver"></Button>
-								<Button className="btn mr-2 beige editar"></Button>
-								<Button className="btn beige borrar"></Button>
-							</td>
-						</tr>
+					<tbody  className="table-autosize">
+						<this.createTableStudents />
 					</tbody>
 				</Table>
+				<Pagination id="pageStudent" className="justify-items"><this.createPagination /></Pagination>
 				<Modal show={this.state.show} onHide={this.handleClose}>
 					<Modal.Header closeButton>
 						<Modal.Title>Registrar estudiante</Modal.Title>
@@ -106,7 +187,7 @@ export default class ListStudent extends Component {
 					</Modal.Body>
 					<Modal.Footer>
 						<Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
-						<Button variant="primary" name="eliminar" onClick={this.subir}>Subir</Button>
+						<Button variant="primary" name="eliminar" onClick={this.upload}>Subir</Button>
 					</Modal.Footer>
 				</Modal>
 			</>
