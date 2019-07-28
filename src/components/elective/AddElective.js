@@ -87,7 +87,7 @@ export default class createElective extends Component {
         this.setState({ voteTimeTo: time });
     }
 
-    addSchedule = () => {        
+    addSchedule = () => {
         var isExists = findSchedule(this.state.avaliable_hours, unhashHour(this.state.time_from), unhashDay(this.state.time_to), unhashDay(this.state.day));
         if (parseInt(this.state.avaliable_hour) !== -1) {
             if (isExists) {
@@ -472,8 +472,8 @@ export default class createElective extends Component {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
                     <Button className="rounded-10" form="formulario" variant="primary" type="submit">Registrar</Button>
+                    <Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
                 </Modal.Footer>
                 <div className="no-login time">
                     <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>

@@ -8,7 +8,7 @@ import es from "date-fns/locale/es";
 
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
-import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
+import { unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
 registerLocale("es", es);
 
 export default class updateElective extends Component {
@@ -509,7 +509,7 @@ export default class updateElective extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button className="rounded-10" form="formulario" variant="primary" type="submit">Guardar cambios</Button>
-                    <Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
+                    <Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
                 </Modal.Footer>
                 <div className="no-login time">
                     <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>

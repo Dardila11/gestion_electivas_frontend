@@ -5,6 +5,7 @@ import axios from 'axios';
 import { time, changePage } from "../../js/HandleDOM";
 import AddElective from './AddElective';
 import EditElective from './EditElective';
+import ViewElective from './ViewElective';
 
 import '../../css/Table.css';
 
@@ -21,6 +22,8 @@ export default class ListElective extends Component {
 			listElectives: [],
 			showCreate: false,
 			showUpdate: false,
+			showView: false,
+			showAlert: false,
 			showMessage: false
 		};
 		this.loadElectives = this.loadElectives.bind(this);
@@ -28,7 +31,7 @@ export default class ListElective extends Component {
 	}
 
 	handleClose = () => {
-		this.setState({ showCreate: false, showUpdate: false });
+		this.setState({ showAlert: false, showCreate: false, showUpdate: false, showView: false });
 		this.loadElectives();
 	}
 
@@ -53,8 +56,26 @@ export default class ListElective extends Component {
 	}
 
 	editar = (event) => {
-		console.log( event.target.value)
 		this.setState({ showUpdate: true, id: event.target.value });
+	}
+
+	ver = (event) => {
+		this.setState({ showView: true, id: event.target.value });
+	}
+
+	eliminar = (event) => {
+		this.setState({ showAlert: false });
+		axios.delete("http://localhost:8000/api/course/delete/" + this.state.id)
+			.then(() => {
+				this.loadElectives()
+			})
+	}
+
+	preguntar = (event) => {
+		console.log(event.currentTarget.value)
+		if (event.currentTarget.name === "eliminar") {
+			this.setState({ id: event.currentTarget.value, showAlert: true });
+		}
 	}
 
 	//CREATE HTML
@@ -167,7 +188,20 @@ export default class ListElective extends Component {
 					<EditElective handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} elective={this.state.id} />
 				</Modal>
 				{/* Ver salón */}
+				<Modal className="modal-custom" show={this.state.showView} onHide={this.handleClose}>
+					<ViewElective handleClose={this.handleClose} elective={this.state.id} />
+				</Modal>
 				{/* Eliminar salón */}
+				{/* Eliminar salón */}
+				<Modal show={this.state.showAlert} onHide={this.handleClose}>
+					<Modal.Body>
+						<span>¿Seguro desea eliminar la electiva?</span>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
+						<Button variant="primary" name="eliminar" onClick={this.eliminar}>Aceptar</Button>
+					</Modal.Footer>
+				</Modal>
 				<div className="no-login time">
 					<Alert variant="success" show={this.state.showMessage} onClose={handleDismiss} dismissible>
 						<p className="mb-0">{this.state.message}</p>
