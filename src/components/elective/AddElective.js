@@ -55,7 +55,7 @@ export default class createElective extends Component {
         if (name === "classroom") {
             this.loadSchedules(value);
         }
-        if (name === "schedule") {
+        if (name === "schedule" && parseInt(value) !== -1) {
             axios.post("http://localhost:8000/api/avaliable/get/" + value)
                 .then((response) => {
                     this.setState({ avaliable_hour: response.data[0].id, time_from: response.data[0].schedule__time_from, time_to: response.data[0].schedule__time_to, day: response.data[0].schedule__day })

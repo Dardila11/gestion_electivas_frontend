@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import { time, changePage } from "../../js/HandleDOM";
 import AddElective from './AddElective';
+import EditElective from './EditElective';
 
 import '../../css/Table.css';
 
@@ -14,10 +15,12 @@ export default class ListElective extends Component {
 	constructor(props, context) {
 		super(props, context);
 		this.state = {
+			id: -1,
 			size: 0,
 			page: 0,
 			listElectives: [],
-			show: false,
+			showCreate: false,
+			showUpdate: false,
 			showMessage: false
 		};
 		this.loadElectives = this.loadElectives.bind(this);
@@ -25,7 +28,7 @@ export default class ListElective extends Component {
 	}
 
 	handleClose = () => {
-		this.setState({ show: false });
+		this.setState({ showCreate: false, showUpdate: false });
 		this.loadElectives();
 	}
 
@@ -34,9 +37,24 @@ export default class ListElective extends Component {
 	}
 
 	handleCloseCreate = () => {
-		this.setState({ showMessage: true, message: "Salón creado" });
+		this.setState({ showMessage: true, message: "Electiva creada" });
 		this.handleClose();
 		time();
+	}
+
+	handleCloseUpdate = () => {
+		this.setState({ showMessage: true, message: "Cambios guardados" });
+		this.handleClose();
+		time();
+	}
+
+	create = () => {
+		this.setState({ showCreate: true });
+	}
+
+	editar = (event) => {
+		console.log( event.target.value)
+		this.setState({ showUpdate: true, id: event.target.value });
 	}
 
 	//CREATE HTML
@@ -124,7 +142,7 @@ export default class ListElective extends Component {
 			<>
 				<div className="title pt-4 mb-2">
 					<h4 className="d-inline white">Gestionar electivas</h4>
-					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.handleShow}></Button>
+					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.create}></Button>
 				</div>
 				<Table striped bordered hover responsive="xl" size="xl">
 					<thead>
@@ -141,10 +159,13 @@ export default class ListElective extends Component {
 				</Table>
 				<Pagination id="pageElectives" className="justify-items"><this.createPagination /></Pagination>
 				{/* Registrar salón */}
-				<Modal className="modal-custom" show={this.state.show} onHide={this.handleClose}>
+				<Modal className="modal-custom" show={this.state.showCreate} onHide={this.handleClose}>
 					<AddElective handleCloseCreate={this.handleCloseCreate} handleClose={this.handleClose} />
 				</Modal>
 				{/* Editar salón */}
+				<Modal className="modal-custom" show={this.state.showUpdate} onHide={this.handleClose}>
+					<EditElective handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} elective={this.state.id} />
+				</Modal>
 				{/* Ver salón */}
 				{/* Eliminar salón */}
 				<div className="no-login time">
