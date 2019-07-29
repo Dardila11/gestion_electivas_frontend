@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Modal, Table, Form, FormControl, Pagination } from 'react-bootstrap';
+import { Button, Modal, Table, Form, FormControl, Pagination, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import AddStudent from './AddStudent';
+import UpdateStudent from './EditStudent';
+import ViewStudent from './ViewStudent';
 import { time, changePage } from "../../js/HandleDOM";
 
 export default class ListStudent extends Component {
@@ -15,8 +17,11 @@ export default class ListStudent extends Component {
 			page: 0,
 			cvs_file: '',
 			listStudents: [],
-			show: false,
-			showUpload: false
+			showCreate: false,
+			showUpdate: false,
+			showUpload: false,
+			showAlert: false,
+			showMessage: false
 		};
 		this.loadStudents = this.loadStudents.bind(this);
 		this.createTableStudents = this.createTableStudents.bind(this);
@@ -33,12 +38,20 @@ export default class ListStudent extends Component {
 	}
 
 	handleClose = () => {
-		this.setState({ show: false, showUpload: false });
+		this.setState({ showCreate: false, showUpdate: false, showView: false, showUpload: false, showAlert: false });
 		this.loadStudents();
 	}
 
-	handleShow = () => {
-		this.setState({ show: true });
+	handleCloseCreate = () => {
+		this.setState({ showMessage: true, message: "Electiva creada" });
+		this.handleClose();
+		time();
+	}
+
+	handleCloseUpdate = () => {
+		this.setState({ showMessage: true, message: "Cambios guardados" });
+		this.handleClose();
+		time();
 	}
 
 	handleUpload = () => {
@@ -46,12 +59,13 @@ export default class ListStudent extends Component {
 	}
 
 	upload = () => {
-		console.log(this.state.cvs_file)
+		const semester = parseInt(localStorage.getItem("semester"));
 		this.setState({ showAlert: false });
 		let form_data = new FormData();
 		form_data.append('csv_file', this.state.cvs_file[0], this.state.cvs_file[0].name);
 		form_data.append('title', 'file');
 		form_data.append('content', 'csv');
+		form_data.append('semester', semester);
 		axios.post("http://localhost:8000/api/file/", form_data, {
 			headers: {
 				'Content-Type': 'multipart/form-data'
@@ -61,6 +75,33 @@ export default class ListStudent extends Component {
 				console.log(response);
 				this.handleClose();
 			})
+			.catch(error => console.log(error))
+	}
+
+	crear = () => {
+		this.setState({ showCreate: true });
+	}
+
+	editar = (event) => {
+		this.setState({ showUpdate: true, id: event.target.value });
+	}
+
+	eliminar = () => {
+		this.setState({ showAlert: false });
+		axios.delete("http://localhost:8000/api/student/delete/" + this.state.id)
+			.then(() => {
+				this.loadStudents()
+			})
+	}
+
+	ver = (event) => {
+		this.setState({ showView: true, id: event.target.value });
+	}
+
+	preguntar = (event) => {
+		if (event.currentTarget.name === "eliminar") {
+			this.setState({ id: event.currentTarget.value, showAlert: true });
+		}
 	}
 
 	//CREATE HTML
@@ -74,7 +115,7 @@ export default class ListStudent extends Component {
 					<div className="d-flex">
 						<Button className="btn mr-2 beige ver" onClick={this.ver} value={student.student__id}></Button>
 						<Button className="btn mr-2 beige editar" onClick={this.editar} value={student.student__id}></Button>
-						<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={student.studenet__id}></Button>
+						<Button className="btn beige borrar" name="eliminar" onClick={this.preguntar} value={student.student__id}></Button>
 					</div>
 				</td>
 			</tr>
@@ -143,12 +184,13 @@ export default class ListStudent extends Component {
 	//- - - - - - - - - - - - - - - -
 
 	render() {
+		const handleDismiss = () => this.setState({ showMessage: false });
 		return (
 			<>
 				<div className="title pt-4 mb-2">
 					<h4 className="d-inline white">Gestionar estudiantes</h4>
 					<Button className="d-inline float-right btn btn-light mb-2 ml-2 subir" onClick={this.handleUpload}></Button>
-					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.handleShow}></Button>
+					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.crear}></Button>
 				</div>
 				<Table striped bordered hover responsive="xl" size="xl">
 					<thead>
@@ -159,21 +201,22 @@ export default class ListStudent extends Component {
 							<th>Opciones</th>
 						</tr>
 					</thead>
-					<tbody  className="table-autosize">
+					<tbody className="table-autosize">
 						<this.createTableStudents />
 					</tbody>
 				</Table>
 				<Pagination id="pageStudent" className="justify-items"><this.createPagination /></Pagination>
-				<Modal show={this.state.show} onHide={this.handleClose}>
-					<Modal.Header closeButton>
-						<Modal.Title>Registrar estudiante</Modal.Title>
-					</Modal.Header>
-					<Modal.Body>
-						<AddStudent />
-					</Modal.Body>
-					<Modal.Footer>
-						<Button variant="secondary" onClick={this.handleClose}>Cerrar</Button>
-					</Modal.Footer>
+				{/* Create student */}
+				<Modal className="modal-custom" show={this.state.showCreate} onHide={this.handleClose}>
+					<AddStudent handleCloseCreate={this.handleCloseCreate} handleClose={this.handleClose} />
+				</Modal>
+				{/* Update student */}
+				<Modal className="modal-custom" show={this.state.showUpdate} onHide={this.handleClose}>
+					<UpdateStudent handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} student={this.state.id}/>
+				</Modal>
+				{/* Ver salón */}
+				<Modal className="modal-custom" show={this.state.showView} onHide={this.handleClose}>
+					<ViewStudent handleClose={this.handleClose} student={this.state.id} />
 				</Modal>
 				{/* Upload students */}
 				<Modal show={this.state.showUpload} onHide={this.handleClose}>
@@ -190,6 +233,24 @@ export default class ListStudent extends Component {
 						<Button variant="primary" name="eliminar" onClick={this.upload}>Subir</Button>
 					</Modal.Footer>
 				</Modal>
+				{/* Eliminar salón */}
+				<Modal show={this.state.showAlert} onHide={this.handleClose}>
+					<Modal.Header closeButton>
+						<Modal.Title>¿Seguro desea eliminar el estudiante?</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<span>Eliminará todas las matriculas asociadas al estudiante</span>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
+						<Button variant="primary" name="eliminar" onClick={this.eliminar}>Aceptar</Button>
+					</Modal.Footer>
+				</Modal>
+				<div className="no-login time">
+					<Alert variant="success" show={this.state.showMessage} onClose={handleDismiss} dismissible>
+						<p className="mb-0">{this.state.message}</p>
+					</Alert>
+				</div>
 			</>
 		);
 	}
