@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Form, Modal, Button, Table, Alert, Row, Col, ListGroup } from "react-bootstrap";
 import axios from "axios";
+import 'simplebar';
 
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
@@ -299,8 +300,8 @@ export default class updateClassroom extends Component {
                                         </Col>
                                     </Row>
                                     <Row className="pt-2 pb-2">
-                                        <Col>
-                                            <ListGroup className="w-l over-y">
+                                        <Col data-simplebar className="w-l over-y">
+                                            <ListGroup>
                                                 <this.createListSchedule />
                                             </ListGroup>
                                         </Col>

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button, Table, Modal, Alert, Pagination } from "react-bootstrap";
 import axios from "axios";
+import 'simplebar';
 
 import { time, changePage } from "../../js/HandleDOM";
 import AddClassroom from "./AddClassroom";
@@ -154,7 +155,7 @@ export default class ListClassroom extends Component {
 		return (
 			<>
 				<div className="title pt-4 mb-0">
-					<h4 className="d-inline white h-100">Gestionar Salones</h4>
+					<h4 className="d-inline white h-100">Gestionar salones</h4>
 					<Button className="d-inline float-right btn btn-light mb-2 agregar" onClick={this.create}></Button>
 				</div>
 				<Table striped bordered responsive="xl" size="xl">
@@ -165,7 +166,7 @@ export default class ListClassroom extends Component {
 							<th>Opciones</th>
 						</tr>
 					</thead>
-					<tbody  className="table-autosize">
+					<tbody className="table-autosize">
 						<this.createTableClassrooms />
 					</tbody>
 				</Table>
@@ -184,9 +185,12 @@ export default class ListClassroom extends Component {
 				</Modal>
 				{/* Eliminar salón */}
 				<Modal show={this.state.showAlert} onHide={this.handleClose}>
-					<Modal.Body>
+					<Modal.Header closeButton>
+						<Modal.Title>¿Seguro desea eliminar el salón?</Modal.Title>
+					</Modal.Header>
+					{/* <Modal.Body>
 						<span>¿Seguro desea eliminar el salón?</span>
-					</Modal.Body>
+					</Modal.Body> */}
 					<Modal.Footer>
 						<Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
 						<Button variant="primary" name="eliminar" onClick={this.eliminar}>Aceptar</Button>
