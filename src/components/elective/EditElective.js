@@ -76,6 +76,22 @@ export default class updateElective extends Component {
         this.props.handleCloseUpdate();
     }
 
+    handleChangeVoteDateFrom = (date) => {
+        this.setState({ voteDateFrom: date });
+    }
+
+    handleChangeVoteDateTo = (date) => {
+        this.setState({ voteDateTo: date });
+    }
+
+    handleChangeVoteTimeFrom = (time) => {
+        this.setState({ voteTimeFrom: time });
+    }
+
+    handleChangeVoteTimeTo = (time) => {
+        this.setState({ voteTimeTo: time });
+    }
+
     addSchedule = () => {
         var isExists = findSchedule(this.state.avaliable_hours, unhashHour(this.state.time_from), unhashDay(this.state.time_to), unhashDay(this.state.day));
         if (parseInt(this.state.avaliable_hour) !== -1) {
@@ -141,6 +157,7 @@ export default class updateElective extends Component {
             const { elective, elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
             const from_date_vote = voteDateFrom.getFullYear() + "-" + voteDateFrom.getMonth() + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
             const until_date_vote = voteDateTo.getFullYear() + "-" + voteDateTo.getMonth() + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
+            console.log(from_date_vote);
             var json = {
                 "id": elective,
                 "quota": quota,
@@ -208,7 +225,6 @@ export default class updateElective extends Component {
     loadAvaliables() {
         axios.get("http://localhost:8000/api/avaliable/course/" + this.state.elective)
             .then((response) => {
-                console.log(response)
                 var i;
                 const data = response.data;
                 for (i = 0; i < data.length; i++) {
@@ -226,13 +242,19 @@ export default class updateElective extends Component {
 
     loadElective() {
         axios.get("http://localhost:8000/api/course/" + this.state.elective)
-            .then(response =>
+            .then((response) => {
+                console.log(response.data[0].from_date_vote)
                 this.setState({
                     elective_id: response.data[0].course__id,
                     quota: response.data[0].quota,
                     priority: response.data[0].priority,
                     professor: response.data[0].professor__id,
-                }))
+                    voteDateFrom: new Date(response.data[0].from_date_vote),
+                    voteDateTo: new Date(response.data[0].until_date_vote),
+                    voteTimeFrom: new Date(response.data[0].from_date_vote),
+                    voteTimeTo: new Date(response.data[0].until_date_vote)
+                })
+            })
     }
     //- - - - - - - - - - - - - - - -
 
@@ -300,7 +322,7 @@ export default class updateElective extends Component {
                                 <Col className="col-sm-6 col-xl-2 col-lg-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Cupos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required></Form.Control>
+                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-3 col-lg-3">
@@ -407,8 +429,8 @@ export default class updateElective extends Component {
                                         </Col>
                                     </Row>
                                     <Row className="pt-2 pb-2">
-                                        <Col>
-                                            <ListGroup className="w-l over-y">
+                                        <Col data-simplebar className="w-l over-y">
+                                            <ListGroup>
                                                 <this.createListAvaliableHours />
                                             </ListGroup>
                                         </Col>

@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
 
 import "../../css/Table.css";
-import { time, addSchedule } from "../../js/HandleDOM";
+import { addSchedule } from "../../js/HandleDOM";
 import { unhashHour, unhashDay } from "../../js/HandleSchedule";
 registerLocale("es", es);
 
@@ -85,7 +85,6 @@ export default class updateElective extends Component {
     loadAvaliables() {
         axios.get("http://localhost:8000/api/avaliable/course/" + this.state.elective)
             .then((response) => {
-                console.log(response)
                 var i;
                 const data = response.data;
                 for (i = 0; i < data.length; i++) {
@@ -109,6 +108,10 @@ export default class updateElective extends Component {
                     quota: response.data[0].quota,
                     priority: response.data[0].priority,
                     professor: response.data[0].professor__id,
+                    voteDateFrom: new Date(response.data[0].from_date_vote),
+                    voteDateTo: new Date(response.data[0].until_date_vote),
+                    voteTimeFrom: new Date(response.data[0].from_date_vote),
+                    voteTimeTo: new Date(response.data[0].until_date_vote)
                 }))
     }
     //- - - - - - - - - - - - - - - -

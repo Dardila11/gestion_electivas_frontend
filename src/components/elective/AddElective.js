@@ -364,15 +364,14 @@ export default class createElective extends Component {
                                             </Form.Group>
                                         </Col>
                                     </Row>
-
                                     <Row>
                                         <Col className="col-sm-12">
                                             <Button className="rounded-10  w-100" variant="primary" onClick={this.addSchedule}>Agregar Horario</Button>
                                         </Col>
                                     </Row>
                                     <Row className="pt-2 pb-2">
-                                        <Col>
-                                            <ListGroup className="w-l over-y">
+                                        <Col data-simplebar className="w-l over-y">
+                                            <ListGroup>
                                                 <this.createListAvaliableHours />
                                             </ListGroup>
                                         </Col>

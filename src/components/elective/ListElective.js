@@ -63,7 +63,7 @@ export default class ListElective extends Component {
 		this.setState({ showView: true, id: event.target.value });
 	}
 
-	eliminar = (event) => {
+	eliminar = () => {
 		this.setState({ showAlert: false });
 		axios.delete("http://localhost:8000/api/course/delete/" + this.state.id)
 			.then(() => {
@@ -192,10 +192,12 @@ export default class ListElective extends Component {
 					<ViewElective handleClose={this.handleClose} elective={this.state.id} />
 				</Modal>
 				{/* Eliminar salón */}
-				{/* Eliminar salón */}
 				<Modal show={this.state.showAlert} onHide={this.handleClose}>
+					<Modal.Header closeButton>
+						<Modal.Title>¿Seguro desea eliminar la electiva?</Modal.Title>
+					</Modal.Header>
 					<Modal.Body>
-						<span>¿Seguro desea eliminar la electiva?</span>
+						<span>Eliminará todas las matriculas asociadas al curso</span>
 					</Modal.Body>
 					<Modal.Footer>
 						<Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
