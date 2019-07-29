@@ -3,6 +3,7 @@ import { Button, Table, Modal, Alert, Pagination } from "react-bootstrap";
 import axios from "axios";
 
 import { time, changePage } from "../../js/HandleDOM";
+import VoteElective from '../elective/VoteElective';
 
 import '../../css/Table.css';
 
@@ -34,7 +35,6 @@ export default class listEnrrollment extends Component {
 
 	//CREATE HTML
 	createTableEnrrollments() {
-        console.log(this.state.listEnrrollment)
 		const listItems = this.state.listEnrrollment.map((enrrollment) =>
 			<tr key={enrrollment.id}>
 				<td>{enrrollment.course__course_id}</td>
@@ -43,7 +43,7 @@ export default class listEnrrollment extends Component {
                 <td>{enrrollment.course__quota}</td>
 				<td>
 					<div className="d-flex">
-						<Button className="btn mr-2 beige votar" onClick={this.votar} value={enrrollment.id}></Button>
+						<Button className="btn mr-2 beige votar" onClick={this.votar} value={enrrollment.course__id}></Button>
 					</div>
 				</td>
 			</tr>
@@ -135,6 +135,10 @@ export default class listEnrrollment extends Component {
 					</tbody>
 				</Table>
 				<Pagination id="pageEnrrollment" className="justify-items"><this.createPagination /></Pagination>
+				{/* Ver salón */}
+				<Modal className="modal-custom" show={this.state.showVote} onHide={this.handleClose}>
+					<VoteElective handleClose={this.handleClose} elective={this.state.id} />
+				</Modal>
 				<div className="no-login time">
 					<Alert variant="success" show={this.state.showMessage} onClose={handleDismiss} dismissible>
 						<p className="mb-0">{this.state.message}</p>
