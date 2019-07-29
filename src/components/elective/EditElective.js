@@ -422,7 +422,6 @@ export default class updateElective extends Component {
                                             </Form.Group>
                                         </Col>
                                     </Row>
-
                                     <Row>
                                         <Col className="col-sm-12">
                                             <Button className="rounded-10  w-100" variant="primary" onClick={this.addSchedule}>Agregar Horario</Button>
