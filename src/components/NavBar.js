@@ -37,7 +37,7 @@ export default class NavBar extends Component {
 			<Navbar>
 				<Navbar.Brand>
 					<Form.Check className="ocultar" name="show" id="boton-show" checked={this.state.show} onChange={this.handleChange} />
-					<Form.Label className="mouse d-inline mr-2" htmlFor="boton-show"><Image src="../img/menu.png" alt="" /></Form.Label>
+					<Form.Label className="mouse d-inline mr-2" htmlFor="boton-show"><Image src="../../img/menu.png" alt="" /></Form.Label>
 					<p className="d-inline m-0">SGE</p>
 				</Navbar.Brand>
 				<Form inline>

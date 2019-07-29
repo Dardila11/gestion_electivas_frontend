@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Button, Table, Modal, Alert, Pagination } from "react-bootstrap";
 import axios from "axios";
-import 'simplebar';
 
 import { time, changePage } from "../../js/HandleDOM";
 import AddClassroom from "./AddClassroom";

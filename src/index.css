@@ -128,6 +128,13 @@ body {
   background-image: url('./img/upload.png');
 }
 
+.votar {
+  padding: 15px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./img/votar.png');
+}
+
 .select {
   background-color: #007bff;
   color: white;
