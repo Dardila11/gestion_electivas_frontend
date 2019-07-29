@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { Image, Button, Navbar, Form, FormControl } from "react-bootstrap";
+import { Image, Button, Navbar, Form } from "react-bootstrap";
 
 import { show } from "../js/HandleDOM";
 
@@ -41,8 +41,6 @@ export default class NavBar extends Component {
 					<p className="d-inline m-0">SGE</p>
 				</Navbar.Brand>
 				<Form inline>
-					<FormControl className="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" />
-					<Button className="btn btn-success my-2 my-sm-0" type="submit">Buscar</Button>
 					<Button className="btn btn-danger my-2 my-sm-0 ml-1" type="button" onClick={this.onLogout}>Salir</Button>
 				</Form>
 			</Navbar>
