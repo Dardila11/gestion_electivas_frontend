@@ -29,6 +29,12 @@ export default class listEnrrollment extends Component {
 		this.setState({ showVote: false });
 	}
 
+	handleCloseVote = () => {
+		this.setState({ showMessage: true, message: "Cambios guardados" });
+		this.handleClose();
+		time();
+	}
+
 	votar = (event) => {
 		this.setState({ showVote: true, id: event.target.value });
 	}
@@ -137,7 +143,7 @@ export default class listEnrrollment extends Component {
 				<Pagination id="pageEnrrollment" className="justify-items"><this.createPagination /></Pagination>
 				{/* Ver salón */}
 				<Modal className="modal-custom" show={this.state.showVote} onHide={this.handleClose}>
-					<VoteElective handleClose={this.handleClose} elective={this.state.id} />
+					<VoteElective handleClose={this.handleClose} handleCloseVote={this.handleCloseVote} elective={this.state.id} />
 				</Modal>
 				<div className="no-login time">
 					<Alert variant="success" show={this.state.showMessage} onClose={handleDismiss} dismissible>
