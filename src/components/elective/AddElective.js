@@ -136,45 +136,48 @@ export default class createElective extends Component {
         var okSchedules = false;
         const semester = parseInt(localStorage.getItem("semester"));
         if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
-            const { elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
-            const from_date_vote = voteDateFrom.getFullYear() + "-" + voteDateFrom.getMonth() + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
-            const until_date_vote = voteDateTo.getFullYear() + "-" + voteDateTo.getMonth() + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
-            var json = {
-                "quota": quota,
-                "priority": priority,
-                "from_date_vote": from_date_vote,
-                "until_date_vote": until_date_vote,
-                "course": elective_id,
-                "professor": professor,
-                "semester": semester,
-            }
-            await axios.put("http://localhost:8000/api/course/", json)
-                .then(function (respone) {
-                    okCourse = true
-                })
-                .catch(() => {
-                    time();
-                    this.setState({ message: "El curso ya esta incluido ", show: true });
-                })
-            //CREATE SCHEDULES TO CLASSROOM
-            const { avaliable_hours } = this.state;
-            json = {
-                "course": elective_id,
-                "schedules": avaliable_hours
-            }
-            await axios.put("http://localhost:8000/api/course/schedule/", json)
-                .then(() => {
-                    okSchedules = true;
-                })
-                .catch(error => {
-                    if (error.response.status) {
+            if (Date.parse(this.state.voteDateFrom) <= Date.parse(this.state.voteDateTo)) {
+                const { elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
+                const from_date_vote = voteDateFrom.getFullYear() + "-" + voteDateFrom.getMonth() + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
+                const until_date_vote = voteDateTo.getFullYear() + "-" + voteDateTo.getMonth() + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
+                var json = {
+                    "quota": quota,
+                    "priority": priority,
+                    "from_date_vote": from_date_vote,
+                    "until_date_vote": until_date_vote,
+                    "course": elective_id,
+                    "professor": professor,
+                    "semester": semester,
+                }
+                await axios.put("http://localhost:8000/api/course/", json)
+                    .then(() => {
+                        okCourse = true
+                    })
+                    .catch(() => {
+                        time();
+                        this.setState({ message: "El curso ya esta incluido ", show: true });
+                    })
+                //CREATE SCHEDULES TO CLASSROOM
+                const { avaliable_hours } = this.state;
+                json = {
+                    "course": elective_id,
+                    "schedules": avaliable_hours
+                }
+                await axios.put("http://localhost:8000/api/course/schedule/", json)
+                    .then(() => {
+                        okSchedules = true;
+                    })
+                    .catch(() => {
                         time();
                         this.setState({ message: "Alguno de los horarios ya existe", show: true });
-                    }
-                });
+                    });
+            } else {
+                time();
+                this.setState({ message: "La fecha final debe ser mayor a la fecha de inicio", show: true });
+            }
         } else {
             time();
-            this.setState({ message: "Elija una prioridad y profesor", show: true });
+            this.setState({ message: "Elija un profesor y la prioridad", show: true });
         }
         if (okCourse && okSchedules) {
             this.handleCloseCreate();

@@ -1,13 +1,16 @@
 import React, { Component } from "react";
-import { Form, Button, Alert, Row, Col, Modal } from "react-bootstrap";
 
+import { Form, Button, Alert, Row, Col, Modal } from "react-bootstrap";
+import axios from "axios";
 import { Redirect } from "react-router-dom";
+
+import { time } from "../../js/HandleDOM";
+import NavBar from "../NavBar";
+
 import DatePicker from "react-datepicker";
 import { registerLocale } from "react-datepicker";
-import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
-import { time } from "../../js/HandleDOM";
 registerLocale("es", es);
 
 export default class FormStartElectivesProcess extends Component {
@@ -62,7 +65,7 @@ export default class FormStartElectivesProcess extends Component {
         if (parseInt(this.state.semester) !== -1) {
             this.redirect();
         } else {
-            this.setState({ message: "Eliga un semester", showAlertModal: true });
+            this.setState({ message: "Elija un semester", showAlertModal: true });
             time();
         }
     }
@@ -83,17 +86,20 @@ export default class FormStartElectivesProcess extends Component {
                     "until_date": until_date
                 }
                 axios.post("http://localhost:8000/api/semester/", json)
-                    .then((response) => { this.setState({ semester: response.data[0].pk }); this.redirect(response) })
-                    .catch(error => {
-                        this.setState({ error: true })
+                    .then((response) => {
+                        this.setState({ semester: response.data[0].pk });
+                        this.redirect(response);
+                    })
+                    .catch(() => {
+                        this.setState({ message: "El semestre ya existe", showAlertThis: true });
+                        time();
                     });
             } else {
-                this.setState({ message: "La Fecha Final debe ser mayor a la Fecha de Inicio", showAlertThis: true });
+                this.setState({ message: "La fecha final debe ser mayor a la fecha de inicio", showAlertThis: true });
                 time();
-                console.log("La fecha final debe ser mayor a la fecha de inicio");
             }
         } else {
-            this.setState({ message: "Eliga un año y periodo", showAlertThis: true });
+            this.setState({ message: "Elija un año y periodo", showAlertThis: true });
             time();
         }
     }
@@ -131,6 +137,7 @@ export default class FormStartElectivesProcess extends Component {
         const handleDismiss = () => this.setState({ show: false, showAlertModal: false });
         return (
             <>
+                <NavBar />
                 <div className="card m-3">
                     <div className="card-header">
                         <span className="center font-weight-bold">INICIAR PROCESO DE ELECTIVAS</span>

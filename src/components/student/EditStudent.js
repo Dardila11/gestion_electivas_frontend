@@ -34,7 +34,6 @@ export default class UpdateStudent extends Component {
     }
 
     handleCloseUpdate = () => {
-        console.log('cerrando');
         this.props.handleCloseUpdate();
     }
 

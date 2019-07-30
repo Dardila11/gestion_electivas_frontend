@@ -82,8 +82,8 @@ body {
   position: fixed;
   display: flex;
   justify-content: center;
-  left: 35%;
-  right: 35%;
+  left: 15%;
+  right: 15%;
   top: 0;
   z-index: 1051;
 }
