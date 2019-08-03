@@ -10,11 +10,10 @@ export default class NavBarStudent extends Component {
         this.state = {
             user: "",
             show: true,
-            tab: 3
+            tab: 2
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
-        this.changeTab = this.changeTab.bind(this);
         this.ocultar = this.ocultar.bind(this);
     }
 
@@ -23,10 +22,6 @@ export default class NavBarStudent extends Component {
         if (event.target.name === "show") {
             hide();
         }
-    }
-
-    changeTab() {
-        this.setState({ tab: 5 });
     }
 
     ocultar() {
@@ -44,7 +39,7 @@ export default class NavBarStudent extends Component {
     }
 
     componentWillUnmount() {
-        
+
     }
 
     render() {

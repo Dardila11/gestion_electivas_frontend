@@ -8,7 +8,7 @@ import es from "date-fns/locale/es";
 
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
-import { unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
+import { unhashHour, unhashDay } from "../../js/HandleSchedule";
 registerLocale("es", es);
 
 export default class updateElective extends Component {
@@ -93,7 +93,7 @@ export default class updateElective extends Component {
     }
 
     addSchedule = () => {
-        var isExists = findSchedule(this.state.avaliable_hours, unhashHour(this.state.time_from), unhashDay(this.state.time_to), unhashDay(this.state.day));
+        var isExists = this.state.avaliable_hours.find(avaliable => avaliable.id === this.state.avaliable_hour) === undefined;
         if (parseInt(this.state.avaliable_hour) !== -1) {
             if (isExists) {
                 if (addSchedule(unhashHour(this.state.time_from), unhashHour(this.state.time_to), unhashDay(this.state.day), "schedule-elective")) {
@@ -155,9 +155,9 @@ export default class updateElective extends Component {
         const semester = parseInt(localStorage.getItem("semester"));
         if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
             const { elective, elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
-            const from_date_vote = voteDateFrom.getFullYear() + "-" + voteDateFrom.getMonth() + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
-            const until_date_vote = voteDateTo.getFullYear() + "-" + voteDateTo.getMonth() + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
-            console.log(from_date_vote);
+            const from_date_vote = voteDateFrom.getFullYear() + "-" + (voteDateFrom.getMonth() + 1) + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
+            const until_date_vote = voteDateTo.getFullYear() + "-" + (voteDateTo.getMonth() + 1) + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
+            
             var json = {
                 "id": elective,
                 "quota": quota,
@@ -168,6 +168,7 @@ export default class updateElective extends Component {
                 "professor": professor,
                 "semester": semester,
             }
+            console.log(json);
             await axios.post("http://localhost:8000/api/course/", json)
                 .then(function (respone) {
                     okCourse = true
@@ -179,10 +180,11 @@ export default class updateElective extends Component {
             //CREATE SCHEDULES TO CLASSROOM
             const { avaliable_hours_add, avaliable_hours_delete } = this.state;
             json = {
-                "id": elective_id,
+                "id": elective,
                 "avaliable_hours_add": avaliable_hours_add,
                 "avaliable_hours_delete": avaliable_hours_delete,
             }
+            console.log(json)
             await axios.post("http://localhost:8000/api/course/schedule/", json)
                 .then(() => {
                     okSchedules = true;
@@ -228,7 +230,7 @@ export default class updateElective extends Component {
                 var i;
                 const data = response.data;
                 for (i = 0; i < data.length; i++) {
-                    var id = data[i].id;
+                    var id = data[i].avaliable;
                     var inicio = data[i].avaliable__schedule__time_from;
                     var fin = data[i].avaliable__schedule__time_to;
                     var dia = data[i].avaliable__schedule__day;
@@ -243,7 +245,7 @@ export default class updateElective extends Component {
     loadElective() {
         axios.get("http://localhost:8000/api/course/" + this.state.elective)
             .then((response) => {
-                console.log(response.data[0].from_date_vote)
+                console.log(response.data[0].until_date_vote)
                 this.setState({
                     elective_id: response.data[0].course__id,
                     quota: response.data[0].quota,

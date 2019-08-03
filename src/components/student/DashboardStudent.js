@@ -18,15 +18,32 @@ export default class DashboardStudent extends Component {
 		};
 	}
 
-	componentWillMount() {
-		console.log( localStorage.getItem("semester") );
+	verificar = () => {
 		axios.post("http://localhost:8000/api/verificate/", { "token": this.token }, { cancelToken: this.source.token, })
 			.then(() => {
 				this.setState({ isNew: false });
+				axios.post("http://localhost:8000/api/refresh/", { "token": this.token }, { cancelToken: this.source.token, })
+					.then((response) => {
+						localStorage.removeItem("token");
+						localStorage.setItem("token", JSON.stringify(response.data.token));
+					})
+					.catch(() => {
+						this.setState({ isLogin: false });
+					});
 			})
 			.catch(() => {
+				alert('Sesion expirada por inactividad');
 				this.setState({ isLogin: false });
 			});
+	}
+
+	mover = () => {
+		clearTimeout(this.timeout);
+		this.timeout = setTimeout(() => { this.verificar() }, 901000);
+	}
+
+	componentWillMount() {
+		this.verificar();
 	}
 
 	componentWillUnmount() {
@@ -38,10 +55,10 @@ export default class DashboardStudent extends Component {
 			return <Redirect to="/" />;
 		} else if (!this.state.isNew) {
 			return (
-				<div className="hmi-100 app-main">
+				<section className="hmi-100 app-main" onKeyPress={this.mover} onPointerEnter={this.mover} onMouseMove={this.mover}>
 					<NavBar />
 					<Nav />
-				</div>
+				</section>
 			)
 		}
 		return (<></>)

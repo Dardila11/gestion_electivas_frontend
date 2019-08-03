@@ -3,9 +3,9 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 
-import logo from "../../img/logoU.png";
-import "../../css/LoginSecretary.css";
-import { time } from "../../js/HandleDOM";
+import logo from "../img/logoU.png";
+import "../css/LoginSecretary.css";
+import { time } from "../js/HandleDOM";
 
 export default class LoginSecretary extends Component {
     constructor(props, context) {
@@ -13,7 +13,9 @@ export default class LoginSecretary extends Component {
         this.state = {
             username: "anita",
             password: "oracle",
-            dashboard: false,
+            dashboardSecretary: false,
+            dashboardStudent: false,
+            dashboardProfessor: false,
             semester: false,
             message: "",
             show: false
@@ -26,35 +28,72 @@ export default class LoginSecretary extends Component {
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    handleSemester = (data) => {
-        if (data.length > 0) {
-            const now = new Date();
-            const date = new Date(data[data.length - 1].fields.until_date);
-            if (now > date) {
-                this.setState({ semester: true });
+    handleSemester = (data, role) => {
+        if (role === 3 || role === undefined) {
+            if (data.length > 0) {
+                const now = new Date();
+                const date = new Date(data[data.length - 1].fields.until_date);
+                if (now > date) {
+                    this.setState({ semester: true });
+                } else {
+                    localStorage.setItem("semester", data[data.length - 1].pk);
+                    this.setState({ dashboardSecretary: true });
+                }
             } else {
-                localStorage.setItem("semester", data[data.length - 1].pk);
-                this.setState({ dashboard: true });
+                this.setState({ semester: true });
             }
-        } else {
-            this.setState({ semester: true });
+        } else if (role === 1) {
+            if (data.length > 0) {
+                const now = new Date();
+                const date = new Date(data[data.length - 1].fields.until_date);
+                if (now > date) {
+                    this.setState({ message: "No hay un semestre en curso", show: true });
+                    time();
+                } else {
+                    localStorage.setItem("semester", data[data.length - 1].pk);
+                    this.setState({ dashboardStudent: true });
+                }
+            } else {
+                this.setState({ message: "No hay semestres registrados", show: true });
+                time();
+            }
+        } else if (role === 2) {
+            if (data.length > 0) {
+                const now = new Date();
+                const date = new Date(data[data.length - 1].fields.until_date);
+                if (now > date) {
+                    this.setState({ message: "No hay un semestre en curso", show: true });
+                    time();
+                } else {
+                    localStorage.setItem("semester", data[data.length - 1].pk);
+                    this.setState({ dashboardProfessor: true });
+                }
+            } else {
+                this.setState({ message: "No hay semestres registrados", show: true });
+                time();
+            }
         }
     }
 
-    redirect = (response) => {
-        localStorage.setItem("user", JSON.stringify(response.data.user.username));
-        localStorage.setItem("token", JSON.stringify(response.data.token));
+
+    redirect = (data) => {
+        localStorage.setItem("user", JSON.stringify(data.user.username));
+        localStorage.setItem("token", JSON.stringify(data.token));
+        const role = data.user.groups[0];
         axios.get("http://localhost:8000/api/semester/", { "token": this.token }, { cancelToken: this.source.token, })
             .then((response) => {
-                this.handleSemester(response.data);
+                this.handleSemester(response.data, role);
             })
+
     }
 
     onLogin(event) {
         event.preventDefault();
         const { username, password } = this.state;
         axios.post("http://localhost:8000/api/login/", { username, password }, { cancelToken: this.source.token, })
-            .then(response => this.redirect(response))
+            .then(response => {
+                this.redirect(response.data)
+            })
             .catch(error => {
                 this.setState({ message: error.response.data.error, show: true });
                 time();
@@ -71,8 +110,14 @@ export default class LoginSecretary extends Component {
     }
 
     render() {
-        if (this.state.dashboard) {
-            return <Redirect to="/dashboard" />;
+        if (this.state.dashboardSecretary) {
+            return <Redirect to="/dashboard/secretary" />;
+        }
+        else if (this.state.dashboardStudent) {
+            return <Redirect to="/dashboard/student" />;
+        }
+        else if (this.state.dashboardProfessor) {
+            return <Redirect to="/dashboard/professor" />;
         }
         else if (this.state.semester) {
             return <Redirect to="/semester" />

@@ -1,20 +1,16 @@
 import React, { Component } from "react";
-import { Modal, Form, Button, Table, Alert, Row, Col, ListGroup } from "react-bootstrap";
+import { Form, Modal, Button, Table, Alert, Row, Col, ListGroup } from "react-bootstrap";
 import axios from "axios";
-import DatePicker from "react-datepicker";
-import { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import es from "date-fns/locale/es";
 
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
 import { unhashHour, unhashDay } from "../../js/HandleSchedule";
-registerLocale("es", es);
 
-export default class createElective extends Component {
+export default class updateElective extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
+            elective: props.elective,
             elective_id: "",
             quota: "",
             faculty: 1,
@@ -33,11 +29,15 @@ export default class createElective extends Component {
             classrooms: [],
             schedules: [],
             avaliable_hours: [],
+            avaliable_hours_add: [],
+            avaliable_hours_delete: [],
             professors: [],
             show: false,
             message: ""
         };
-        this.createElective = this.createElective.bind(this);
+        this.updateElective = this.updateElective.bind(this);
+        this.loadElective = this.loadElective.bind(this);
+        this.loadAvaliables = this.loadAvaliables.bind(this);
         this.loadClassrooms = this.loadClassrooms.bind(this);
         this.loadSchedules = this.loadSchedules.bind(this);
         this.loadProfessors = this.loadProfessors.bind(this);
@@ -56,9 +56,9 @@ export default class createElective extends Component {
             this.loadSchedules(value);
         }
         if (name === "schedule" && parseInt(value) !== -1) {
-            axios.post("http://localhost:8000/api/avaliable/get/" + value)
+            axios.post("http://localhost:8000/api/avaliable/profeesor_get/" + value)
                 .then((response) => {
-                    this.setState({ avaliable_hour: response.data[0].id, time_from: response.data[0].schedule__time_from, time_to: response.data[0].schedule__time_to, day: response.data[0].schedule__day })
+                    this.setState({ avaliable_hour: response.data[0].id, time_from: response.data[0].avaliable__schedule__time_from, time_to: response.data[0].avaliable__schedule__time_to, day: response.data[0].avaliable__schedule__day })
                 })
         }
     }
@@ -67,8 +67,8 @@ export default class createElective extends Component {
         this.props.handleClose();
     }
 
-    handleCloseCreate = () => {
-        this.props.handleCloseCreate();
+    handleCloseVote = () => {
+        this.props.handleCloseUpdate();
     }
 
     handleChangeVoteDateFrom = (date) => {
@@ -88,8 +88,6 @@ export default class createElective extends Component {
     }
 
     addSchedule = () => {
-        console.log(this.state.avaliable_hours)
-        console.log(this.state.avaliable_hours.find(avaliable => avaliable.id === this.state.avaliable_hour) === undefined)
         var isExists = this.state.avaliable_hours.find(avaliable => avaliable.id === this.state.avaliable_hour) === undefined;
         if (parseInt(this.state.avaliable_hour) !== -1) {
             if (isExists) {
@@ -98,6 +96,7 @@ export default class createElective extends Component {
                     var time_to = this.state.time_to;
                     var day = this.state.day;
                     this.state.avaliable_hours.push({ "id": this.state.avaliable_hour, "time_from": time_from, "time_to": time_to, "day": day });
+                    this.state.avaliable_hours_add.push({ "schedule": this.state.avaliable_hour, "course": this.state.elective });
                     this.setState({ avaliable_hours: this.state.avaliable_hours })
                 } else {
                     time();
@@ -111,16 +110,29 @@ export default class createElective extends Component {
             time();
             this.setState({ message: "Elija una fraja horaria", show: true });
         }
+        console.log(this.state.avaliable_hours_add);
     }
 
     removeSchedule = (event) => {
         var schedule;
         var i = 0;
         for (schedule of this.state.avaliable_hours) {
+            var is_history = false;
             if (parseInt(event.target.value) === schedule.id) {
+                var j = 0, schedule_add;
                 const time_from = schedule.time_from;
                 const time_to = schedule.time_to;
                 const day = schedule.day;
+                for (schedule_add of this.state.avaliable_hours_add) {
+                    if (parseInt(event.target.value) === schedule_add.avaliable) {
+                        this.state.avaliable_hours_add.splice(j, 1);
+                        is_history = true;
+                        break;
+                    }
+                    j++;
+                }
+                if (!is_history)
+                    this.state.avaliable_hours_delete.push(this.state.avaliable_hours[i]);
                 this.state.avaliable_hours.splice(i, 1);
                 removeSchedule(unhashHour(time_from), unhashHour(time_to), unhashDay(day), "schedule-elective");
                 break;
@@ -131,72 +143,47 @@ export default class createElective extends Component {
     }
 
     //REQUESTS SERVER
-    async createElective(event) {
-        //TODO Registrar horarios
+    async updateElective(event) {
         event.preventDefault();
-        var okCourse = false;
+        const username = localStorage.getItem("user").replace(/[""]+/g, "");
         var okSchedules = false;
-        const semester = parseInt(localStorage.getItem("semester"));
-        if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
-            if (Date.parse(this.state.voteDateFrom) <= Date.parse(this.state.voteDateTo)) {
-                const { elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
-                const from_date_vote = voteDateFrom.getFullYear() + "-" + (voteDateFrom.getMonth() + 1) + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
-                const until_date_vote = voteDateTo.getFullYear() + "-" + (voteDateTo.getMonth() + 1) + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
-                var json = {
-                    "quota": quota,
-                    "priority": priority,
-                    "from_date_vote": from_date_vote,
-                    "until_date_vote": until_date_vote,
-                    "course": elective_id,
-                    "professor": professor,
-                    "semester": semester,
-                }
-                await axios.put("http://localhost:8000/api/course/", json)
-                    .then(() => {
-                        okCourse = true
-                    })
-                    .catch(() => {
-                        time();
-                        this.setState({ message: "El curso ya esta incluido ", show: true });
-                    })
-                //CREATE SCHEDULES TO CLASSROOM
-                const { avaliable_hours } = this.state;
-                json = {
-                    "course": elective_id,
-                    "semester": semester,
-                    "schedules": avaliable_hours
-                }
-                await axios.put("http://localhost:8000/api/course/schedule/", json)
-                    .then(() => {
-                        okSchedules = true;
-                    })
-                    .catch(() => {
+        if (this.state.avaliable_hours.length > 1) {
+            //CREATE SCHEDULES TO CLASSROOM
+            const { avaliable_hours_add, avaliable_hours_delete } = this.state;
+            const json = {
+                "professor": username,
+                "schedules_add": avaliable_hours_add,
+                "schedules_delete": avaliable_hours_delete,
+            }
+            await axios.put("http://localhost:8000/api/course/professor/", json)
+                .then(() => {
+                    okSchedules = true;
+                })
+                .catch(error => {
+                    if (error.response.status) {
                         time();
                         this.setState({ message: "Alguno de los horarios ya existe", show: true });
-                    });
-            } else {
-                time();
-                this.setState({ message: "La fecha final debe ser mayor a la fecha de inicio", show: true });
-            }
+                    }
+                });
         } else {
             time();
-            this.setState({ message: "Elija un profesor y la prioridad", show: true });
+            this.setState({ message: "Elija por lo menos dos franjas horarias", show: true });
         }
-        if (okCourse && okSchedules) {
-            this.handleCloseCreate();
+        if (okSchedules) {
+            this.handleCloseVote();
         }
     }
     //- - - - - - - - - - - - - - - -
 
     //LOAD DATA
     loadClassrooms() {
-        axios.get("http://localhost:8000/api/classroom/")
+        axios.get("http://localhost:8000/api/getcourse/" + this.state.elective)
             .then(response =>
                 this.setState({ classrooms: response.data }))
     }
 
     loadSchedules(value) {
-        axios.post("http://localhost:8000/api/avaliable/" + value)
+        axios.post("http://localhost:8000/api/avaliable/professor/" + value + "/" + this.state.elective)
             .then(response =>
                 this.setState({ schedules: response.data }))
     }
@@ -206,19 +193,53 @@ export default class createElective extends Component {
             .then(response =>
                 this.setState({ professors: response.data }))
     }
+
+    loadAvaliables() {
+        axios.get("http://localhost:8000/api/avaliable/profeesor_schedule/" + this.state.elective)
+            .then((response) => {
+                var i;
+                const data = response.data;
+                for (i = 0; i < data.length; i++) {
+                    var id = data[i].schedule;
+                    var inicio = data[i].schedule__avaliable__schedule__time_from;
+                    var fin = data[i].schedule__avaliable__schedule__time_to;
+                    var dia = data[i].schedule__avaliable__schedule__day;
+                    if (addSchedule(unhashHour(inicio), unhashHour(fin), unhashDay(dia), "schedule-elective")) {
+                        this.state.avaliable_hours.push({ "id": id, "time_from": inicio, "time_to": fin, "day": dia, "schedule": data[i].schedule });
+                    }
+                }
+                this.setState({ avaliable_hours: this.state.avaliable_hours })
+            })
+    }
+
+    loadElective() {
+        // axios.get("http://localhost:8000/api/course/" + this.state.elective)
+        //     .then((response) => {
+        //         this.setState({
+        //             elective_id: response.data[0].course__id,
+        //             quota: response.data[0].quota,
+        //             priority: response.data[0].priority,
+        //             professor: response.data[0].professor__id,
+        //             voteDateFrom: new Date(response.data[0].from_date_vote),
+        //             voteDateTo: new Date(response.data[0].until_date_vote),
+        //             voteTimeFrom: new Date(response.data[0].from_date_vote),
+        //             voteTimeTo: new Date(response.data[0].until_date_vote)
+        //         })
+        //     })
+    }
     //- - - - - - - - - - - - - - - -
 
     //CREATE HTML
     createListClassrooms() {
         const listItems = this.state.classrooms.map((classroom) =>
-            <option key={classroom.id} value={classroom.id}>{classroom.classroom_id} | {classroom.faculty__name}</option>
+            <option key={classroom.avaliable__classroom} value={classroom.avaliable__classroom}>{classroom.avaliable__classroom__classroom_id} | {classroom.avaliable__classroom__faculty__name}</option>
         );
         return listItems;
     }
 
     createListSchedules() {
         const listItems = this.state.schedules.map((schedule) =>
-            <option key={schedule.id} value={schedule.id}>{schedule.schedule__day} | {schedule.schedule__time_from} - {schedule.schedule__time_to}</option>
+            <option key={schedule.id} value={schedule.id}>{schedule.avaliable__schedule__day} | {schedule.avaliable__schedule__time_from} - {schedule.avaliable__schedule__time_to}</option>
         );
         return listItems;
     }
@@ -247,6 +268,8 @@ export default class createElective extends Component {
     componentWillMount() {
         this.loadClassrooms();
         this.loadProfessors();
+        this.loadElective();
+        this.loadAvaliables();
     }
     //- - - - - - - - - - - - - - - -
 
@@ -255,99 +278,11 @@ export default class createElective extends Component {
         return (
             <>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registrar electiva</Modal.Title>
+                    <Modal.Title>Editar electiva</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="container-fluid">
-                        <Form id="formulario" onSubmit={this.createElective}>
-                            <Row className="bb-1-g mb-3">
-                                <Col className="col-sm-3 col-xl-2 col-lg-2">
-                                    <Form.Group>
-                                        <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="elective_id" value={this.state.elective_id} onChange={this.handleChange} placeholder="Código" required />
-                                    </Form.Group>
-                                </Col>
-                                <Col className="col-sm-6 col-xl-2 col-lg-2">
-                                    <Form.Group>
-                                        <Form.Label><span className="ml-0">Cupos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required></Form.Control>
-                                    </Form.Group>
-                                </Col>
-                                <Col className="col-sm-6 col-xl-3 col-lg-3">
-                                    <Form.Group>
-                                        <Form.Label><span className="ml-0">Profesor</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select" name="professor" value={this.state.professor} onChange={this.handleChange}>
-                                            <option key={-1} value={-1}>-----</option>
-                                            <this.createListProfessors />
-                                        </Form.Control>
-                                    </Form.Group>
-                                </Col>
-                                <Col className="col-sm-6 col-xl-2 col-lg-2">
-                                    <Form.Group>
-                                        <Form.Label><span className="ml-0">Prioridad</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select" name="priority" value={this.state.priority} onChange={this.handleChange}>
-                                            <option key={-1} value={-1}>-----</option>
-                                            <option key={1} value={1}>Alta</option>
-                                            <option key={2} value={2}>Media</option>
-                                            <option key={3} value={3}>Baja</option>
-                                        </Form.Control>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row className="mt-2 bb-1-g mb-3">
-                                <Col>
-                                    <Form.Label><span className="h5">Fechas de Votaciones</span></Form.Label>
-                                    <Row>
-                                        <Col className="col-lg-4">
-                                            <Form.Group>
-                                                <Form.Label><span >Inicio</span></Form.Label>
-                                                <Form.Group>
-                                                    <DatePicker className="form-control"
-                                                        selected={this.state.voteDateFrom}
-                                                        endDate={this.state.voteDateTo}
-                                                        onChange={this.handleChangeVoteDateFrom}
-                                                        placeholderText="Fecha Inicio"
-                                                        dateFormat="dd/MM/yyyy"
-                                                    />
-                                                    <DatePicker className="form-control"
-                                                        selected={this.state.voteTimeFrom}
-                                                        onChange={this.handleChangeVoteTimeFrom}
-                                                        showTimeSelect
-                                                        showTimeSelectOnly
-                                                        timeIntervals={30}
-                                                        dateFormat="h:mm aa"
-                                                        timeCaption="Time"
-                                                    />
-                                                </Form.Group>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col className="col-lg-4">
-                                            <Form.Group>
-                                                <Form.Label><span >Final</span></Form.Label>
-                                                <Form.Group>
-                                                    <DatePicker className="form-control"
-                                                        selected={this.state.voteDateTo}
-                                                        startDate={this.state.voteDateFrom}
-                                                        onChange={this.handleChangeVoteDateTo}
-                                                        dateFormat="dd/MM/yyyy"
-                                                        placeholderText="Fecha Final"
-                                                        minDate={this.state.voteDateFrom}
-                                                    />
-                                                    <DatePicker className="form-control"
-                                                        selected={this.state.voteTimeTo}
-                                                        onChange={this.handleChangeVoteTimeTo}
-                                                        showTimeSelect
-                                                        showTimeSelectOnly
-                                                        timeIntervals={30}
-                                                        dateFormat="h:mm aa"
-                                                        timeCaption="Time"
-                                                    />
-                                                </Form.Group>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                            </Row>
+                        <Form id="formulario" onSubmit={this.updateElective}>
                             <Row className="bb-1-g mb-3">
                                 <Col className="col-sm-4">
                                     <Row>
@@ -477,7 +412,7 @@ export default class createElective extends Component {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button className="rounded-10" form="formulario" variant="primary" type="submit">Registrar</Button>
+                    <Button className="rounded-10" form="formulario" variant="primary" type="submit">Guardar cambios</Button>
                     <Button variant="secondary" onClick={this.handleClose}>Cancelar</Button>
                 </Modal.Footer>
                 <div className="no-login time">

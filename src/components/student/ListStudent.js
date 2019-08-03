@@ -15,20 +15,20 @@ export default class ListStudent extends Component {
 		this.state = {
 			size: 0,
 			page: 0,
-			cvs_file: '',
+			cvs_file: [],
 			listStudents: [],
 			showCreate: false,
 			showUpdate: false,
 			showUpload: false,
 			showAlert: false,
-			showMessage: false
+			showMessage: false,
+			typeMessage: "",
 		};
 		this.loadStudents = this.loadStudents.bind(this);
 		this.createTableStudents = this.createTableStudents.bind(this);
 	}
 
 	handleChange = (event) => {
-		console.log(event)
 		const target = event.target;
 		const value = target.type === "file" ? target.files : target.value;
 		const name = target.name;
@@ -43,13 +43,13 @@ export default class ListStudent extends Component {
 	}
 
 	handleCloseCreate = () => {
-		this.setState({ showMessage: true, message: "Electiva creada" });
+		this.setState({ typeMessage: "success", showMessage: true, message: "Electiva creada" });
 		this.handleClose();
 		time();
 	}
 
 	handleCloseUpdate = () => {
-		this.setState({ showMessage: true, message: "Cambios guardados" });
+		this.setState({ typeMessage: "success", showMessage: true, message: "Cambios guardados" });
 		this.handleClose();
 		time();
 	}
@@ -59,23 +59,30 @@ export default class ListStudent extends Component {
 	}
 
 	upload = () => {
-		const semester = parseInt(localStorage.getItem("semester"));
-		this.setState({ showAlert: false });
-		let form_data = new FormData();
-		form_data.append('csv_file', this.state.cvs_file[0], this.state.cvs_file[0].name);
-		form_data.append('title', 'file');
-		form_data.append('content', 'csv');
-		form_data.append('semester', semester);
-		axios.post("http://localhost:8000/api/file/", form_data, {
-			headers: {
-				'Content-Type': 'multipart/form-data'
-			}
-		})
-			.then((response) => {
-				console.log(response);
-				this.handleClose();
+		if (this.state.cvs_file.length > 0) {
+			const semester = parseInt(localStorage.getItem("semester"));
+			this.setState({ showAlert: false });
+			let form_data = new FormData();
+			form_data.append('csv_file', this.state.cvs_file[0], this.state.cvs_file[0].name);
+			form_data.append('title', 'file');
+			form_data.append('content', 'csv');
+			form_data.append('semester', semester);
+			axios.post("http://localhost:8000/api/file/", form_data, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
 			})
-			.catch(error => console.log(error))
+				.then((response) => {
+					this.setState({ typeMessage: "success", showMessage: true, message: response.data });
+					this.handleClose();
+				})
+				.catch(error => console.log(error))
+			this.setState({ cvs_file: [] });
+		} else {
+			console.log('error');
+			this.setState({ typeMessage: "danger", showMessage: true, message: "Seleccione un archivo" });
+			time();
+		}
 	}
 
 	crear = () => {
@@ -212,7 +219,7 @@ export default class ListStudent extends Component {
 				</Modal>
 				{/* Update student */}
 				<Modal className="modal-custom" show={this.state.showUpdate} onHide={this.handleClose}>
-					<UpdateStudent handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} student={this.state.id}/>
+					<UpdateStudent handleCloseUpdate={this.handleCloseUpdate} handleClose={this.handleClose} student={this.state.id} />
 				</Modal>
 				{/* Ver salón */}
 				<Modal className="modal-custom" show={this.state.showView} onHide={this.handleClose}>
@@ -247,7 +254,7 @@ export default class ListStudent extends Component {
 					</Modal.Footer>
 				</Modal>
 				<div className="no-login time">
-					<Alert variant="success" show={this.state.showMessage} onClose={handleDismiss} dismissible>
+					<Alert variant={this.state.typeMessage} show={this.state.showMessage} onClose={handleDismiss} dismissible>
 						<p className="mb-0">{this.state.message}</p>
 					</Alert>
 				</div>

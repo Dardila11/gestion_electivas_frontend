@@ -84,7 +84,7 @@ export default class addStudentStudent extends Component {
         }
         await axios.put('http://localhost:8000/api/student/', json)
             .then(function (response) {
-                console.log(response);
+                okCourse = true;
             });
         const { enrrollments } = this.state;
         json = {

@@ -52,15 +52,16 @@ export default class ListElective extends Component {
 	}
 
 	create = () => {
-		this.setState({ showCreate: true });
+		this.setState({ showCreate: true, showMessage: false });
 	}
 
 	editar = (event) => {
-		this.setState({ showUpdate: true, id: event.target.value });
+		console.log(event.target.value)
+		this.setState({ showUpdate: true, showMessage: false, id: event.target.value });
 	}
 
 	ver = (event) => {
-		this.setState({ showView: true, id: event.target.value });
+		this.setState({ showView: true, showMessage: false, id: event.target.value });
 	}
 
 	eliminar = () => {

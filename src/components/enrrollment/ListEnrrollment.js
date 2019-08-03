@@ -41,19 +41,31 @@ export default class listEnrrollment extends Component {
 
 	//CREATE HTML
 	createTableEnrrollments() {
-		const listItems = this.state.listEnrrollment.map((enrrollment) =>
-			<tr key={enrrollment.id}>
-				<td>{enrrollment.course__course_id}</td>
-				<td>{enrrollment.course__course__name}</td>
-                <td>{enrrollment.course__professor__first_name} {enrrollment.course__professor__last_name}</td>
-                <td>{enrrollment.course__quota}</td>
-				<td>
-					<div className="d-flex">
-						<Button className="btn mr-2 beige votar" onClick={this.votar} value={enrrollment.course__id}></Button>
-					</div>
-				</td>
-			</tr>
-		);
+		const listItems = [];
+		const today = new Date();
+		for (const enrrollment of this.state.listEnrrollment) {
+			var buttonvote;
+			const from_date = (new Date(this.state.listEnrrollment[0].course__from_date_vote));
+			const to_date = (new Date(this.state.listEnrrollment[0].course__until_date_vote));
+			if (today >= from_date && today <= to_date) {
+				buttonvote = <Button className="btn mr-2 beige votar" onClick={this.votar} value={enrrollment.course__id}></Button>
+			} else {
+				buttonvote = <span>No disponible</span>
+			}
+			listItems.push(
+				<tr key={enrrollment.id}>
+					<td>{enrrollment.course__course_id}</td>
+					<td>{enrrollment.course__course__name}</td>
+					<td>{enrrollment.course__professor__first_name} {enrrollment.course__professor__last_name}</td>
+					<td>{enrrollment.course__quota}</td>
+					<td>
+						<div className="d-flex">
+							{buttonvote}
+						</div>
+					</td>
+				</tr>
+			);
+		}
 		return listItems;
 	}
 
@@ -72,36 +84,37 @@ export default class listEnrrollment extends Component {
 
 	//LOAD DATA
 	changeEnrrollments = (event) => {
-        const semester = parseInt(localStorage.getItem("semester"));
-        const username = parseInt(localStorage.getItem("username"));
+		const semester = parseInt(localStorage.getItem("semester"));
+		const username = localStorage.getItem("user").replace(/[""]+/g, "");
 		const init = (parseInt(event.target.name) - 1) * this.sizeBreak;
 		const end = parseInt(event.target.name) * this.sizeBreak;
 		changePage(parseInt(event.target.name), "pageEnrrollment");
 		this.setState({ page: init });
-		axios.get("http://localhost:8000/api/enrrollment/limit/" + init + "/" + end + "/" + semester + "/cblanco", { cancelToken: this.source.token, })
+		axios.get("http://localhost:8000/api/enrrollment/limit/" + init + "/" + end + "/" + semester + "/" + username, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listEnrrollment: response.data })
 			)
 	}
 
 	async loadEnrrollments() {
-        const semester = parseInt(localStorage.getItem("semester"));
-        const username = parseInt(localStorage.getItem("username"));
+		const semester = parseInt(localStorage.getItem("semester"));
+		const username = localStorage.getItem("user").replace(/[""]+/g, "");
+		console.log(username)
 		var init = this.state.page;
-		await axios.get("http://localhost:8000/api/enrrollment/count/" + semester + "/cblanco", { cancelToken: this.source.token, })
+		await axios.get("http://localhost:8000/api/enrrollment/count/" + semester + "/" + username, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ size: response.data })
 			)
 		if (this.state.size > 0) {
 			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
 			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
-			await axios.get("http://localhost:8000/api/enrrollment/limit/" + initAux + "/" + endAux + "/" + semester + "/cblanco", { cancelToken: this.source.token, })
+			await axios.get("http://localhost:8000/api/enrrollment/limit/" + initAux + "/" + endAux + "/" + semester + "/" + username, { cancelToken: this.source.token, })
 				.then((response) => {
 					this.setState({ listEnrrollment: response.data })
 				})
 			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak), "pageEnrrollment");
 		} else {
-			await axios.get("http://localhost:8000/api/enrrollment/limit/" + 0 + "/" + 0 + "/" + semester + "/cblanco", { cancelToken: this.source.token, })
+			await axios.get("http://localhost:8000/api/enrrollment/limit/" + 0 + "/" + 0 + "/" + semester + "/" + username, { cancelToken: this.source.token, })
 				.then(response =>
 					this.setState({ listEnrrollment: response.data })
 				)
@@ -131,8 +144,8 @@ export default class listEnrrollment extends Component {
 						<tr>
 							<th>Código</th>
 							<th>Nombre</th>
-                            <th>Profesor</th>
-                            <th>Cupos</th>
+							<th>Profesor</th>
+							<th>Cupos</th>
 							<th>Opciones</th>
 						</tr>
 					</thead>

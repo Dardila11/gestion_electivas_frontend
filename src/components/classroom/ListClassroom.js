@@ -48,15 +48,15 @@ export default class ListClassroom extends Component {
 	}
 
 	ver = (event) => {
-		this.setState({ showView: true, id: event.target.value });
+		this.setState({ showView: true, showMessage: false, id: event.target.value });
 	}
 
 	create = () => {
-		this.setState({ showCreate: true });
+		this.setState({ showCreate: true, showMessage: false });
 	}
 
 	editar = (event) => {
-		this.setState({ showUpdate: true, id: event.target.value });
+		this.setState({ showUpdate: true, showMessage: false, id: event.target.value });
 	}
 
 	eliminar = (event) => {
