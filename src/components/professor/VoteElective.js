@@ -3,6 +3,7 @@ import { Modal, Button, Alert, Row, Card } from "react-bootstrap";
 import axios from "axios";
 
 import { time } from "../../js/HandleDOM";
+import { URL } from "../../utils/URLServer";
 import "../../css/Table.css";
 
 export default class VoteElective extends Component {
@@ -81,7 +82,7 @@ export default class VoteElective extends Component {
                 "schedules_add": votes_add,
                 "schedules_delete": votes_delete
             }
-            axios.put("http://localhost:8000/api/student/vote/", json)
+            axios.put(URL + "api/student/vote/", json)
                 .then(() => {
                     this.handleCloseVote();
                 })
@@ -94,7 +95,7 @@ export default class VoteElective extends Component {
 
     //LOAD DATA
     loadSchedules() {
-        axios.get("http://localhost:8000/api/course/schedule/professor/" + this.state.elective)
+        axios.get(URL + "api/course/schedule/professor/" + this.state.elective)
             .then((response) => {
                 this.setState({ schedules: response.data })
             })
@@ -102,7 +103,7 @@ export default class VoteElective extends Component {
 
     loadVotes() {
         const username = localStorage.getItem("user").replace(/[""]+/g, "");
-        axios.get("http://localhost:8000/api/student/vote/" + this.state.elective + "/" + username)
+        axios.get(URL + "api/student/vote/" + this.state.elective + "/" + username)
             .then((response) => {
                 this.setState({ votes: response.data })
             })

@@ -3,7 +3,8 @@ import { Redirect } from "react-router-dom";
 import { Image, Button, Navbar, Form } from "react-bootstrap";
 import axios from 'axios';
 
-import { show } from "../js/HandleDOM";
+import { show, hide } from "../js/HandleDOM";
+import { URL } from "../utils/URLServer"
 
 export default class NavBar extends Component {
 	constructor(props, context) {
@@ -28,13 +29,15 @@ export default class NavBar extends Component {
 		localStorage.removeItem("token");
 		localStorage.removeItem("user");
 		localStorage.removeItem("semester");
+		localStorage.removeItem("role");
 		this.setState({ redirect: true });
 	}
 
 	componentWillMount() {
+		hide();
 		const semester = parseInt(localStorage.getItem("semester"));
 		if (localStorage.getItem("semester") !== null) {
-			axios.get("http://localhost:8000/api/semester/" + semester, { "token": this.token })
+			axios.get(URL + "api/semester/" + semester, { "token": this.token })
 				.then((response) => {
 					this.setState({ semester: " " + response.data[0].year + "." + response.data[0].period })
 				})

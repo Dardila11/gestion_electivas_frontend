@@ -5,6 +5,7 @@ import AddStudent from './AddStudent';
 import UpdateStudent from './EditStudent';
 import ViewStudent from './ViewStudent';
 import { time, changePage } from "../../js/HandleDOM";
+import { URL } from "../../utils/URLServer"
 
 export default class ListStudent extends Component {
 	sizeBreak = 2;
@@ -67,7 +68,7 @@ export default class ListStudent extends Component {
 			form_data.append('title', 'file');
 			form_data.append('content', 'csv');
 			form_data.append('semester', semester);
-			axios.post("http://localhost:8000/api/file/", form_data, {
+			axios.post(URL + "api/file/", form_data, {
 				headers: {
 					'Content-Type': 'multipart/form-data'
 				}
@@ -95,7 +96,7 @@ export default class ListStudent extends Component {
 
 	eliminar = () => {
 		this.setState({ showAlert: false });
-		axios.delete("http://localhost:8000/api/student/delete/" + this.state.id)
+		axios.delete(URL + "api/student/delete/" + this.state.id)
 			.then(() => {
 				this.loadStudents()
 			})
@@ -150,7 +151,7 @@ export default class ListStudent extends Component {
 		const end = parseInt(event.target.name) * this.sizeBreak;
 		changePage(parseInt(event.target.name), "pageStudent");
 		this.setState({ page: init });
-		axios.get("http://localhost:8000/api/student/limit/" + init + "/" + end + "/" + semester, { cancelToken: this.source.token, })
+		axios.get(URL + "api/student/limit/" + init + "/" + end + "/" + semester, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listStudents: response.data })
 			)
@@ -159,20 +160,20 @@ export default class ListStudent extends Component {
 	async loadStudents() {
 		const semester = parseInt(localStorage.getItem("semester"));
 		var init = this.state.page;
-		await axios.get("http://localhost:8000/api/student/count/" + semester, { cancelToken: this.source.token, })
+		await axios.get(URL + "api/student/count/" + semester, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ size: response.data })
 			)
 		if (this.state.size > 0) {
 			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
 			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
-			await axios.get("http://localhost:8000/api/student/limit/" + initAux + "/" + endAux + "/" + semester, { cancelToken: this.source.token, })
+			await axios.get(URL + "api/student/limit/" + initAux + "/" + endAux + "/" + semester, { cancelToken: this.source.token, })
 				.then((response) => {
 					this.setState({ listStudents: response.data })
 				})
 			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak), "pageStudent");
 		} else {
-			await axios.get("http://localhost:8000/api/student/limit/" + 0 + "/" + 0 + "/" + semester, { cancelToken: this.source.token, })
+			await axios.get(URL + "api/student/limit/" + 0 + "/" + 0 + "/" + semester, { cancelToken: this.source.token, })
 				.then(response =>
 					this.setState({ listStudents: response.data })
 				)

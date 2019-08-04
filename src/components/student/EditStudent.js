@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import '../../css/Table.css';
 import { time } from "../../js/HandleDOM";
+import { URL } from "../../utils/URLServer"
 
 export default class UpdateStudent extends Component {
     constructor(props, context) {
@@ -112,7 +113,7 @@ export default class UpdateStudent extends Component {
             "enrrollments_add": enrrollments_add,
             "enrrollments_delete": enrrollments_delete
         }
-        await axios.post("http://localhost:8000/api/enrrollment/", json)
+        await axios.post(URL + "api/enrrollment/", json)
             .then(() => {
                 okSchedules = true;
             })
@@ -130,7 +131,7 @@ export default class UpdateStudent extends Component {
 
     //LOAD DATA
     loadStudent() {
-        axios.post("http://localhost:8000/api/student/" + this.state.student)
+        axios.post(URL + "api/student/" + this.state.student)
             .then(response =>
                 this.setState({ 
                     codigo: response.data[0].user_id,
@@ -142,14 +143,14 @@ export default class UpdateStudent extends Component {
 
     loadElectives() {
         const semester = parseInt(localStorage.getItem("semester"));
-        axios.post("http://localhost:8000/api/course/semester/" + semester)
+        axios.post(URL + "api/course/semester/" + semester)
             .then(response =>
                 this.setState({ electives: response.data }))
     }
 
     loadEnrrollments() {
         const semester = parseInt(localStorage.getItem("semester"));
-        axios.post("http://localhost:8000/api/enrrollment/" + this.state.student + "/" + semester)
+        axios.post(URL + "api/enrrollment/" + this.state.student + "/" + semester)
             .then(response =>
                 this.setState({ enrrollments: response.data }))
     }

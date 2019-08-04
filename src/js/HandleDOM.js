@@ -31,14 +31,20 @@ export function removeSchedule(time_from, time_to, day, elemento) {
     }
 }
 
+export function hidemenu() {
+    $(".menu-body").addClass("ocultar-l");
+    $(".menu-body").removeClass("mostrar-l");
+}
+
 export function show() {
-    $("#menu").addClass("mostrar-l");
-    $("#menu").removeClass("ocultar-l");
+    $(".menu-body").addClass("mostrar-l");
+    $(".menu-body").removeClass("ocultar-l");
 }
 
 export function hide() {
-    $("#menu").addClass("ocultar-l");
-    $("#menu").removeClass("mostrar-l");
+    console.log("ocultar")
+    $(".menu-body").addClass("ocultar-l");
+    $(".menu-body").removeClass("mostrar-l");
 }
 
 export function time() {

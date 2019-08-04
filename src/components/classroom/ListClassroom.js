@@ -6,6 +6,7 @@ import { time, changePage } from "../../js/HandleDOM";
 import AddClassroom from "./AddClassroom";
 import EditClassroom from "./EditClassroom";
 import ViewClassroom from "./ViewClassroom";
+import { URL } from "../../utils/URLServer";
 
 import '../../css/Table.css';
 
@@ -61,7 +62,7 @@ export default class ListClassroom extends Component {
 
 	eliminar = (event) => {
 		this.setState({ showAlert: false });
-		axios.delete("http://localhost:8000/api/deleteclassroom/" + this.state.id)
+		axios.delete(URL + "api/deleteclassroom/" + this.state.id)
 			.then(() => {
 				this.loadClassrooms()
 			})
@@ -110,7 +111,7 @@ export default class ListClassroom extends Component {
 		const end = parseInt(event.target.name) * this.sizeBreak;
 		changePage(parseInt(event.target.name), "pageClassroom");
 		this.setState({ page: init });
-		axios.get("http://localhost:8000/api/classroom/limit/" + init + "/" + end, { cancelToken: this.source.token, })
+		axios.get(URL + "api/classroom/limit/" + init + "/" + end, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listClassroom: response.data })
 			)
@@ -118,20 +119,20 @@ export default class ListClassroom extends Component {
 
 	async loadClassrooms() {
 		var init = this.state.page;
-		await axios.get("http://localhost:8000/api/classroom/count/", { cancelToken: this.source.token, })
+		await axios.get(URL + "api/classroom/count/", { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ size: response.data })
 			)
 		if (this.state.size > 0) {
 			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
 			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
-			await axios.get("http://localhost:8000/api/classroom/limit/" + initAux + "/" + endAux, { cancelToken: this.source.token, })
+			await axios.get(URL + "api/classroom/limit/" + initAux + "/" + endAux, { cancelToken: this.source.token, })
 				.then((response) => {
 					this.setState({ listClassroom: response.data })
 				})
 			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak), "pageClassroom");
 		} else {
-			await axios.get("http://localhost:8000/api/classroom/limit/" + 0 + "/" + 0, { cancelToken: this.source.token, })
+			await axios.get(URL + "api/classroom/limit/" + 0 + "/" + 0, { cancelToken: this.source.token, })
 				.then(response =>
 					this.setState({ listClassroom: response.data })
 				)

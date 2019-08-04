@@ -11,7 +11,7 @@ export default class NavBarSecretary extends Component {
         super(props);
         this.state = {
             user: "",
-            show: true,
+            show: false,
             tab: 2
         };
         this.handleChange = this.handleChange.bind(this);
@@ -40,30 +40,28 @@ export default class NavBarSecretary extends Component {
         }
     }
 
-    componentWillUnmount() {
-        
-    }
-
     render() {
         return (
             <Tab.Container activeKey={this.state.tab} onSelect={this.handleSelect}>
-                <Nav className="flex-column ocultar-l transicion" id="menu">
-                    <div className="p-3 bb-1">
-                        <Form.Check className="ocultar" name="show" id="boton-hide" checked={this.state.show} onChange={this.handleChange} />
-                        <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt="" /></Form.Label>
-                        <p className="d-inline m-0">SGE</p>
-                    </div>
-                    <div className="p-3 bb-1 d-flex justify-content-center">
-                        <div className="text-center">
-                            <Image className="b-a p-1" src="../img/chica.png" roundedCircle />
-                            <p className="mb-0">{this.state.user}</p>
+                <div className="menu-body transicion ocultar-l" onClick={hide}>
+                    <Nav className="flex-column" id="menu">
+                        <div className="p-3 bb-1">
+                            <Form.Check className="ocultar" name="show" id="boton-hide" checked={this.state.show} onChange={this.handleChange} />
+                            <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt="" /></Form.Label>
+                            <p className="d-inline m-0">SGE</p>
                         </div>
-                    </div>
-                    <Nav.Link eventKey="1" name="1" onClick={this.ocultar}>Inicio</Nav.Link>
-                    <Nav.Link eventKey="2" name="2" onClick={this.ocultar}>Salones</Nav.Link>
-                    <Nav.Link eventKey="3" name="3" onClick={this.ocultar}>Electivas</Nav.Link>
-                    <Nav.Link eventKey="4" name="4" onClick={this.ocultar}>Estudiantes</Nav.Link>
-                </Nav>
+                        <div className="p-3 bb-1 d-flex justify-content-center">
+                            <div className="text-center">
+                                <Image className="b-a p-1" src="../img/chica.png" roundedCircle />
+                                <p className="mb-0">{this.state.user}</p>
+                            </div>
+                        </div>
+                        <Nav.Link eventKey="1" name="1" className="opacar text-center" onClick={this.ocultar}>Inicio</Nav.Link>
+                        <Nav.Link eventKey="2" name="2" className="opacar text-center" onClick={this.ocultar}>Salones</Nav.Link>
+                        <Nav.Link eventKey="3" name="3" className="opacar text-center" onClick={this.ocultar}>Electivas</Nav.Link>
+                        <Nav.Link eventKey="4" name="4" className="opacar text-center" onClick={this.ocultar}>Estudiantes</Nav.Link>
+                    </Nav>
+                </div>
                 <Tab.Content>
                     <Container className="pl-5 pr-5">
                         <Tab.Pane eventKey="1"></Tab.Pane>
@@ -76,7 +74,7 @@ export default class NavBarSecretary extends Component {
                         <Tab.Pane eventKey="4">
                             <ListStudent />
                         </Tab.Pane>
-                    </Container>
+                    </Container>                    
                 </Tab.Content>
             </Tab.Container>
         )

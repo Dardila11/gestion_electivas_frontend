@@ -9,6 +9,7 @@ import es from "date-fns/locale/es";
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
 import { unhashHour, unhashDay } from "../../js/HandleSchedule";
+import { URL } from "../../utils/URLServer";
 registerLocale("es", es);
 
 export default class createElective extends Component {
@@ -56,7 +57,7 @@ export default class createElective extends Component {
             this.loadSchedules(value);
         }
         if (name === "schedule" && parseInt(value) !== -1) {
-            axios.post("http://localhost:8000/api/avaliable/get/" + value)
+            axios.post(URL + "api/avaliable/get/" + value)
                 .then((response) => {
                     this.setState({ avaliable_hour: response.data[0].id, time_from: response.data[0].schedule__time_from, time_to: response.data[0].schedule__time_to, day: response.data[0].schedule__day })
                 })
@@ -88,10 +89,8 @@ export default class createElective extends Component {
     }
 
     addSchedule = () => {
-        console.log(this.state.avaliable_hours)
-        console.log(this.state.avaliable_hours.find(avaliable => avaliable.id === this.state.avaliable_hour) === undefined)
-        var isExists = this.state.avaliable_hours.find(avaliable => avaliable.id === this.state.avaliable_hour) === undefined;
         if (parseInt(this.state.avaliable_hour) !== -1) {
+            var isExists = this.state.avaliable_hours.find(avaliable => avaliable.id === this.state.avaliable_hour) === undefined;
             if (isExists) {
                 if (addSchedule(unhashHour(this.state.time_from), unhashHour(this.state.time_to), unhashDay(this.state.day), "schedule-elective")) {
                     var time_from = this.state.time_from;
@@ -151,7 +150,7 @@ export default class createElective extends Component {
                     "professor": professor,
                     "semester": semester,
                 }
-                await axios.put("http://localhost:8000/api/course/", json)
+                await axios.put(URL + "api/course/", json)
                     .then(() => {
                         okCourse = true
                     })
@@ -166,7 +165,7 @@ export default class createElective extends Component {
                     "semester": semester,
                     "schedules": avaliable_hours
                 }
-                await axios.put("http://localhost:8000/api/course/schedule/", json)
+                await axios.put(URL + "api/course/schedule/", json)
                     .then(() => {
                         okSchedules = true;
                     })
@@ -190,19 +189,19 @@ export default class createElective extends Component {
 
     //LOAD DATA
     loadClassrooms() {
-        axios.get("http://localhost:8000/api/classroom/")
+        axios.get(URL + "api/classroom/")
             .then(response =>
                 this.setState({ classrooms: response.data }))
     }
 
     loadSchedules(value) {
-        axios.post("http://localhost:8000/api/avaliable/" + value)
+        axios.post(URL + "api/avaliable/" + value)
             .then(response =>
                 this.setState({ schedules: response.data }))
     }
 
     loadProfessors() {
-        axios.get("http://localhost:8000/api/professor/")
+        axios.get(URL + "api/professor/")
             .then(response =>
                 this.setState({ professors: response.data }))
     }

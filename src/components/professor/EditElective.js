@@ -5,6 +5,7 @@ import axios from "axios";
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
 import { unhashHour, unhashDay } from "../../js/HandleSchedule";
+import { URL } from "../../utils/URLServer";
 
 export default class updateElective extends Component {
     constructor(props, context) {
@@ -56,7 +57,7 @@ export default class updateElective extends Component {
             this.loadSchedules(value);
         }
         if (name === "schedule" && parseInt(value) !== -1) {
-            axios.post("http://localhost:8000/api/avaliable/profeesor_get/" + value)
+            axios.post(URL + "api/avaliable/profeesor_get/" + value)
                 .then((response) => {
                     this.setState({ avaliable_hour: response.data[0].id, time_from: response.data[0].avaliable__schedule__time_from, time_to: response.data[0].avaliable__schedule__time_to, day: response.data[0].avaliable__schedule__day })
                 })
@@ -155,7 +156,7 @@ export default class updateElective extends Component {
                 "schedules_add": avaliable_hours_add,
                 "schedules_delete": avaliable_hours_delete,
             }
-            await axios.put("http://localhost:8000/api/course/professor/", json)
+            await axios.put(URL + "api/course/professor/", json)
                 .then(() => {
                     okSchedules = true;
                 })
@@ -177,25 +178,25 @@ export default class updateElective extends Component {
 
     //LOAD DATA
     loadClassrooms() {
-        axios.get("http://localhost:8000/api/getcourse/" + this.state.elective)
+        axios.get(URL + "api/getcourse/" + this.state.elective)
             .then(response =>
                 this.setState({ classrooms: response.data }))
     }
 
     loadSchedules(value) {
-        axios.post("http://localhost:8000/api/avaliable/professor/" + value + "/" + this.state.elective)
+        axios.post(URL + "api/avaliable/professor/" + value + "/" + this.state.elective)
             .then(response =>
                 this.setState({ schedules: response.data }))
     }
 
     loadProfessors() {
-        axios.get("http://localhost:8000/api/professor/")
+        axios.get(URL + "api/professor/")
             .then(response =>
                 this.setState({ professors: response.data }))
     }
 
     loadAvaliables() {
-        axios.get("http://localhost:8000/api/avaliable/profeesor_schedule/" + this.state.elective)
+        axios.get(URL + "api/avaliable/profeesor_schedule/" + this.state.elective)
             .then((response) => {
                 var i;
                 const data = response.data;
@@ -213,7 +214,7 @@ export default class updateElective extends Component {
     }
 
     loadElective() {
-        // axios.get("http://localhost:8000/api/course/" + this.state.elective)
+        // axios.get(URL + "api/course/" + this.state.elective)
         //     .then((response) => {
         //         this.setState({
         //             elective_id: response.data[0].course__id,

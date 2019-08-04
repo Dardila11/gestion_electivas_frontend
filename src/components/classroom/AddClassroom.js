@@ -7,6 +7,7 @@ import 'simplebar/dist/simplebar.css';
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
 import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
+import { URL } from "../../utils/URLServer";
 
 export default class AddClassroom extends Component {
     constructor(props, context) {
@@ -94,7 +95,7 @@ export default class AddClassroom extends Component {
                 "description": description,
                 "faculty": faculty
             }
-            await axios.put("http://localhost:8000/api/classroom/", json)
+            await axios.put(URL + "api/classroom/", json)
                 .then(() => {
                     okClassroom = true;
                 })
@@ -111,7 +112,7 @@ export default class AddClassroom extends Component {
                 "classroom": classroom_id,
                 "schedules": schedules
             }
-            await axios.put("http://localhost:8000/api/schedule/", json)
+            await axios.put(URL + "api/schedule/", json)
                 .then(() => {
                     okSchedules = true;
                 })
@@ -133,7 +134,7 @@ export default class AddClassroom extends Component {
 
     //LOAD DATA
     loadFaculties() {
-        axios.post("http://localhost:8000/api/faculty/")
+        axios.post(URL + "api/faculty/")
             .then(response =>
                 this.setState({ faculties: response.data }))
     }
@@ -353,7 +354,7 @@ export default class AddClassroom extends Component {
                                 <Col>
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Descripción</span></Form.Label>
-                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange} required></textarea>
+                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange}></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>

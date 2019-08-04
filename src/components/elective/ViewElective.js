@@ -9,6 +9,7 @@ import es from "date-fns/locale/es";
 import "../../css/Table.css";
 import { addSchedule } from "../../js/HandleDOM";
 import { unhashHour, unhashDay } from "../../js/HandleSchedule";
+import { URL } from "../../utils/URLServer";
 registerLocale("es", es);
 
 export default class updateElective extends Component {
@@ -65,25 +66,25 @@ export default class updateElective extends Component {
 
     //LOAD DATA
     loadClassrooms() {
-        axios.get("http://localhost:8000/api/classroom/")
+        axios.get(URL + "api/classroom/")
             .then(response =>
                 this.setState({ classrooms: response.data }))
     }
 
     loadSchedules(value) {
-        axios.post("http://localhost:8000/api/avaliable/" + value)
+        axios.post(URL + "api/avaliable/" + value)
             .then(response =>
                 this.setState({ schedules: response.data }))
     }
 
     loadProfessors() {
-        axios.get("http://localhost:8000/api/professor/")
+        axios.get(URL + "api/professor/")
             .then(response =>
                 this.setState({ professors: response.data }))
     }
 
     loadAvaliables() {
-        axios.get("http://localhost:8000/api/avaliable/course/" + this.state.elective)
+        axios.get(URL + "api/avaliable/course/" + this.state.elective)
             .then((response) => {
                 var i;
                 const data = response.data;
@@ -101,7 +102,7 @@ export default class updateElective extends Component {
     }
 
     loadElective() {
-        axios.get("http://localhost:8000/api/course/" + this.state.elective)
+        axios.get(URL + "api/course/" + this.state.elective)
             .then(response =>
                 this.setState({
                     elective_id: response.data[0].course__id,

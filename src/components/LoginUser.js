@@ -6,6 +6,7 @@ import axios from "axios";
 import logo from "../img/logoU.png";
 import "../css/LoginSecretary.css";
 import { time } from "../js/HandleDOM";
+import { URL } from "../utils/URLServer"
 
 export default class LoginSecretary extends Component {
     constructor(props, context) {
@@ -29,7 +30,7 @@ export default class LoginSecretary extends Component {
     }
 
     handleSemester = (data, role) => {
-        if (role === 3 || role === undefined) {
+        if (role === 3) {
             if (data.length > 0) {
                 const now = new Date();
                 const date = new Date(data[data.length - 1].fields.until_date);
@@ -72,6 +73,9 @@ export default class LoginSecretary extends Component {
                 this.setState({ message: "No hay semestres registrados", show: true });
                 time();
             }
+        } else {
+            this.setState({ message: "Usuario sin permisos", show: true });
+            time();
         }
     }
 
@@ -80,7 +84,9 @@ export default class LoginSecretary extends Component {
         localStorage.setItem("user", JSON.stringify(data.user.username));
         localStorage.setItem("token", JSON.stringify(data.token));
         const role = data.user.groups[0];
-        axios.get("http://localhost:8000/api/semester/", { "token": this.token }, { cancelToken: this.source.token, })
+        console.log(role)
+        localStorage.setItem("role", JSON.stringify(role));
+        axios.get(URL + "api/semester/", { "token": this.token }, { cancelToken: this.source.token, })
             .then((response) => {
                 this.handleSemester(response.data, role);
             })
@@ -90,7 +96,7 @@ export default class LoginSecretary extends Component {
     onLogin(event) {
         event.preventDefault();
         const { username, password } = this.state;
-        axios.post("http://localhost:8000/api/login/", { username, password }, { cancelToken: this.source.token, })
+        axios.post(URL + "api/login/", { username, password }, { cancelToken: this.source.token, })
             .then(response => {
                 this.redirect(response.data)
             })

@@ -6,6 +6,7 @@ import 'simplebar';
 import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
 import { hashHour, hashDay, unhashHour, unhashDay, findSchedule } from "../../js/HandleSchedule";
+import { URL } from "../../utils/URLServer";
 
 export default class updateClassroom extends Component {
     constructor(props, context) {
@@ -114,7 +115,7 @@ export default class updateClassroom extends Component {
                 "description": description,
                 "faculty": faculty
             }
-            await axios.post("http://localhost:8000/api/classroom/", json)
+            await axios.post(URL + "api/classroom/", json)
                 .then(() => {
                     okClassroom = true;
                 })
@@ -132,7 +133,7 @@ export default class updateClassroom extends Component {
                 "schedules_add": schedules_add,
                 "schedules_delete": schedules_delete
             }
-            await axios.post("http://localhost:8000/api/schedule/", json)
+            await axios.post(URL + "api/schedule/", json)
                 .then(() => {
                     okSchedules = true;
                 })
@@ -154,7 +155,7 @@ export default class updateClassroom extends Component {
 
     //LOAD DATA
     loadFaculties() {
-        axios.post("http://localhost:8000/api/faculty/")
+        axios.post(URL + "api/faculty/")
             .then(response =>
                 this.setState({ faculties: response.data }))
     }
@@ -202,11 +203,11 @@ export default class updateClassroom extends Component {
     componentWillMount() {
         this.loadFaculties();
         this.setState({ showAlert: false });
-        axios.get("http://localhost:8000/api/getclassroom/" + this.state.classroom)
+        axios.get(URL + "api/getclassroom/" + this.state.classroom)
             .then((response) => {
                 this.loadClassroom(response.data[0])
             })
-        axios.get("http://localhost:8000/api/schedule/" + this.state.classroom)
+        axios.get(URL + "api/schedule/" + this.state.classroom)
             .then((response) => {
                 //this.setState({schedules: response.data})
                 this.loadSchedules(response.data)
@@ -401,7 +402,7 @@ export default class updateClassroom extends Component {
                                 <Col>
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Descripción</span></Form.Label>
-                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange} required></textarea>
+                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange}></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>

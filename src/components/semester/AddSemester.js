@@ -6,17 +6,20 @@ import { Redirect } from "react-router-dom";
 
 import { time } from "../../js/HandleDOM";
 import NavBar from "../NavBar";
+import { URL } from "../../utils/URLServer";
 
 import DatePicker from "react-datepicker";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
+import { closeSesion } from "../../js/handleLocalStorage";
 registerLocale("es", es);
 
 export default class FormStartElectivesProcess extends Component {
     CancelToken = axios.CancelToken;
     source = this.CancelToken.source();
     token = JSON.parse(localStorage.getItem("token"));
+    role = JSON.parse(localStorage.getItem("role"));
     constructor(props, context) {
         super(props, context);
         this.state = {
@@ -73,27 +76,39 @@ export default class FormStartElectivesProcess extends Component {
     }
 
     verificar = () => {
-        axios.post("http://localhost:8000/api/verificate/", { "token": this.token })
-            .then(() => {
-                this.setState({ isNew: false });
-                axios.post("http://localhost:8000/api/refresh/", { "token": this.token })
-                    .then((response) => {
-                        localStorage.removeItem("token");
-                        localStorage.setItem("token", JSON.stringify(response.data.token));
+        if (this.role !== null) {
+            const role = parseInt(this.role);
+            if (role === 3) {
+                axios.post(URL + "api/verificate/", { "token": this.token })
+                    .then(() => {
+                        this.setState({ isNew: false });
+                        axios.post(URL + "api/refresh/", { "token": this.token })
+                            .then((response) => {
+                                localStorage.removeItem("token");
+                                localStorage.setItem("token", JSON.stringify(response.data.token));
+                            })
+                            .catch(() => {
+                                this.setState({ isLogin: false });
+                            });
                     })
                     .catch(() => {
+                        closeSesion();
+                        alert('Sesion expirada por inactividad');
                         this.setState({ isLogin: false });
                     });
-            })
-            .catch(() => {
-                alert('Sesion expirada por inactividad');
+            } else {
+                closeSesion();
+                alert('Sesion expirada por politicas de seguridad');
                 this.setState({ isLogin: false });
-            });
+            }
+        } else {
+			this.setState({ isLogin: false });
+		}
     }
 
     mover = () => {
         clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => { this.verificar() }, 901000);
+        this.timeout = setTimeout(() => { this.verificar() }, 900500);
     }
 
     //REQUESTS SERVER
@@ -110,7 +125,7 @@ export default class FormStartElectivesProcess extends Component {
                     "from_date": from_date,
                     "until_date": until_date
                 }
-                axios.post("http://localhost:8000/api/semester/", json)
+                axios.post(URL + "api/semester/", json)
                     .then((response) => {
                         this.setState({ semester: response.data[0].pk });
                         this.redirect(response);
@@ -132,7 +147,7 @@ export default class FormStartElectivesProcess extends Component {
 
     //LOAD DATA
     loadSemesters = () => {
-        axios.get("http://localhost:8000/api/semester/")
+        axios.get(URL + "api/semester/")
             .then(response =>
                 this.setState({ semesters: response.data })
             )

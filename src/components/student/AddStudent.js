@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import '../../css/Table.css';
 import { time } from "../../js/HandleDOM";
+import { URL } from "../../utils/URLServer"
 
 export default class addStudentStudent extends Component {
     constructor(props, context) {
@@ -91,7 +92,7 @@ export default class addStudentStudent extends Component {
             "student": codigo,
             "enrrollments": enrrollments
         }
-        await axios.put("http://localhost:8000/api/enrrollment/", json)
+        await axios.put(URL + "api/enrrollment/", json)
             .then(() => {
                 okSchedules = true;
             })
@@ -110,7 +111,7 @@ export default class addStudentStudent extends Component {
     //LOAD DATA
     loadElectives() {
         const semester = parseInt(localStorage.getItem("semester"));
-        axios.post("http://localhost:8000/api/course/semester/" + semester)
+        axios.post(URL + "api/course/semester/" + semester)
             .then(response =>
                 this.setState({ electives: response.data }))
     }

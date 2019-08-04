@@ -6,6 +6,7 @@ import { time, changePage } from "../../js/HandleDOM";
 import AddElective from './AddElective';
 import EditElective from './EditElective';
 import ViewElective from './ViewElective';
+import { URL } from "../../utils/URLServer";
 
 import '../../css/Table.css';
 
@@ -66,7 +67,7 @@ export default class ListElective extends Component {
 
 	eliminar = () => {
 		this.setState({ showAlert: false });
-		axios.delete("http://localhost:8000/api/course/delete/" + this.state.id)
+		axios.delete(URL + "api/course/delete/" + this.state.id)
 			.then(() => {
 				this.loadElectives()
 			})
@@ -118,7 +119,7 @@ export default class ListElective extends Component {
 		const end = parseInt(event.target.name) * this.sizeBreak;
 		changePage(parseInt(event.target.name), "pageElectives");
 		this.setState({ page: init });
-		axios.get("http://localhost:8000/api/course/limit/" + init + "/" + end + "/" + semester, { cancelToken: this.source.token, })
+		axios.get(URL + "api/course/limit/" + init + "/" + end + "/" + semester, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ listElectives: response.data })
 			)
@@ -127,20 +128,20 @@ export default class ListElective extends Component {
 	async loadElectives() {
 		const semester = parseInt(localStorage.getItem("semester"));
 		const init = this.state.page;
-		await axios.get("http://localhost:8000/api/course/count/" + semester, { cancelToken: this.source.token, })
+		await axios.get(URL + "api/course/count/" + semester, { cancelToken: this.source.token, })
 			.then(response =>
 				this.setState({ size: response.data })
 			)
 		if (this.state.size > 0) {
 			const initAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? (Math.ceil(this.state.size / this.sizeBreak) - 1) * this.sizeBreak : init;
 			const endAux = Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? this.state.size : init + this.sizeBreak;
-			await axios.get("http://localhost:8000/api/course/limit/" + initAux + "/" + endAux + "/" + semester, { cancelToken: this.source.token, })
+			await axios.get(URL + "api/course/limit/" + initAux + "/" + endAux + "/" + semester, { cancelToken: this.source.token, })
 				.then((response) => {
 					this.setState({ listElectives: response.data })
 				})
 			changePage(Math.ceil(init / this.sizeBreak) >= Math.ceil(this.state.size / this.sizeBreak) ? Math.ceil(init / this.sizeBreak) : Math.ceil((init + 1) / this.sizeBreak), "pageElectives");
 		} else {
-			await axios.get("http://localhost:8000/api/course/limit/" + 0 + "/" + 0 + "/" + semester, { cancelToken: this.source.token, })
+			await axios.get(URL + "api/course/limit/" + 0 + "/" + 0 + "/" + semester, { cancelToken: this.source.token, })
 				.then(response =>
 					this.setState({ listElectives: response.data })
 				)

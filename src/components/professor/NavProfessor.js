@@ -3,6 +3,7 @@ import { Image, Nav, Tab, Form, Container } from "react-bootstrap";
 
 import { hide } from "../../js/HandleDOM";
 import ListElectives from "./ListElectives";
+import Footer from "../Footer";
 
 export default class NavBarStudent extends Component {
     constructor(props) {
@@ -29,7 +30,7 @@ export default class NavBarStudent extends Component {
     }
 
     handleSelect(key) {
-        this.setState({ tab: key })
+        this.setState({ tab: key });
     }
 
     componentWillMount() {
@@ -38,28 +39,26 @@ export default class NavBarStudent extends Component {
         }
     }
 
-    componentWillUnmount() {
-
-    }
-
     render() {
         return (
             <Tab.Container activeKey={this.state.tab} onSelect={this.handleSelect}>
-                <Nav className="flex-column ocultar-l transicion" id="menu">
-                    <div className="p-3 bb-1">
-                        <Form.Check className="ocultar" name="show" id="boton-hide" checked={this.state.show} onChange={this.handleChange} />
-                        <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt="" /></Form.Label>
-                        <p className="d-inline m-0">SGE</p>
-                    </div>
-                    <div className="p-3 bb-1 d-flex justify-content-center">
-                        <div className="text-center">
-                            <Image className="b-a p-1" src="../img/chica.png" roundedCircle />
-                            <p className="mb-0">{this.state.user}</p>
+                <div className="menu-body transicion ocultar-l" onClick={hide}>
+                    <Nav className="flex-column" id="menu">
+                        <div className="p-3 bb-1">
+                            <Form.Check className="ocultar" name="show" id="boton-hide" checked={this.state.show} onChange={this.handleChange} />
+                            <Form.Label className="mouse d-inline mr-2" htmlFor="boton-hide"><Image src="../img/menu-1.png" alt="" /></Form.Label>
+                            <p className="d-inline m-0">SGE</p>
                         </div>
-                    </div>
-                    <Nav.Link eventKey="1" name="1" onClick={this.ocultar}>Inicio</Nav.Link>
-                    <Nav.Link eventKey="2" name="2" onClick={this.ocultar}>Mis electivas</Nav.Link>
-                </Nav>
+                        <div className="p-3 bb-1 d-flex justify-content-center">
+                            <div className="text-center">
+                                <Image className="b-a p-1" src="../img/chica.png" roundedCircle />
+                                <p className="mb-0">{this.state.user}</p>
+                            </div>
+                        </div>
+                        <Nav.Link eventKey="1" name="1" className="opacar text-center" onClick={this.ocultar}>Inicio</Nav.Link>
+                        <Nav.Link eventKey="2" name="2" className="opacar text-center" onClick={this.ocultar}>Mis electivas</Nav.Link>
+                    </Nav>
+                </div>
                 <Tab.Content>
                     <Container className="pl-5 pr-5">
                         <Tab.Pane eventKey="1"></Tab.Pane>
@@ -68,6 +67,7 @@ export default class NavBarStudent extends Component {
                         </Tab.Pane>
                     </Container>
                 </Tab.Content>
+                <Footer></Footer>
             </Tab.Container>
         )
     }
