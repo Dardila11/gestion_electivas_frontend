@@ -78,6 +78,5 @@ export default class DashboardSecretary extends Component {
 				</section>
 			)
 		}
-		return (<></>)
 	}
 }

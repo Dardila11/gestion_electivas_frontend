@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Form, Button, Row, Col, Modal, Alert, ListGroup } from 'react-bootstrap';
 
 export default class ErrorNonFound extends Component {
     render() {
