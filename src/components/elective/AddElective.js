@@ -198,8 +198,8 @@ export default class createElective extends Component {
     //- - - - - - - - - - - - - - - -
 
     //LOAD DATA
-    loadElectives() {
-        axios.get(URL + "api/course/all")
+    async loadElectives() {
+        await axios.get(URL + "api/course/all")
             .then(response =>
                 this.setState({ electives: response.data })
             )
