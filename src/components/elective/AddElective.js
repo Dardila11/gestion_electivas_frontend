@@ -10,6 +10,7 @@ import "../../css/Table.css";
 import { time, addSchedule, removeSchedule } from "../../js/HandleDOM";
 import { unhashHour, unhashDay } from "../../js/HandleSchedule";
 import { URL } from "../../utils/URLServer";
+import Autosuggest from 'react-autosuggest';
 registerLocale("es", es);
 
 export default class createElective extends Component {
@@ -35,6 +36,9 @@ export default class createElective extends Component {
             schedules: [],
             avaliable_hours: [],
             professors: [],
+            electives: [],
+            value: '',
+            suggestions: [],
             show: false,
             message: ""
         };
@@ -42,11 +46,50 @@ export default class createElective extends Component {
         this.loadClassrooms = this.loadClassrooms.bind(this);
         this.loadSchedules = this.loadSchedules.bind(this);
         this.loadProfessors = this.loadProfessors.bind(this);
+        this.loadElectives = this.loadElectives.bind(this);
         this.createListClassrooms = this.createListClassrooms.bind(this);
         this.createListSchedules = this.createListSchedules.bind(this);
         this.createListAvaliableHours = this.createListAvaliableHours.bind(this);
         this.createListProfessors = this.createListProfessors.bind(this);
     }
+
+    // When suggestion is clicked, Autosuggest needs to populate the input
+    // based on the clicked suggestion. Teach Autosuggest how to calculate the
+    // input value for every given suggestion.
+    getSuggestionValue = suggestion => suggestion.name;
+
+    // Use your imagination to render suggestions.
+    renderSuggestion = suggestion => (
+        <div>
+            {suggestion.id}
+            {suggestion.name}
+        </div>
+    );
+
+    // Teach Autosuggest how to calculate suggestions for any given input value.
+    getSuggestions = value => {
+        const inputValue = value.trim().toLowerCase();
+        console.log(inputValue);
+        const inputLength = inputValue.length;
+
+        return inputLength === 0 ? [] : this.state.electives.filter(lang =>
+            lang.name.toLowerCase().slice(0, inputLength) === inputValue
+        );
+    };
+
+
+    onSuggestionsFetchRequested = ({ value }) => {
+        this.setState({
+            suggestions: this.getSuggestions(value)
+        });
+    };
+
+    // Autosuggest will call this function every time you need to clear suggestions.
+    onSuggestionsClearRequested = () => {
+        this.setState({
+            suggestions: []
+        });
+    };
 
     handleChange = (event) => {
         const target = event.target;
@@ -188,6 +231,13 @@ export default class createElective extends Component {
     //- - - - - - - - - - - - - - - -
 
     //LOAD DATA
+    loadElectives() {
+        axios.get(URL + "api/course/all")
+            .then(response =>
+                this.setState({ electives: response.data })
+            )
+    }
+
     loadClassrooms() {
         axios.get(URL + "api/classroom/")
             .then(response =>
@@ -246,15 +296,30 @@ export default class createElective extends Component {
     componentWillMount() {
         this.loadClassrooms();
         this.loadProfessors();
+        this.loadElectives();
     }
     //- - - - - - - - - - - - - - - -
 
+    onChange = (event, { newValue, method }) => {
+        console.log(newValue)
+        this.setState({
+            value: newValue
+        });
+    };
+
     render() {
+        // Autosuggest will pass through all these props to the input.
+        const { value, suggestions } = this.state;
+        const inputProps = {
+            placeholder: 'Codigo electiva',
+            value,
+            onChange: this.onChange
+        };
         const handleDismiss = () => this.setState({ show: false });
         return (
             <>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registrar electiva</Modal.Title>
+                    <Modal.Title>Registrar salón a electiva</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="container-fluid">
@@ -263,7 +328,14 @@ export default class createElective extends Component {
                                 <Col className="col-sm-3 col-xl-2 col-lg-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="elective_id" value={this.state.elective_id} onChange={this.handleChange} placeholder="Código" required />
+                                        <Autosuggest
+                                            suggestions={suggestions}
+                                            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                                            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                                            getSuggestionValue={this.getSuggestionValue}
+                                            renderSuggestion={this.renderSuggestion}
+                                            inputProps={inputProps}
+                                        />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-2 col-lg-2">
