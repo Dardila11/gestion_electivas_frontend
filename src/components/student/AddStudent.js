@@ -5,6 +5,7 @@ import axios from 'axios';
 import '../../css/Table.css';
 import { time } from "../../js/HandleDOM";
 import { URL } from "../../utils/URLServer"
+import Autosuggest from 'react-autosuggest';
 
 export default class addStudentStudent extends Component {
     constructor(props, context) {
@@ -15,11 +16,15 @@ export default class addStudentStudent extends Component {
             apellidos: "",
             usuario: "",
             elective: -1,
+            students: [],
             electives: [],
+            value: '',
+            suggestions: [],
             enrrollments: [],
             show: false
         };
         this.createStudent = this.createStudent.bind(this);
+        this.loadStudents = this.loadStudents.bind(this);
         this.loadElectives = this.loadElectives.bind(this);
         this.createListElectives = this.createListElectives.bind(this);
         this.createListEnrrollments = this.createListEnrrollments.bind(this);
@@ -109,6 +114,15 @@ export default class addStudentStudent extends Component {
     //- - - - - - - - - - - - - - - -
 
     //LOAD DATA
+    loadStudents() {
+        axios.get(URL + "api/student/")
+            .then((response) => {
+                this.setState({ students: response.data })
+                console.log(response)
+            })
+                
+    }
+
     loadElectives() {
         const semester = parseInt(localStorage.getItem("semester"));
         axios.post(URL + "api/course/semester/" + semester)
@@ -141,10 +155,66 @@ export default class addStudentStudent extends Component {
     //METHODS LIFESPAN COMPONENT
     componentWillMount() {
         this.loadElectives();
+        this.loadStudents();
     }
     //- - - - - - - - - - - - - - - -
 
+    // When suggestion is clicked, Autosuggest needs to populate the input
+    // based on the clicked suggestion. Teach Autosuggest how to calculate the
+    // input value for every given suggestion.
+    getSuggestionValue = suggestion => suggestion.user_id.toString();
+
+    // Use your imagination to render suggestions.
+    renderSuggestion = suggestion => (
+        <div>
+            {suggestion.user_id}
+        </div>
+    );
+
+    // Teach Autosuggest how to calculate suggestions for any given input value.
+    getSuggestions = value => {
+        const inputValue = value.toString().toLowerCase();
+        const inputLength = inputValue.length;
+
+        return inputLength === 0 ? [] : this.state.students.filter(lang =>
+            lang.user_id.toString().toLowerCase().slice(0, inputLength) === inputValue
+        );
+    };
+
+
+    onSuggestionsFetchRequested = ({ value }) => {
+
+        this.setState({
+            suggestions: this.getSuggestions(value)
+        });
+    };
+
+    // Autosuggest will call this function every time you need to clear suggestions.
+    onSuggestionsClearRequested = () => {
+        this.setState({
+            suggestions: []
+        });
+    };
+
+    onChange = (event, { newValue, method }) => {
+        const elective = this.state.students.find(elective => elective.user_id === parseInt(newValue));
+        if (elective !== undefined) {
+            this.setState({ codigo: elective.user_id, nombres: elective.first_name, apellidos: elective.last_name, usuario: elective.username });
+        }
+        this.setState({
+            value: newValue
+        });
+    };
+
     render() {
+        // Autosuggest will pass through all these props to the input.
+        const { value, suggestions } = this.state;
+        const inputProps = {
+            className: "form-control",
+            placeholder: 'Codigo*',
+            value,
+            onChange: this.onChange
+        };
         const handleDismiss = () => this.setState({ show: false });
         return (
             <>
@@ -157,26 +227,33 @@ export default class addStudentStudent extends Component {
                             <Row className="mb-3">
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="codigo" value={this.state.codigo} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Código<span className="obligatorio">*</span></span></Form.Label>
+                                        <Autosuggest 
+                                            suggestions={suggestions}
+                                            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                                            onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                                            getSuggestionValue={this.getSuggestionValue}
+                                            renderSuggestion={this.renderSuggestion}
+                                            inputProps={inputProps}
+                                        />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Usuario</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="usuario" value={this.state.usuario} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Usuario<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="usuario" value={this.state.usuario} onChange={this.handleChange} placeholder="Usuario*" required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Nombres</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="nombres" value={this.state.nombres} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Nombres<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="nombres" value={this.state.nombres} onChange={this.handleChange} placeholder="Nombres*" required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Apellidos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="apellidos" value={this.state.apellidos} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Apellidos<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="apellidos" value={this.state.apellidos} onChange={this.handleChange} placeholder="Apellidos*" required />
                                     </Form.Group>
                                 </div>
                             </Row>

@@ -180,19 +180,19 @@ export default class AddClassroom extends Component {
                             <Row className="bb-1-g mb-3">
                                 <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">No. Salón</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
+                                        <Form.Label><span className="ml-0">No. Salón<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón*" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Capacidad</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
+                                        <Form.Label><span className="ml-0">Capacidad<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad*" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-4">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Facultad</span></Form.Label>
+                                        <Form.Label><span className="ml-0">Facultad<span className="obligatorio">*</span></span></Form.Label>
                                         <Form.Control className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <this.createListFaculties />

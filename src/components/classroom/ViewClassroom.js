@@ -110,19 +110,19 @@ export default class ViewClassroom extends Component {
                                 <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">No. Salón</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="text" name="classroom_id" value={this.state.classroom_id} onChange={this.handleChange} placeholder="No. salón" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-3 col-xl-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Capacidad</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="number" name="capacity" value={this.state.capacity} onChange={this.handleChange} placeholder="Capacidad" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-4">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Facultad</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
+                                        <Form.Control disabled="disabled" className="ml-0" as="select" name="faculty" value={this.state.faculty} onChange={this.handleChange}>
                                             <this.createListFaculties />
                                         </Form.Control>
                                     </Form.Group>
@@ -223,7 +223,7 @@ export default class ViewClassroom extends Component {
                                 <Col>
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Descripción</span></Form.Label>
-                                        <textarea className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange} required></textarea>
+                                        <textarea disabled="disabled" className="form-control" name="description" id="" value={this.state.description} onChange={this.handleChange} required></textarea>
                                     </Form.Group>
                                 </Col>
                             </Row>

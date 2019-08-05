@@ -318,19 +318,19 @@ export default class updateElective extends Component {
                             <Row className="bb-1-g mb-3">
                                 <Col className="col-sm-3 col-xl-2 col-lg-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="elective_id" value={this.state.elective_id} onChange={this.handleChange} placeholder="Código" required />
+                                        <Form.Label><span className="ml-0">Código<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="elective_id" value={this.state.elective_id} onChange={this.handleChange} placeholder="Código" disabled="disabled" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-2 col-lg-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Cupos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required />
+                                        <Form.Label><span className="ml-0">Cupos<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos*" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-3 col-lg-3">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Profesor</span></Form.Label>
+                                        <Form.Label><span className="ml-0">Profesor<span className="obligatorio">*</span></span></Form.Label>
                                         <Form.Control className="ml-0" as="select" name="professor" value={this.state.professor} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <this.createListProfessors />
@@ -339,7 +339,7 @@ export default class updateElective extends Component {
                                 </Col>
                                 <Col className="col-sm-6 col-xl-2 col-lg-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Prioridad</span></Form.Label>
+                                        <Form.Label><span className="ml-0">Prioridad<span className="obligatorio">*</span></span></Form.Label>
                                         <Form.Control className="ml-0" as="select" name="priority" value={this.state.priority} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <option key={1} value={1}>Alta</option>

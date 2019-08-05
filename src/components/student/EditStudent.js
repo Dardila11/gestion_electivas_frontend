@@ -198,26 +198,26 @@ export default class UpdateStudent extends Component {
                             <Row className="mb-3">
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="codigo" value={this.state.codigo} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Código<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="number" name="codigo" value={this.state.codigo} onChange={this.handleChange} disabled="disabled" required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Usuario</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="usuario" value={this.state.usuario} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Usuario<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="usuario" value={this.state.usuario} onChange={this.handleChange} placeholder="Usuario*" required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Nombres</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="nombres" value={this.state.nombres} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Nombres<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="nombres" value={this.state.nombres} onChange={this.handleChange} placeholder="Nombres*" required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Apellidos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="apellidos" value={this.state.apellidos} onChange={this.handleChange} required />
+                                        <Form.Label><span className="ml-0">Apellidos<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="text" name="apellidos" value={this.state.apellidos} onChange={this.handleChange} placeholder="Apellidos" required />
                                     </Form.Group>
                                 </div>
                             </Row>

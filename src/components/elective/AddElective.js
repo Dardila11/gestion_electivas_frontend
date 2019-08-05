@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Modal, Form, Button, Table, Alert, Row, Col, ListGroup } from "react-bootstrap";
+import { Modal, Form, Button, Table, Alert, Row, ListGroup } from "react-bootstrap";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import { registerLocale } from "react-datepicker";
@@ -17,7 +17,7 @@ export default class createElective extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            elective_id: "",
+            elective_id: -1,
             quota: "",
             faculty: 1,
             priority: -1,
@@ -52,44 +52,6 @@ export default class createElective extends Component {
         this.createListAvaliableHours = this.createListAvaliableHours.bind(this);
         this.createListProfessors = this.createListProfessors.bind(this);
     }
-
-    // When suggestion is clicked, Autosuggest needs to populate the input
-    // based on the clicked suggestion. Teach Autosuggest how to calculate the
-    // input value for every given suggestion.
-    getSuggestionValue = suggestion => suggestion.name;
-
-    // Use your imagination to render suggestions.
-    renderSuggestion = suggestion => (
-        <div>
-            {suggestion.id}
-            {suggestion.name}
-        </div>
-    );
-
-    // Teach Autosuggest how to calculate suggestions for any given input value.
-    getSuggestions = value => {
-        const inputValue = value.trim().toLowerCase();
-        console.log(inputValue);
-        const inputLength = inputValue.length;
-
-        return inputLength === 0 ? [] : this.state.electives.filter(lang =>
-            lang.name.toLowerCase().slice(0, inputLength) === inputValue
-        );
-    };
-
-
-    onSuggestionsFetchRequested = ({ value }) => {
-        this.setState({
-            suggestions: this.getSuggestions(value)
-        });
-    };
-
-    // Autosuggest will call this function every time you need to clear suggestions.
-    onSuggestionsClearRequested = () => {
-        this.setState({
-            suggestions: []
-        });
-    };
 
     handleChange = (event) => {
         const target = event.target;
@@ -178,51 +140,56 @@ export default class createElective extends Component {
         event.preventDefault();
         var okCourse = false;
         var okSchedules = false;
-        const semester = parseInt(localStorage.getItem("semester"));
-        if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
-            if (Date.parse(this.state.voteDateFrom) <= Date.parse(this.state.voteDateTo)) {
-                const { elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
-                const from_date_vote = voteDateFrom.getFullYear() + "-" + (voteDateFrom.getMonth() + 1) + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
-                const until_date_vote = voteDateTo.getFullYear() + "-" + (voteDateTo.getMonth() + 1) + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
-                var json = {
-                    "quota": quota,
-                    "priority": priority,
-                    "from_date_vote": from_date_vote,
-                    "until_date_vote": until_date_vote,
-                    "course": elective_id,
-                    "professor": professor,
-                    "semester": semester,
+        if (this.state.elective !== -1) {
+            const semester = parseInt(localStorage.getItem("semester"));
+            if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
+                if (Date.parse(this.state.voteDateFrom) <= Date.parse(this.state.voteDateTo)) {
+                    const { elective_id, quota, priority, professor, voteDateFrom, voteDateTo, voteTimeFrom, voteTimeTo } = this.state;
+                    const from_date_vote = voteDateFrom.getFullYear() + "-" + (voteDateFrom.getMonth() + 1) + "-" + voteDateFrom.getDate() + "T" + voteTimeFrom.getHours() + ":" + voteTimeFrom.getMinutes() + ":" + voteTimeFrom.getSeconds();
+                    const until_date_vote = voteDateTo.getFullYear() + "-" + (voteDateTo.getMonth() + 1) + "-" + voteDateTo.getDate() + "T" + voteTimeTo.getHours() + ":" + voteTimeTo.getMinutes() + ":" + voteTimeTo.getSeconds();
+                    var json = {
+                        "quota": quota,
+                        "priority": priority,
+                        "from_date_vote": from_date_vote,
+                        "until_date_vote": until_date_vote,
+                        "course": elective_id,
+                        "professor": professor,
+                        "semester": semester,
+                    }
+                    await axios.put(URL + "api/course/", json)
+                        .then(() => {
+                            okCourse = true
+                        })
+                        .catch(() => {
+                            time();
+                            this.setState({ message: "El curso ya esta incluido ", show: true });
+                        })
+                    //CREATE SCHEDULES TO CLASSROOM
+                    const { avaliable_hours } = this.state;
+                    json = {
+                        "course": elective_id,
+                        "semester": semester,
+                        "schedules": avaliable_hours
+                    }
+                    await axios.put(URL + "api/course/schedule/", json)
+                        .then(() => {
+                            okSchedules = true;
+                        })
+                        .catch(() => {
+                            time();
+                            this.setState({ message: "Alguno de los horarios ya existe", show: true });
+                        });
+                } else {
+                    time();
+                    this.setState({ message: "La fecha final debe ser mayor a la fecha de inicio", show: true });
                 }
-                await axios.put(URL + "api/course/", json)
-                    .then(() => {
-                        okCourse = true
-                    })
-                    .catch(() => {
-                        time();
-                        this.setState({ message: "El curso ya esta incluido ", show: true });
-                    })
-                //CREATE SCHEDULES TO CLASSROOM
-                const { avaliable_hours } = this.state;
-                json = {
-                    "course": elective_id,
-                    "semester": semester,
-                    "schedules": avaliable_hours
-                }
-                await axios.put(URL + "api/course/schedule/", json)
-                    .then(() => {
-                        okSchedules = true;
-                    })
-                    .catch(() => {
-                        time();
-                        this.setState({ message: "Alguno de los horarios ya existe", show: true });
-                    });
             } else {
                 time();
-                this.setState({ message: "La fecha final debe ser mayor a la fecha de inicio", show: true });
+                this.setState({ message: "Elija un profesor y la prioridad", show: true });
             }
         } else {
             time();
-            this.setState({ message: "Elija un profesor y la prioridad", show: true });
+            this.setState({ message: "Elija una electiva valida", show: true });
         }
         if (okCourse && okSchedules) {
             this.handleCloseCreate();
@@ -300,8 +267,54 @@ export default class createElective extends Component {
     }
     //- - - - - - - - - - - - - - - -
 
+
+
+    // When suggestion is clicked, Autosuggest needs to populate the input
+    // based on the clicked suggestion. Teach Autosuggest how to calculate the
+    // input value for every given suggestion.
+    getSuggestionValue = suggestion => suggestion.name;
+
+    // Use your imagination to render suggestions.
+    renderSuggestion = suggestion => (
+        <div>
+            {suggestion.name}
+        </div>
+    );
+
+    // Teach Autosuggest how to calculate suggestions for any given input value.
+    getSuggestions = value => {
+        const inputValue = value.trim().toLowerCase();
+        const inputLength = inputValue.length;
+        const id = inputLength === 0 ? -1 : this.state.elective_id;
+
+        this.setState({id: id})
+
+        return inputLength === 0 ? [] : this.state.electives.filter(lang =>
+            lang.name.toLowerCase().slice(0, inputLength) === inputValue
+        );
+    };
+
+
+    onSuggestionsFetchRequested = ({ value }) => {
+
+        this.setState({
+            suggestions: this.getSuggestions(value)
+        });
+    };
+
+    // Autosuggest will call this function every time you need to clear suggestions.
+    onSuggestionsClearRequested = () => {
+        this.setState({
+            suggestions: []
+        });
+    };
+
     onChange = (event, { newValue, method }) => {
-        console.log(newValue)
+        const elective = this.state.electives.find(elective => elective.name === newValue);
+        if (elective !== undefined) {
+            console.log(elective.id)
+            this.setState({ elective_id: elective.id });
+        }
         this.setState({
             value: newValue
         });
@@ -311,7 +324,8 @@ export default class createElective extends Component {
         // Autosuggest will pass through all these props to the input.
         const { value, suggestions } = this.state;
         const inputProps = {
-            placeholder: 'Codigo electiva',
+            className: "form-control",
+            placeholder: 'Electiva*',
             value,
             onChange: this.onChange
         };
@@ -319,16 +333,16 @@ export default class createElective extends Component {
         return (
             <>
                 <Modal.Header closeButton>
-                    <Modal.Title>Registrar salón a electiva</Modal.Title>
+                    <Modal.Title>Registrar electiva en el semestre</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="container-fluid">
                         <Form id="formulario" onSubmit={this.createElective}>
                             <Row className="bb-1-g mb-3">
-                                <Col className="col-sm-3 col-xl-2 col-lg-2">
+                                <div className="col-sm-3 col-xl-2 col-lg-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Autosuggest
+                                        <Form.Label><span className="ml-0">Electiva<span className="obligatorio">*</span></span></Form.Label>
+                                        <Autosuggest 
                                             suggestions={suggestions}
                                             onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                                             onSuggestionsClearRequested={this.onSuggestionsClearRequested}
@@ -337,25 +351,25 @@ export default class createElective extends Component {
                                             inputProps={inputProps}
                                         />
                                     </Form.Group>
-                                </Col>
-                                <Col className="col-sm-6 col-xl-2 col-lg-2">
+                                </div>
+                                <div className="col-sm-3 col-xl-2 col-lg-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Cupos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required></Form.Control>
+                                        <Form.Label><span className="ml-0">Cupos<span className="obligatorio">*</span></span></Form.Label>
+                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos*" required></Form.Control>
                                     </Form.Group>
-                                </Col>
-                                <Col className="col-sm-6 col-xl-3 col-lg-3">
+                                </div>
+                                <div className="col-sm-6 col-xl-3 col-lg-3">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Profesor</span></Form.Label>
+                                        <Form.Label><span className="ml-0">Profesor<span className="obligatorio">*</span></span></Form.Label>
                                         <Form.Control className="ml-0" as="select" name="professor" value={this.state.professor} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <this.createListProfessors />
                                         </Form.Control>
                                     </Form.Group>
-                                </Col>
-                                <Col className="col-sm-6 col-xl-2 col-lg-2">
+                                </div>
+                                <div className="col-sm-6 col-xl-2 col-lg-2">
                                     <Form.Group>
-                                        <Form.Label><span className="ml-0">Prioridad</span></Form.Label>
+                                        <Form.Label><span className="ml-0">Prioridad<span className="obligatorio">*</span></span></Form.Label>
                                         <Form.Control className="ml-0" as="select" name="priority" value={this.state.priority} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <option key={1} value={1}>Alta</option>
@@ -363,13 +377,13 @@ export default class createElective extends Component {
                                             <option key={3} value={3}>Baja</option>
                                         </Form.Control>
                                     </Form.Group>
-                                </Col>
+                                </div>
                             </Row>
                             <Row className="mt-2 bb-1-g mb-3">
-                                <Col>
+                                <div>
                                     <Form.Label><span className="h5">Fechas de Votaciones</span></Form.Label>
                                     <Row>
-                                        <Col className="col-lg-4">
+                                        <div className="col-lg-4">
                                             <Form.Group>
                                                 <Form.Label><span >Inicio</span></Form.Label>
                                                 <Form.Group>
@@ -391,8 +405,8 @@ export default class createElective extends Component {
                                                     />
                                                 </Form.Group>
                                             </Form.Group>
-                                        </Col>
-                                        <Col className="col-lg-4">
+                                        </div>
+                                        <div className="col-lg-4">
                                             <Form.Group>
                                                 <Form.Label><span >Final</span></Form.Label>
                                                 <Form.Group>
@@ -415,14 +429,14 @@ export default class createElective extends Component {
                                                     />
                                                 </Form.Group>
                                             </Form.Group>
-                                        </Col>
+                                        </div>
                                     </Row>
-                                </Col>
+                                </div>
                             </Row>
                             <Row className="bb-1-g mb-3">
-                                <Col className="col-sm-4">
+                                <div className="col-sm-4">
                                     <Row>
-                                        <Col className="col-sm-12">
+                                        <div className="col-sm-12">
                                             <Form.Group>
                                                 <Form.Label><span className="ml-0">Salón</span></Form.Label>
                                                 <Form.Control className="ml-0" as="select" name="classroom" value={this.state.classroom} onChange={this.handleChange}>
@@ -430,8 +444,8 @@ export default class createElective extends Component {
                                                     <this.createListClassrooms />
                                                 </Form.Control>
                                             </Form.Group>
-                                        </Col>
-                                        <Col className="col-sm-12">
+                                        </div>
+                                        <div className="col-sm-12">
                                             <Form.Group>
                                                 <Form.Label><span className="ml-0">Disponibilidad</span></Form.Label>
                                                 <Form.Control className="ml-0" as="select" name="schedule" value={this.state.schedule} onChange={this.handleChange}>
@@ -439,22 +453,22 @@ export default class createElective extends Component {
                                                     <this.createListSchedules />
                                                 </Form.Control>
                                             </Form.Group>
-                                        </Col>
+                                        </div>
                                     </Row>
                                     <Row>
-                                        <Col className="col-sm-12">
+                                        <div className="col-sm-12">
                                             <Button className="rounded-10  w-100" variant="primary" onClick={this.addSchedule}>Agregar Horario</Button>
-                                        </Col>
+                                        </div>
                                     </Row>
                                     <Row className="pt-2 pb-2">
-                                        <Col data-simplebar className="w-l over-y">
+                                        <div data-simplebar className="w-l over-y">
                                             <ListGroup>
                                                 <this.createListAvaliableHours />
                                             </ListGroup>
-                                        </Col>
+                                        </div>
                                     </Row>
-                                </Col>
-                                <Col className="col-sm-8">
+                                </div>
+                                <div className="col-sm-8">
                                     <Table responsive size="s">
                                         <thead className="table-sm">
                                             <tr>
@@ -542,7 +556,7 @@ export default class createElective extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                </Col>
+                                </div>
                             </Row>
                         </Form>
                     </div>

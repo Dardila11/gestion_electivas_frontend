@@ -64,7 +64,6 @@ export default class ViewStudent extends Component {
                 className="text-s1"
                 key={enrrollment.course__id + enrrollment.course__course__name} >
                 {enrrollment.course__course__name + " - " + enrrollment.course__professor__first_name + enrrollment.course__professor__last_name}
-                <Button name="schedule" value={enrrollment.course__id} onClick={this.removeEnrrollment} className="mouse float-right text-sm p-0">x</Button>
             </ListGroup.Item>
         );
         return listItems;
@@ -92,25 +91,25 @@ export default class ViewStudent extends Component {
                                 <div className="col-lg-6">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="codigo" value={this.state.codigo} onChange={this.handleChange} required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="number" name="codigo" value={this.state.codigo} onChange={this.handleChange} required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Usuario</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="usuario" value={this.state.usuario} onChange={this.handleChange} required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="text" name="usuario" value={this.state.usuario} onChange={this.handleChange} required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Nombres</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="nombres" value={this.state.nombres} onChange={this.handleChange} required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="text" name="nombres" value={this.state.nombres} onChange={this.handleChange} required />
                                     </Form.Group>
                                 </div>
                                 <div className="col-lg-6">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Apellidos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="apellidos" value={this.state.apellidos} onChange={this.handleChange} required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="text" name="apellidos" value={this.state.apellidos} onChange={this.handleChange} required />
                                     </Form.Group>
                                 </div>
                             </Row>

@@ -156,19 +156,19 @@ export default class updateElective extends Component {
                                 <Col className="col-sm-3 col-xl-2 col-lg-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Código</span></Form.Label>
-                                        <Form.Control className="ml-0" type="text" name="elective_id" value={this.state.elective_id} onChange={this.handleChange} placeholder="Código" required />
+                                        <Form.Control disabled="disabled" className="ml-0" type="text" name="elective_id" value={this.state.elective_id} onChange={this.handleChange} placeholder="Código" required />
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-2 col-lg-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Cupos</span></Form.Label>
-                                        <Form.Control className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required></Form.Control>
+                                        <Form.Control disabled="disabled" className="ml-0" type="number" name="quota" value={this.state.quota} onChange={this.handleChange} placeholder="Cupos" required></Form.Control>
                                     </Form.Group>
                                 </Col>
                                 <Col className="col-sm-6 col-xl-3 col-lg-3">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Profesor</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select" name="professor" value={this.state.professor} onChange={this.handleChange}>
+                                        <Form.Control disabled="disabled" className="ml-0" as="select" name="professor" value={this.state.professor} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <this.createListProfessors />
                                         </Form.Control>
@@ -177,7 +177,7 @@ export default class updateElective extends Component {
                                 <Col className="col-sm-6 col-xl-2 col-lg-2">
                                     <Form.Group>
                                         <Form.Label><span className="ml-0">Prioridad</span></Form.Label>
-                                        <Form.Control className="ml-0" as="select" name="priority" value={this.state.priority} onChange={this.handleChange}>
+                                        <Form.Control disabled="disabled" className="ml-0" as="select" name="priority" value={this.state.priority} onChange={this.handleChange}>
                                             <option key={-1} value={-1}>-----</option>
                                             <option key={1} value={1}>Alta</option>
                                             <option key={2} value={2}>Media</option>
@@ -194,14 +194,14 @@ export default class updateElective extends Component {
                                             <Form.Group>
                                                 <Form.Label><span >Inicio</span></Form.Label>
                                                 <Form.Group>
-                                                    <DatePicker className="form-control"
+                                                    <DatePicker disabled="disabled" className="form-control"
                                                         selected={this.state.voteDateFrom}
                                                         endDate={this.state.voteDateTo}
                                                         onChange={this.handleChangeVoteDateFrom}
                                                         placeholderText="Fecha Inicio"
                                                         dateFormat="dd/MM/yyyy"
                                                     />
-                                                    <DatePicker className="form-control"
+                                                    <DatePicker disabled="disabled" className="form-control"
                                                         selected={this.state.voteTimeFrom}
                                                         onChange={this.handleChangeVoteTimeFrom}
                                                         showTimeSelect
@@ -217,7 +217,7 @@ export default class updateElective extends Component {
                                             <Form.Group>
                                                 <Form.Label><span >Final</span></Form.Label>
                                                 <Form.Group>
-                                                    <DatePicker className="form-control"
+                                                    <DatePicker disabled="disabled" className="form-control"
                                                         selected={this.state.voteDateTo}
                                                         startDate={this.state.voteDateFrom}
                                                         onChange={this.handleChangeVoteDateTo}
@@ -225,7 +225,7 @@ export default class updateElective extends Component {
                                                         placeholderText="Fecha Final"
                                                         minDate={this.state.voteDateFrom}
                                                     />
-                                                    <DatePicker className="form-control"
+                                                    <DatePicker disabled="disabled" className="form-control"
                                                         selected={this.state.voteTimeTo}
                                                         onChange={this.handleChangeVoteTimeTo}
                                                         showTimeSelect

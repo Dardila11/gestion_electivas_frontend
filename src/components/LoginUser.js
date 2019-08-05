@@ -138,7 +138,9 @@ export default class LoginSecretary extends Component {
                         </header>
                         <div className="caja">
                             <Form onSubmit={this.onLogin}>
-                                <Form.Label><h3>Iniciar Sesión</h3></Form.Label>
+                                <div className="justify-content-center d-flex"><div className="logo-sge"></div></div>
+                                
+                                <Form.Label><h3 className="title-login">Iniciar Sesión</h3></Form.Label>
                                 <Form.Control className="mb-2" type="text" name="username" value={this.state.username} onChange={this.handleChange} placeholder="Usuario" required />
                                 <Form.Control className="mb-2" type="password" name="password" value={this.state.password} onChange={this.handleChange} placeholder="Contraseña" required />
                                 <Button variant="primary" type="submit">Ingresar</Button>

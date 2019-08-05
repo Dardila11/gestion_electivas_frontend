@@ -257,6 +257,10 @@ footer {
   font-size: 200px;
 }
 
+.obligatorio {
+  color: red;
+}
+
 @media only screen and (max-width: 700px) {
   .modal-custom > .modal-dialog {
     max-width: 100%;
@@ -266,33 +270,6 @@ footer {
 
 
 
-.react-autosuggest__container {
-  position: relative;
-}
-
-.react-autosuggest__input {
-  width: 240px;
-  height: 30px;
-  padding: 10px 20px;
-  font-family: Helvetica, sans-serif;
-  font-weight: 300;
-  font-size: 16px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-}
-
-.react-autosuggest__input--focused {
-  outline: none;
-}
-
-.react-autosuggest__input--open {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.react-autosuggest__suggestions-container {
-  display: none;
-}
 
 .react-autosuggest__suggestions-container--open {
   display: block;
