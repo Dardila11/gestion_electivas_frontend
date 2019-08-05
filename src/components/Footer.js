@@ -9,7 +9,9 @@ export default class Footer extends Component {
             <div className="container-footer">
                     <footer className="d-flex row footer">
                         <div className="seccion-logo col-md-2">
-                            <div className="logo"></div>
+                            <a href="http://www.unicauca.edu.co/versionP/" target="_blank">
+                                <div className="logo"></div>
+                            </a>
                         </div>
                         <div className="seccion-footer pt-3 col-md-2">
                             <span className="negrilla d-block">Acerca de</span>
@@ -21,7 +23,7 @@ export default class Footer extends Component {
                         </div>
                         <div className="seccion-footer pt-3 col-md-2">
                             <span className="negrilla">Enlaces</span>
-                            <div className="facebook d-block"></div>
+                            <a href=""><div className="facebook d-block"></div></a>
                         </div>
                         <div className="seccion-footer pt-3 col-md-4">
                             <span className="negrilla">Contacto</span>

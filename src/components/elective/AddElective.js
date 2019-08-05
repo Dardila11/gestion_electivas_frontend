@@ -140,7 +140,7 @@ export default class createElective extends Component {
         event.preventDefault();
         var okCourse = false;
         var okSchedules = false;
-        if (this.state.elective !== -1) {
+        if (this.state.elective_id !== -1) {
             const semester = parseInt(localStorage.getItem("semester"));
             if (parseInt(this.state.priority) !== -1 || parseInt(this.state.professor) !== -1) {
                 if (Date.parse(this.state.voteDateFrom) <= Date.parse(this.state.voteDateTo)) {
