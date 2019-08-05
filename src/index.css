@@ -261,6 +261,12 @@ footer {
   color: red;
 }
 
+.testamento {
+  background-color: white;
+  width: 80%;
+  padding: 20px 20px 20px 20px;
+}
+
 @media only screen and (max-width: 700px) {
   .modal-custom > .modal-dialog {
     max-width: 100%;

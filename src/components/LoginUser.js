@@ -136,17 +136,27 @@ export default class LoginSecretary extends Component {
                         <header className="app-header">
                             <img src={logo} alt="logo" />
                         </header>
-                        <div className="caja">
-                            <Form onSubmit={this.onLogin}>
-                                <div className="justify-content-center d-flex"><div className="logo-sge"></div></div>
-                                
-                                <Form.Label><h3 className="title-login">Iniciar Sesión</h3></Form.Label>
-                                <Form.Control className="mb-2" type="text" name="username" value={this.state.username} onChange={this.handleChange} placeholder="Usuario" required />
-                                <Form.Control className="mb-2" type="password" name="password" value={this.state.password} onChange={this.handleChange} placeholder="Contraseña" required />
-                                <Button variant="primary" type="submit">Ingresar</Button>
-                            </Form>
+                        <div className="content-caja d-flex justify-content-center">
+                            <div className="caja">
+                                <Form onSubmit={this.onLogin}>
+                                    <div className="justify-content-center d-flex">
+                                        <div className="logo-sge"></div>
+                                    </div>
+                                    <span className="SGE">SGE</span><br />
+                                    <Form.Label className="mb-0"><h3 className="title-login mt-2">Iniciar Sesión</h3></Form.Label>
+                                    <Form.Control className="mb-2" type="text" name="username" value={this.state.username} onChange={this.handleChange} placeholder="Usuario" required />
+                                    <Form.Control className="mb-2" type="password" name="password" value={this.state.password} onChange={this.handleChange} placeholder="Contraseña" required />
+                                    <Button variant="primary" type="submit">Ingresar</Button>
+                                </Form>
+                            </div>
+                        </div>
+                        <div className="footer-login p-3">
+                            <span>2019 | División de las Tecnologías de la Información y las Comunicaciones</span><br />
+                            <span>Universidad del Cauca | sgeunicauca@gmail.com</span> <br />
+                            <span>Version 1.0</span>
                         </div>
                     </div>
+
                 </div>
                 <div className="no-login time">
                     <Alert variant="danger" show={this.state.show} onClose={handleDismiss} dismissible>
